@@ -10,7 +10,7 @@ html,body{
   background:var(--bg); color:var(--fg);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   font-size:16px; -webkit-font-smoothing:antialiased;
-  scroll-behavior:smooth;                    /* smooth scroll for [↑] */
+  scroll-behavior:smooth;
 }
 
 a, a:link, a:visited { color: var(--fg); text-decoration:none; }
