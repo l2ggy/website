@@ -1,8 +1,9 @@
 :root{
-  --bg: rgb(48,48,48);
-  --fg: blanchedalmond;
-  --border: rgba(255,255,255,0.10);
-  --muted: rgba(255,235,205,0.07);
+  /* lavender palette (minimal change) */
+  --bg: #2e2a3b;                             /* deep lavender-aubergine */
+  --fg: #efe9f7;                              /* soft lavender text */
+  --border: rgba(239,233,247,0.18);           /* lilac-tinted border */
+  --muted: rgba(239,233,247,0.10);            /* hover/focus wash */
 }
 
 html,body{
@@ -24,7 +25,7 @@ h1{font-size:34px;margin:6px 0 8px 0;text-align:center;cursor:pointer}
 #cursor{display:inline-block;margin-left:6px;opacity:1}
 .headline{text-align:center;margin:10px 0 18px 0;opacity:.96}
 
-.section{margin:18px 0;padding:12px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,0.02)}
+.section{margin:18px 0;padding:12px;border:1px solid var(--border);border-radius:8px;background:rgba(239,233,247,0.03)}
 .section h2{margin:0 0 8px 0;font-size:16px;letter-spacing:.5px}
 
 /* clear separation + better legibility */
@@ -39,7 +40,7 @@ h1{font-size:34px;margin:6px 0 8px 0;text-align:center;cursor:pointer}
   position:fixed; right:16px; bottom:16px;
   opacity:0; pointer-events:none; transition:opacity .2s ease;
   border:1px solid var(--border); border-radius:6px; padding:6px 8px;
-  background:rgba(255,255,255,0.02);
+  background:rgba(239,233,247,0.03);
 }
 #totop.show{ opacity:1; pointer-events:auto; }
 #totop:hover{ background:var(--muted); }
