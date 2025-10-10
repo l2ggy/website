@@ -1,28 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Hi I'm Boris</title>
-    <style>
-        /* Center the text both vertically and horizontally */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* Full viewport height */
-            margin: 0; /* Remove default margin */
-            background-color: #f0f0f0; /* Light gray background */
-            font-family: Arial, sans-serif; /* Font style */
-        }
-
-        /* Style the text */
-        .greeting {
-            font-size: 2em;
-            color: #333;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Boris Kafidov</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="greeting">Hi, I'm Boris -  test test test. Nicole was here!</div>
+<body id="top">
+  <header>
+    <nav>
+      <a href="https://www.linkedin.com/in/laggy" target="_blank" rel="noopener noreferrer">[linkedin]</a>
+      <a href="https://github.com/l2ggy" target="_blank" rel="noopener noreferrer">[github]</a>
+      <a href="resume.pdf" target="_blank" rel="noopener noreferrer">[resume]</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1 id="name"><span id="type"></span><span id="cursor">▮</span></h1>
+    <p class="headline">HBSc Computer Science &amp; Mathematics (AI focus) — aspiring SWE with interests in AI &amp; ML.</p>
+
+    <!-- Education -->
+    <section class="section" id="education">
+      <h2>[education]</h2>
+      <div class="item">
+        <div class="item-title">University of Toronto — HBSc, Computer Science &amp; Mathematics</div>
+        <div class="item-sub">Focus in Artificial Intelligence • 3.9 GPA in CS courses • Toronto, ON</div>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section class="section" id="experience">
+      <h2>[experience]</h2>
+
+      <div class="item">
+        <div class="item-title">Wheeler Lab — Instrumentation Software Developer (Work Study)</div>
+        <ul class="bullets">
+          <li>Python &amp; PySide6 GUIs for <span class="nowrap">DISCO</span> on Linux (data acquisition, device control, data handling).</li>
+          <li>Integrate new hardware; extend automation pipelines; prototype ML-assisted image analysis.</li>
+          <li>Refactor &amp; document codebase; standardize Git workflows and testing for reliability.</li>
+        </ul>
+      </div>
+
+      <div class="item">
+        <div class="item-title">University of Toronto Quantum Computing Club — Web Developer / Executive</div>
+        <ul class="bullets">
+          <li>Team of 2 building a new website for 650+ members; streamline event &amp; resource updates.</li>
+        </ul>
+      </div>
+
+      <div class="item">
+        <div class="item-title">Helmholtz Munich — Research Intern</div>
+        <ul class="bullets">
+          <li>Operated pco.edge 4.2 &amp; pco.camware for optoacoustic imaging / photothermal diagnostics research.</li>
+          <li>Wet-lab work with technicians; contributed to data acquisition &amp; sample prep for spectroscopy and laser systems.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="section" id="projects">
+      <h2>[projects]</h2>
+
+      <div class="item">
+        <div class="item-title">APA Site Choice Transformer — Toronto Bioinformatics Hackathon (2nd place)</div>
+        <ul class="bullets">
+          <li>Co-led a team of 5 (2nd of 23 projects; 116 contestants) — $500 award.</li>
+          <li>PyTorch + Hugging Face on A100 GPUs; custom loaders for &gt;800k labeled sequences (PolyASite 2.0, PolyA_DB, GENCODE).</li>
+          <li>Held-out: Acc 0.86 · AUROC 0.93 · AUPRC 0.94 · F1 0.86.</li>
+          <li>Managed GCP A100s; used AWS; Git LFS; diagnosed CUDA/Triton attention issues; stabilized training/inference.</li>
+        </ul>
+      </div>
+
+      <div class="item">
+        <div class="item-title">LeetTutor — AI Code-Review Micro-App</div>
+        <ul class="bullets">
+          <li>Analyzes 1,000+ LeetCode problems; targeted feedback in &lt;2s round-trip.</li>
+          <li>Groq qwen-32B via Cloudflare Function (serverless; secure API keys); client bundle &lt;30 KB.</li>
+          <li>Plain-JS UI with live status + output sanitization; 100/100 Lighthouse perf &amp; best-practice scores.</li>
+          <li>Wrangler + GitHub Actions: local emulation &amp; cloud deploys — every commit live in &lt;1 min.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section" id="contact">
+      <h2>[contact]</h2>
+      <p>Email: <span id="mail" class="linklike">b.kafidov [at] mail.utoronto[dot]ca</span></p>
+    </section>
+  </main>
+
+  <!-- Back to top -->
+  <a id="totop" href="#top" aria-label="Back to top">[↑]</a>
+
+  <script>
+    // typewriter + Easter egg (10 clicks toggles message)
+    (function(){
+      const nameEl = document.getElementById('name');
+      const text = "Boris Kafidov";
+      const alt = "Nicole was here";
+      const typeEl = document.getElementById('type');
+      const cur = document.getElementById('cursor');
+      let i = 0, clicks = 0, showingAlt = false;
+
+      const t = setInterval(()=> {
+        if (i <= text.length) typeEl.textContent = text.slice(0,i++);
+        else { clearInterval(t); setInterval(()=> cur.style.opacity = cur.style.opacity === '0' ? '1' : '0', 500); }
+      }, 70);
+
+      nameEl.addEventListener('click', () => {
+        clicks++;
+        if (clicks >= 10) {
+          showingAlt = !showingAlt;
+          typeEl.textContent = showingAlt ? alt : text;
+          clicks = 0;
+        }
+      });
+    })();
+
+    // back-to-top visibility
+    (function(){
+      const btn = document.getElementById('totop');
+      const onScroll = () => btn.classList.toggle('show', window.scrollY > 240);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
+
+    // email: reconstruct on click
+    (function(){
+      const el = document.getElementById('mail');
+      const u = 'b.kafidov', d = 'mail.utoronto.ca';
+      el.addEventListener('click', ()=> location.href = 'mailto:' + u + '@' + d);
+    })();
+  </script>
 </body>
 </html>
