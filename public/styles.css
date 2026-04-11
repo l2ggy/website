@@ -2,13 +2,88 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg-ink: #070b14;
+  --bg-deep: #0f1728;
+  --text-primary: #e8edf8;
+  --text-muted: #bfd0ee;
+  --panel-border: rgba(184, 212, 255, 0.22);
+  --panel-fill: rgba(20, 32, 54, 0.5);
+  --panel-shadow: 0 24px 56px rgba(0, 0, 0, 0.45);
+}
+
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(95, 121, 175, 0.12), transparent 40%),
+    radial-gradient(circle at 76% 8%, rgba(70, 91, 136, 0.1), transparent 44%),
+    repeating-linear-gradient(
+      -30deg,
+      rgba(255, 255, 255, 0.03) 0,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 11px
+    ),
+    linear-gradient(160deg, var(--bg-ink), var(--bg-deep));
 }
 
 .shell {
+  position: relative;
+  isolation: isolate;
   max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+  margin: clamp(2rem, 8vh, 4.5rem) auto;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid var(--panel-border);
+  border-radius: 24px;
+  background: linear-gradient(150deg, rgba(34, 50, 80, 0.6), var(--panel-fill));
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.shell::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  background: linear-gradient(
+    130deg,
+    transparent 34%,
+    rgba(255, 255, 255, 0.09) 47%,
+    rgba(255, 255, 255, 0.02) 55%,
+    transparent 68%
+  );
+  transform: translate3d(-22%, -18%, 0);
+  animation: glass-sweep 20s linear infinite;
+  z-index: 0;
+}
+
+.shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  margin-top: 0;
+  letter-spacing: 0.01em;
+}
+
+p {
+  color: var(--text-muted);
+}
+
+a {
+  color: #d8e8ff;
+}
+
+@keyframes glass-sweep {
+  from {
+    transform: translate3d(-24%, -20%, 0);
+  }
+  to {
+    transform: translate3d(26%, 22%, 0);
+  }
 }
