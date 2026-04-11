@@ -1,14 +1,61 @@
+:root {
+  color-scheme: dark;
+  --bg-base: #090909;
+  --text-primary: #f2f2f2;
+  --text-muted: #bdbdbd;
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-bg: rgba(0, 0, 0, 0.35);
+}
+
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  min-height: 100%;
+}
+
+body {
+  position: relative;
+  overflow-x: hidden;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.dot-matrix-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .shell {
   max-width: 640px;
-  margin: 4rem auto;
+  margin: clamp(3rem, 8vh, 5rem) auto;
   padding: 0 1rem;
+}
+
+.card {
+  padding: 1.25rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  background: var(--surface-bg);
+  backdrop-filter: blur(2px);
+}
+
+h1 {
+  margin-top: 0;
+}
+
+p {
+  color: var(--text-muted);
+}
+
+a {
+  color: var(--text-primary);
 }
