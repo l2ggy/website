@@ -1,14 +1,99 @@
-* {
-  box-sizing: border-box;
+:root {
+  --bg: #1f1d1a;
+  --panel: #26231f;
+  --text: #ece4d7;
+  --muted: #b6ab9a;
+  --line: #3a352f;
 }
 
+html[data-theme="light"] {
+  --bg: #f4efe6;
+  --panel: #ede6da;
+  --text: #292521;
+  --muted: #6a6258;
+  --line: #d8cebf;
+}
+
+* { box-sizing: border-box; }
+
+html,
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 18px/1.75 "Lora", Georgia, serif;
+  transition: background-color .35s ease, color .35s ease;
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+.bar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .85rem 1rem;
+  border-color: var(--line);
+  background: color-mix(in oklab, var(--bg) 92%, transparent);
+  backdrop-filter: blur(4px);
 }
+
+.top { top: 0; border-bottom: 1px solid var(--line); }
+.bottom { bottom: 0; border-top: 1px solid var(--line); }
+
+.page {
+  width: min(640px, calc(100% - 2rem));
+  margin: 4.75rem auto 4.9rem;
+}
+
+.intro {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin: 0 0 1.5rem;
+}
+
+.avatar {
+  width: 72px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  font-size: .72rem;
+}
+
+h1 { margin: .2rem 0 0; font-size: clamp(1.45rem, 3vw, 2rem); line-height: 1.25; }
+p { margin: 0 0 1rem; }
+.kicker { margin: 0; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+
+.brand,
+.link,
+summary {
+  color: var(--text);
+  text-decoration: none;
+  font: inherit;
+}
+
+.link,
+summary { opacity: .78; transition: opacity .2s ease; }
+.link:hover,
+summary:hover { opacity: 1; }
+
+button.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+details {
+  border-top: 1px solid var(--line);
+  padding: .7rem 0;
+}
+
+small { color: var(--muted); }

@@ -1,17 +1,52 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Placeholder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <nav class="bar top" aria-label="Primary">
+      <a href="#" class="brand">Your Name</a>
+      <button id="theme-toggle" class="link" type="button" aria-label="Toggle theme">Theme</button>
+    </nav>
+
+    <main class="page" aria-label="Portfolio placeholders">
+      <header class="intro">
+        <div class="avatar" aria-hidden="true">Photo</div>
+        <div>
+          <p class="kicker">Portfolio placeholder</p>
+          <h1>A calm, minimal space for your future work.</h1>
+        </div>
+      </header>
+
+      <p>
+        This area is intentionally empty and styled like long-form writing. Add a short introduction,
+        current focus, or recent work notes here.
+      </p>
+
+      <details>
+        <summary>Selected work placeholder</summary>
+        <p>Project notes, links, and lightweight case study text.</p>
+      </details>
+
+      <details>
+        <summary>About placeholder</summary>
+        <p>Brief background, process, and contact details.</p>
+      </details>
     </main>
+
+    <footer class="bar bottom" aria-label="Status">
+      <small>Available for collaboration · Placeholder footer</small>
+      <a href="#" class="link">Contact</a>
+    </footer>
 
     <script src="script.js"></script>
   </body>
