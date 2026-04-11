@@ -3,15 +3,48 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Placeholder</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="bar top">
+      <a href="#" class="brand">Your Name</a>
+      <nav aria-label="Primary">
+        <a href="#">Work</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </nav>
+      <button id="theme-toggle" aria-label="Toggle theme">Theme</button>
+    </header>
+
+    <main class="page">
+      <section class="intro">
+        <div class="avatar" aria-hidden="true">Photo</div>
+        <div>
+          <p class="kicker">Portfolio Placeholder</p>
+          <h1>Quiet, thoughtful work presented with clarity.</h1>
+        </div>
+      </section>
+
+      <p>
+        This is placeholder copy for your future projects, writing, and case studies. Keep it personal, calm,
+        and concise. <a href="#">Inline links</a> stay understated and readable.
+      </p>
+
+      <details>
+        <summary>Selected work placeholder</summary>
+        <p>Project list, context, and outcomes go here.</p>
+      </details>
+
+      <details>
+        <summary>Notes placeholder</summary>
+        <p>Long-form writing or ideas can live here.</p>
+      </details>
     </main>
+
+    <footer class="bar bottom">
+      <p>Status: Available for selected collaborations.</p>
+    </footer>
 
     <script src="script.js"></script>
   </body>

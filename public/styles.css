@@ -1,14 +1,160 @@
+:root {
+  --bg: #f2ede4;
+  --surface: #f7f2e9;
+  --text: #2c2a28;
+  --muted: #6f675f;
+  --line: #d8d0c6;
+}
+
+body.dark {
+  --bg: #1d1b19;
+  --surface: #23211f;
+  --text: #ece6dc;
+  --muted: #b0a89f;
+  --line: #3b3733;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 1.04rem/1.85 Lora, Georgia, serif;
+  transition: background-color 240ms ease, color 240ms ease;
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.top {
+  top: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.bottom {
+  bottom: 0;
+  border-top: 1px solid var(--line);
+}
+
+nav {
+  display: flex;
+  gap: 0.9rem;
+}
+
+a,
+button,
+summary {
+  color: inherit;
+  font: inherit;
+}
+
+a {
+  text-underline-offset: 0.14em;
+}
+
+button {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.2rem 0.55rem;
+  cursor: pointer;
+}
+
+.page {
+  width: min(43rem, calc(100% - 2.2rem));
+  margin: 0 auto;
+  padding: 6.2rem 0 4.8rem;
+}
+
+.intro {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  width: 4.2rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.kicker {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.55rem, 4vw, 2.35rem);
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+p {
+  margin: 0 0 1.2rem;
+}
+
+details {
+  border-top: 1px solid var(--line);
+  padding: 0.8rem 0;
+}
+
+details p {
+  margin: 0.65rem 0 0;
+  color: var(--muted);
+}
+
+summary {
+  cursor: pointer;
+}
+
+nav a,
+.brand,
+.bottom p,
+button {
+  opacity: 0.86;
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
+nav a:hover,
+.brand:hover,
+button:hover,
+a:hover {
+  opacity: 1;
+}
+
+.bottom p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 700px) {
+  .top {
+    flex-wrap: wrap;
+  }
 }
