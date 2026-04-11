@@ -2,13 +2,55 @@
   box-sizing: border-box;
 }
 
+:root {
+  color-scheme: dark;
+}
+
 body {
+  position: relative;
+  min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
   font-family: system-ui, sans-serif;
+  color: #ebebeb;
+  background: linear-gradient(145deg, #313131 0%, #1a1a1a 58%, #090909 100%);
+  background-size: 106% 106%;
+  animation: shell-gradient-shift 70s ease-in-out infinite alternate;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.16) 0.45px, transparent 0.8px),
+    radial-gradient(circle at 80% 65%, rgba(255, 255, 255, 0.13) 0.4px, transparent 0.8px);
+  background-size: 3px 3px, 4px 4px;
+  mix-blend-mode: soft-light;
 }
 
 .shell {
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+a {
+  color: #f7f7f7;
+}
+
+@keyframes shell-gradient-shift {
+  0% {
+    background-position: 50% 50%;
+  }
+
+  50% {
+    background-position: 48% 52%;
+  }
+
+  100% {
+    background-position: 52% 48%;
+  }
 }
