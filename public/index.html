@@ -3,16 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="bar top">
+      <a class="brand" href="#">Your Name</a>
+      <nav aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="about">
+        <p class="kicker">Portfolio — Placeholder</p>
+        <h1>Quietly building thoughtful work.</h1>
+        <p>Short intro placeholder. Add your voice here when ready.</p>
+      </section>
+
+      <section class="placeholder" id="work" aria-label="Selected Work Placeholder"></section>
     </main>
 
-    <script src="script.js"></script>
+    <footer class="bar bottom" id="contact">
+      <small>© Your Name</small>
+      <a href="mailto:hello@example.com">hello@example.com</a>
+    </footer>
   </body>
 </html>
