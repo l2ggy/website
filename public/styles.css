@@ -5,10 +5,59 @@
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  position: relative;
+  background: #090b10;
+  color: #e7eaf1;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+body::before {
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(170, 178, 191, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(170, 178, 191, 0.08) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+body::after {
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(190, 208, 255, 0.07) 46%,
+    rgba(190, 208, 255, 0.12) 50%,
+    rgba(190, 208, 255, 0.07) 54%,
+    transparent 100%
+  );
+  transform: translateY(-55vh);
+  animation: scan-band 18s linear infinite;
 }
 
 .shell {
+  position: relative;
+  z-index: 1;
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+a {
+  color: #c7d9ff;
+}
+
+@keyframes scan-band {
+  from {
+    transform: translateY(-55vh);
+  }
+  to {
+    transform: translateY(55vh);
+  }
 }
