@@ -1,14 +1,96 @@
+:root {
+  --bg: #111214;
+  --surface: #17191d;
+  --text: #eceff1;
+  --muted: #a2a8af;
+  --line: #252932;
+  --max: 760px;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  font: 400 16px/1.6 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.bar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: color-mix(in oklab, var(--bg), black 8%);
+  border-color: var(--line);
+}
+
+.top {
+  top: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.bottom {
+  bottom: 0;
+  border-top: 1px solid var(--line);
+}
+
+.brand,
+h1,
+h2 {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+main {
+  width: min(100% - 2.5rem, var(--max));
+  margin: 0 auto;
+  padding: 7rem 0 5.75rem;
+}
+
+.hero,
+.placeholder {
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow,
+small,
+.placeholder p {
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.75rem, 5vw, 2.4rem);
+  line-height: 1.2;
+}
+
+h2,
+p {
+  margin: 0;
+}
+
+h2 {
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
 }

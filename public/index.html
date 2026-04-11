@@ -3,16 +3,48 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="bar top">
+      <a class="brand" href="#">Your Name</a>
+      <nav aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <p class="eyebrow">Portfolio</p>
+        <h1 id="hero-title">A calm, modern personal space.</h1>
+        <p>
+          Placeholder intro text. Add your story, current focus, and what you
+          care about building.
+        </p>
+      </section>
+
+      <section id="about" class="placeholder">
+        <h2>About</h2>
+        <p>Placeholder for a short bio and values.</p>
+      </section>
+
+      <section id="work" class="placeholder">
+        <h2>Selected Work</h2>
+        <p>Placeholder for projects, writing, and experiments.</p>
+      </section>
+
+      <section id="contact" class="placeholder">
+        <h2>Contact</h2>
+        <p>Placeholder for email and social links.</p>
+      </section>
     </main>
 
-    <script src="script.js"></script>
+    <footer class="bar bottom">
+      <small>© 2026 Your Name</small>
+      <small>Built with intention.</small>
+    </footer>
   </body>
 </html>
