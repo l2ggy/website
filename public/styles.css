@@ -3,12 +3,52 @@
 }
 
 body {
+  position: relative;
   margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: linear-gradient(140deg, #2f2f2f 0%, #1a1a1a 55%, #090909 100%);
+  background-size: 105% 105%;
+  animation: drift-gradient 90s ease-in-out infinite alternate;
+  color: #f2f2f2;
   font-family: system-ui, sans-serif;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.085;
+  z-index: 0;
+  background-image: radial-gradient(circle at 20% 20%, #ffffff 0.6px, transparent 0.8px);
+  background-size: 3px 3px;
+  mix-blend-mode: soft-light;
+}
+
 .shell {
+  position: relative;
+  z-index: 1;
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+h1,
+p,
+a {
+  color: inherit;
+}
+
+a {
+  text-decoration-color: rgba(242, 242, 242, 0.7);
+}
+
+@keyframes drift-gradient {
+  0% {
+    background-position: 48% 50%;
+  }
+  100% {
+    background-position: 52% 50%;
+  }
 }
