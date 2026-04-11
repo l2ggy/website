@@ -1,1 +1,1 @@
-// Minimal JS shell.
+// Intentionally blank for now.

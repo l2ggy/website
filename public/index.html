@@ -3,16 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="bar top">
+      <nav class="frame" aria-label="Main navigation">
+        <a class="brand" href="#">Your Name</a>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#work">Work</a></li>
+          <li><a href="#writing">Writing</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="frame content">
+      <section class="hero" id="about">
+        <p class="eyebrow">Portfolio</p>
+        <h1>Quietly building thoughtful things.</h1>
+        <p>
+          A calm, minimal space for projects, notes, and ideas. Content coming
+          soon.
+        </p>
+      </section>
+
+      <section class="placeholder" id="work">
+        <h2>Selected Work</h2>
+        <p>Project placeholders.</p>
+      </section>
+
+      <section class="placeholder" id="writing">
+        <h2>Writing</h2>
+        <p>Essay and note placeholders.</p>
+      </section>
+
+      <section class="placeholder" id="contact">
+        <h2>Contact</h2>
+        <p>Contact placeholder.</p>
+      </section>
     </main>
 
-    <script src="script.js"></script>
+    <footer class="bar bottom">
+      <div class="frame footer-inner">
+        <span>© 2026</span>
+        <a href="resume.pdf">Resume</a>
+      </div>
+    </footer>
   </body>
 </html>
