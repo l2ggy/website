@@ -1,3 +1,11 @@
+:root {
+  --bg-base: #f3f3f3;
+  --text-main: #141414;
+  --panel: rgba(255, 255, 255, 0.72);
+  --ribbon-soft: rgba(130, 130, 130, 0.18);
+  --ribbon-deep: rgba(55, 55, 55, 0.14);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -5,10 +13,68 @@
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  color: var(--text-main);
+  background: var(--bg-base);
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: -22%;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(82px);
+  transform: translate3d(0, 0, 0);
+}
+
+body::before {
+  background:
+    linear-gradient(115deg, transparent 18%, var(--ribbon-soft) 32%, transparent 46%),
+    linear-gradient(145deg, transparent 38%, var(--ribbon-deep) 54%, transparent 70%),
+    linear-gradient(80deg, transparent 58%, rgba(20, 20, 20, 0.08) 72%, transparent 86%);
+  animation: ribbon-drift-a 52s ease-in-out infinite alternate;
+  opacity: 0.85;
+}
+
+body::after {
+  background:
+    linear-gradient(132deg, transparent 8%, rgba(160, 160, 160, 0.16) 24%, transparent 40%),
+    linear-gradient(64deg, transparent 48%, rgba(45, 45, 45, 0.12) 63%, transparent 78%);
+  animation: ribbon-drift-b 68s ease-in-out infinite alternate;
+  opacity: 0.7;
+}
+
+@keyframes ribbon-drift-a {
+  0% {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(2%, 2%, 0) scale(1.04);
+  }
+}
+
+@keyframes ribbon-drift-b {
+  0% {
+    transform: translate3d(2%, -2%, 0) scale(1.02);
+  }
+  100% {
+    transform: translate3d(-2%, 2%, 0) scale(1.06);
+  }
 }
 
 .shell {
   max-width: 640px;
   margin: 4rem auto;
-  padding: 0 1rem;
+  padding: 1.25rem;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid rgba(20, 20, 20, 0.08);
+}
+
+.shell a {
+  color: inherit;
 }
