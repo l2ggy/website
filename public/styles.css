@@ -1,14 +1,107 @@
+:root {
+  --bg-base: #090909;
+  --bg-dot: rgba(225, 225, 225, 0.24);
+  --bg-dot-soft: rgba(225, 225, 225, 0.1);
+  --dot-gap: 20px;
+  --mx: 50%;
+  --my: 50%;
+  --density-boost: 0;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: system-ui, sans-serif;
+  color: #efefef;
+  background: var(--bg-base);
+  position: relative;
+  isolation: isolate;
+}
+
+.matrix-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+.matrix-background::before,
+.matrix-background::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+}
+
+.matrix-background::before {
+  background-image: radial-gradient(circle, var(--bg-dot) 1.1px, transparent 1.6px);
+  background-size: var(--dot-gap) var(--dot-gap);
+  background-position: 0 0;
+  opacity: calc(0.58 + var(--density-boost) * 0.2);
+  animation: matrix-drift 26s linear infinite;
+  will-change: background-position, opacity;
+}
+
+.matrix-background::after {
+  background-image:
+    radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, 0.11), transparent 44%),
+    repeating-radial-gradient(
+      circle at var(--mx) var(--my),
+      rgba(255, 255, 255, 0.09) 0 2px,
+      transparent 2px 42px
+    ),
+    radial-gradient(circle, var(--bg-dot-soft) 0.9px, transparent 1.5px);
+  background-size: 100% 100%, 100% 100%, calc(var(--dot-gap) * 1.2) calc(var(--dot-gap) * 1.2);
+  background-position: center;
+  opacity: calc(0.18 + var(--density-boost) * 0.08);
+  animation: matrix-ripple 18s ease-in-out infinite;
+  will-change: opacity, transform;
 }
 
 .shell {
   max-width: 640px;
-  margin: 4rem auto;
+  margin: clamp(2rem, 8vw, 5rem) auto;
   padding: 0 1rem;
+}
+
+@keyframes matrix-drift {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 10px 18px;
+  }
+  100% {
+    background-position: 0 36px;
+  }
+}
+
+@keyframes matrix-ripple {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: calc(0.14 + var(--density-boost) * 0.08);
+  }
+  50% {
+    transform: scale(1.018);
+    opacity: calc(0.2 + var(--density-boost) * 0.08);
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --dot-gap: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .matrix-background::before,
+  .matrix-background::after {
+    animation: none;
+  }
 }
