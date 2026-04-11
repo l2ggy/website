@@ -3,15 +3,49 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Placeholder</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="site-header">
+      <a class="brand" href="#">Your Name</a>
+      <nav aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="#about">About</a></li>
+          <li><a href="#work">Work</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="about" aria-labelledby="hero-title">
+        <p class="kicker">Portfolio</p>
+        <h1 id="hero-title">Clean, modern portfolio coming soon.</h1>
+        <p class="hero-copy">Replace this with your short personal intro.</p>
+      </section>
+
+      <section class="placeholder-grid" id="work" aria-label="Work placeholders">
+        <article class="placeholder-card">
+          <p class="placeholder-label">Project Placeholder 01</p>
+        </article>
+        <article class="placeholder-card">
+          <p class="placeholder-label">Project Placeholder 02</p>
+        </article>
+        <article class="placeholder-card">
+          <p class="placeholder-label">Project Placeholder 03</p>
+        </article>
+      </section>
+
+      <section class="contact-placeholder" id="contact" aria-label="Contact placeholder">
+        <p class="placeholder-label">Contact Placeholder</p>
+      </section>
     </main>
+
+    <footer class="site-footer">
+      <p>© <span id="year"></span> Your Name</p>
+      <a href="resume.pdf">Resume</a>
+    </footer>
 
     <script src="script.js"></script>
   </body>
