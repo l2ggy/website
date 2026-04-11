@@ -5,6 +5,44 @@
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  color: #f2f2f2;
+  background: linear-gradient(145deg, #2a2a2a, #0f0f0f 55%, #050505);
+  background-size: 105% 105%;
+  animation: bg-shift 40s ease-in-out infinite alternate;
+  position: relative;
+  isolation: isolate;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+  background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.28), transparent 40%);
+  background-size: 3px 3px, 4px 4px;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+a {
+  color: #d8d8d8;
+}
+
+@keyframes bg-shift {
+  0% {
+    background-position: 48% 50%;
+  }
+  100% {
+    background-position: 52% 50%;
+  }
 }
 
 .shell {
