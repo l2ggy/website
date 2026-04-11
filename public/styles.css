@@ -2,13 +2,84 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  min-height: 100%;
+}
+
+body {
+  position: relative;
+  color: #17181a;
+  background: #eceef1;
+  isolation: isolate;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: -18vmax;
+  pointer-events: none;
+  z-index: -2;
+}
+
+body::before {
+  background:
+    radial-gradient(95vmax 52vmax at 14% 28%, rgba(16, 17, 19, 0.18), rgba(16, 17, 19, 0) 68%),
+    radial-gradient(94vmax 48vmax at 76% 18%, rgba(53, 55, 61, 0.18), rgba(53, 55, 61, 0) 70%),
+    radial-gradient(88vmax 52vmax at 36% 78%, rgba(88, 91, 101, 0.16), rgba(88, 91, 101, 0) 72%),
+    radial-gradient(86vmax 46vmax at 88% 84%, rgba(136, 140, 151, 0.12), rgba(136, 140, 151, 0) 76%);
+  filter: blur(56px) saturate(82%);
+  opacity: 0.82;
+  transform-origin: 50% 50%;
+  animation: ribbonDrift 44s ease-in-out infinite alternate;
+}
+
+body::after {
+  background:
+    radial-gradient(50vmax 30vmax at 24% 42%, rgba(154, 124, 186, 0.1), rgba(154, 124, 186, 0) 70%),
+    radial-gradient(96vmax 58vmax at 65% 65%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 74%);
+  filter: blur(82px);
+  opacity: 0.15;
+  z-index: -1;
+  animation: accentPulse 68s ease-in-out infinite;
 }
 
 .shell {
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+  position: relative;
+}
+
+@keyframes ribbonDrift {
+  0% {
+    transform: translate3d(-2%, -1.5%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(1.2%, 1.4%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(2%, -1.2%, 0) scale(1.02);
+  }
+}
+
+@keyframes accentPulse {
+  0%,
+  86%,
+  100% {
+    opacity: 0.07;
+  }
+  92% {
+    opacity: 0.15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+  }
 }
