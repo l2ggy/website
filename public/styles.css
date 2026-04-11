@@ -2,13 +2,113 @@
   box-sizing: border-box;
 }
 
+:root {
+  --mesh-x: 0px;
+  --mesh-y: 0px;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: system-ui, sans-serif;
+  color: #111;
+  background: #f6f6f6;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.mesh {
+  position: fixed;
+  inset: -18vh -10vw;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.mesh__blob {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.38), rgba(36, 36, 36, 0.2));
+  filter: blur(72px);
+  opacity: 0.4;
+  transform: translate(
+      calc(var(--mesh-x) * var(--mesh-factor-x, 1)),
+      calc(var(--mesh-y) * var(--mesh-factor-y, 1))
+    )
+    scale(var(--mesh-scale, 1));
+  will-change: transform;
+}
+
+.mesh__blob--1 {
+  width: 44vw;
+  max-width: 460px;
+  aspect-ratio: 1.12;
+  left: 2%;
+  top: -2%;
+  --mesh-factor-x: -0.75;
+  --mesh-factor-y: -0.5;
+}
+
+.mesh__blob--2 {
+  width: 50vw;
+  max-width: 520px;
+  aspect-ratio: 1;
+  right: -4%;
+  top: 8%;
+  --mesh-factor-x: 0.65;
+  --mesh-factor-y: -0.65;
+}
+
+.mesh__blob--3 {
+  width: 48vw;
+  max-width: 500px;
+  aspect-ratio: 1.2;
+  left: 16%;
+  bottom: -20%;
+  --mesh-factor-x: -0.45;
+  --mesh-factor-y: 0.75;
+}
+
+.mesh__blob--4 {
+  width: 42vw;
+  max-width: 420px;
+  aspect-ratio: 1;
+  right: 6%;
+  bottom: -24%;
+  --mesh-factor-x: 0.5;
+  --mesh-factor-y: 0.7;
 }
 
 .shell {
+  position: relative;
+  z-index: 1;
   max-width: 640px;
   margin: 4rem auto;
-  padding: 0 1rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: rgba(246, 246, 246, 0.76);
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+  .mesh {
+    inset: -15vh -28vw;
+  }
+
+  .mesh__blob {
+    filter: blur(64px);
+    opacity: 0.35;
+  }
+
+  .shell {
+    margin: 3rem auto;
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh__blob {
+    transition: none;
+    transform: scale(var(--mesh-scale, 1));
+  }
 }
