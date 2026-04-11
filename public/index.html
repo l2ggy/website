@@ -3,16 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="bar top-bar">
+      <a class="brand" href="#">Your Name</a>
+      <nav aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#notes">Notes</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <p class="label">Portfolio</p>
+        <h1 id="hero-title">Placeholder headline for your future work.</h1>
+        <p class="muted">A quiet place for projects, writing, and who you are.</p>
+      </section>
     </main>
 
-    <script src="script.js"></script>
+    <footer class="bar bottom-bar">
+      <small>© 2026 · Placeholder</small>
+      <small>Built with intention.</small>
+    </footer>
   </body>
 </html>
