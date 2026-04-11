@@ -2,13 +2,80 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg: #090b10;
+  --fg: #e7ebf3;
+  --grid-line: rgba(165, 178, 205, 0.12);
+  --scan-core: rgba(125, 168, 255, 0.16);
+  --scan-soft: rgba(125, 168, 255, 0.08);
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
   font-family: system-ui, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 35px,
+      var(--grid-line) 35px,
+      var(--grid-line) 36px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 35px,
+      var(--grid-line) 35px,
+      var(--grid-line) 36px
+    );
+}
+
+body::after {
+  transform: translateY(-130%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 42%,
+    var(--scan-soft) 47%,
+    var(--scan-core) 50%,
+    var(--scan-soft) 53%,
+    transparent 58%,
+    transparent 100%
+  );
+  animation: scan-band 22s linear infinite;
 }
 
 .shell {
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+@keyframes scan-band {
+  to {
+    transform: translateY(130%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after {
+    animation: none;
+  }
 }
