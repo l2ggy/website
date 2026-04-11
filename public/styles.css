@@ -1,14 +1,76 @@
+:root {
+  --bg: #121212;
+  --text: #e6e6e6;
+  --muted: #9a9a9a;
+  --space: 0.75rem;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  font: 400 16px/1.5 Inter, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+header,
+footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  padding: var(--space);
+}
+
+header {
+  top: 0;
+}
+
+footer {
+  bottom: 0;
+}
+
+nav {
+  display: flex;
+  gap: var(--space);
+  color: var(--muted);
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: calc(var(--space) * 6) var(--space) calc(var(--space) * 5);
+}
+
+section {
+  margin: 0;
+}
+
+section + section {
+  margin-top: calc(var(--space) * 2);
+}
+
+p,
+h1 {
+  margin: 0;
+}
+
+h1 {
+  margin: var(--space) 0;
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+main p,
+footer {
+  color: var(--muted);
 }
