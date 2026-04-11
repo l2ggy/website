@@ -1,14 +1,97 @@
+:root {
+  color-scheme: dark;
+  --bg: #151515;
+  --surface: #1c1c1c;
+  --text: #ececec;
+  --muted: #9f9f9f;
+  --line: #2f2f2f;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font: 400 16px/1.6 Inter, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.layout {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.bar {
+  position: sticky;
+  z-index: 1;
+  background: color-mix(in oklab, var(--bg) 90%, black);
+  backdrop-filter: blur(6px);
+  border-color: var(--line);
+  padding: 1rem clamp(1rem, 3vw, 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+header.bar {
+  top: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+footer.bar {
+  bottom: 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.brand,
+.kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+main {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: clamp(2rem, 8vh, 6rem) clamp(1rem, 3vw, 2rem);
+}
+
+.hero h1 {
+  margin: 0.7rem 0;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.1;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--muted);
+}
+
+.placeholder {
+  margin-top: 2.5rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 1rem;
+  color: var(--muted);
 }
