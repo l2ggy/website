@@ -2,13 +2,80 @@
   box-sizing: border-box;
 }
 
+:root {
+  --mesh-motion: 1;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: #111;
+  background: #f7f7f7;
   font-family: system-ui, sans-serif;
 }
 
+.mesh {
+  position: fixed;
+  inset: -12vmax;
+  z-index: -1;
+  overflow: hidden;
+  filter: blur(36px);
+  opacity: 0.44;
+  pointer-events: none;
+}
+
+.mesh__blob {
+  position: absolute;
+  width: clamp(16rem, 26vw, 34rem);
+  height: clamp(16rem, 26vw, 34rem);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #f2f2f2 0%, #8a8a8a 72%, #676767 100%);
+  transform: translate3d(
+      calc(var(--tx, 0px) * var(--mesh-motion)),
+      calc(var(--ty, 0px) * var(--mesh-motion)),
+      0
+    )
+    scale(var(--scale, 1));
+}
+
+.blob-a {
+  top: 6%;
+  left: 8%;
+  --scale: 1.06;
+}
+
+.blob-b {
+  top: 52%;
+  left: 14%;
+  --scale: 1.18;
+}
+
+.blob-c {
+  top: 12%;
+  right: 8%;
+  --scale: 1;
+}
+
+.blob-d {
+  top: 56%;
+  right: 12%;
+  --scale: 1.1;
+}
+
 .shell {
+  position: relative;
   max-width: 640px;
   margin: 4rem auto;
-  padding: 0 1rem;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mesh-motion: 0;
+  }
 }
