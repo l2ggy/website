@@ -2,9 +2,79 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg-base: #090b12;
+  --text-color: #f2f5ff;
+  --particle-color-rgb: 205, 220, 255;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: system-ui, sans-serif;
+  color: var(--text-color);
+  background: var(--bg-base);
+}
+
+#particle-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle-group {
+  position: absolute;
+  inset: 0;
+}
+
+.particle-group--far {
+  --drift-x: 5px;
+  --drift-y: -12px;
+}
+
+.particle-group--near {
+  --drift-x: 10px;
+  --drift-y: -24px;
+}
+
+.particle {
+  position: absolute;
+  width: var(--size, 3px);
+  height: var(--size, 3px);
+  border-radius: 50%;
+  background: rgba(var(--particle-color-rgb), var(--opacity, 0.18));
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  animation: float var(--duration, 24s) ease-in-out infinite alternate;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes float {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(var(--drift-x), var(--drift-y), 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particle {
+    animation-duration: 120s;
+    animation-iteration-count: 1;
+  }
+
+  .particle-group--far {
+    --drift-x: 1px;
+    --drift-y: -2px;
+  }
+
+  .particle-group--near {
+    --drift-x: 2px;
+    --drift-y: -4px;
+  }
 }
 
 .shell {
