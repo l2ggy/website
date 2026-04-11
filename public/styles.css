@@ -5,10 +5,49 @@
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  min-height: 100vh;
+  color: #ececec;
+  background:
+    radial-gradient(120% 120% at 20% 15%, #2f2f2f 0%, #161616 55%, #080808 100%);
+  background-size: 108% 108%;
+  animation: drift-gradient 90s ease-in-out infinite alternate;
+  position: relative;
+  overflow-x: hidden;
 }
 
 .shell {
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.06;
+  background-image:
+    repeating-radial-gradient(circle at 0 0, #fff 0 1px, transparent 1px 2px),
+    repeating-radial-gradient(circle at 12px 12px, #fff 0 1px, transparent 1px 2px);
+  background-size: 24px 24px;
+}
+
+a {
+  color: #f2f2f2;
+}
+
+@keyframes drift-gradient {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 1.5% 1%;
+  }
+  100% {
+    background-position: -1% 1.5%;
+  }
 }
