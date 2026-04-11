@@ -3,16 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Placeholder</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="site-header">
+      <a class="brand" href="#">YOUR NAME</a>
+      <nav aria-label="Primary navigation">
+        <ul class="nav-list">
+          <li><a href="#">Work</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="content" aria-label="Portfolio placeholders">
+      <section class="hero placeholder">
+        <p class="label">Header Placeholder</p>
+        <h1>Portfolio Headline</h1>
+        <p>Add your intro statement here.</p>
+      </section>
+
+      <section class="placeholder-grid" aria-label="Project placeholders">
+        <article class="placeholder card"><p class="label">Project 01</p></article>
+        <article class="placeholder card"><p class="label">Project 02</p></article>
+        <article class="placeholder card"><p class="label">Project 03</p></article>
+      </section>
     </main>
 
-    <script src="script.js"></script>
+    <footer class="site-footer">
+      <p>Footer Placeholder · © Your Name</p>
+    </footer>
   </body>
 </html>
