@@ -1,43 +1,62 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portfolio Placeholder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="site-frame">
-      <nav class="top-nav" aria-label="Primary navigation">
-        <a class="brand" href="#">Your Name</a>
-        <ul>
-          <li><a href="#">Work</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-      </nav>
+    <nav class="frame top" aria-label="Primary navigation">
+      <a href="#" class="brand">Your Name</a>
+      <div class="nav-links">
+        <a href="#">Work</a>
+        <a href="#">Writing</a>
+        <a href="#">Contact</a>
+        <button id="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+      </div>
+    </nav>
 
-      <header class="hero" aria-labelledby="hero-title">
-        <p class="eyebrow">Portfolio</p>
-        <h1 id="hero-title">A clean, modern space for your future work.</h1>
-        <p class="placeholder">Header placeholder — intro copy goes here.</p>
+    <main class="column">
+      <header class="intro">
+        <div class="portrait" aria-hidden="true">Photo</div>
+        <div>
+          <h1>Quiet portfolio, clean placeholders.</h1>
+          <p>
+            This is an empty starter page for selected work, notes, and a short bio.
+            <a href="#">Replace this line with your intro</a> when ready.
+          </p>
+        </div>
       </header>
 
-      <main class="content" aria-label="Content placeholders">
-        <section class="card">
-          <h2>Featured Project Placeholder</h2>
-          <p>Add your first case study here.</p>
-        </section>
-        <section class="card">
-          <h2>About Placeholder</h2>
-          <p>Short bio and experience snapshot.</p>
-        </section>
-      </main>
+      <section>
+        <p>
+          Placeholder body copy. Keep this area editorial: thoughtful spacing, simple words,
+          and a calm reading rhythm.
+        </p>
+      </section>
 
-      <footer class="footer">
-        <p>Footer placeholder — © Your Name</p>
-      </footer>
-    </div>
+      <details>
+        <summary>Selected work placeholder</summary>
+        <p>Project list goes here.</p>
+      </details>
+
+      <details>
+        <summary>About placeholder</summary>
+        <p>Short bio goes here.</p>
+      </details>
+    </main>
+
+    <footer class="frame bottom">
+      <span>Status: available for commissions</span>
+      <span>© Your Name</span>
+    </footer>
 
     <script src="script.js"></script>
   </body>

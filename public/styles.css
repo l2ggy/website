@@ -1,140 +1,139 @@
 :root {
-  --bg: #171717;
-  --surface: #1f1f1f;
-  --surface-soft: #242424;
-  --text: #f2f2f2;
-  --text-muted: #a0a0a0;
-  --line: #343434;
+  --bg: #1e1e1c;
+  --surface: #232321;
+  --text: #ece7de;
+  --muted: #bdb6ac;
+  --line: #373733;
+}
+
+html[data-theme="light"] {
+  --bg: #f3eee4;
+  --surface: #f8f3ea;
+  --text: #232220;
+  --muted: #5e5a54;
+  --line: #d7d0c4;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html,
 body {
   margin: 0;
-  min-height: 100%;
-  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
+  font: 400 1.05rem/1.75 "Lora", Georgia, serif;
+  transition: background-color 220ms ease, color 220ms ease;
 }
 
-body {
-  min-height: 100vh;
+a {
+  color: inherit;
+  text-decoration-color: color-mix(in oklab, var(--text), transparent 75%);
+  text-underline-offset: 0.18em;
 }
 
-.site-frame {
-  min-height: 100vh;
-  display: grid;
-  grid-template-rows: auto auto 1fr auto;
-}
-
-.top-nav,
-.footer {
-  position: sticky;
-  z-index: 10;
-  backdrop-filter: blur(6px);
-  background: color-mix(in oklab, var(--bg) 88%, black);
-}
-
-.top-nav {
-  top: 0;
+.frame {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border-color: var(--line);
+  background: color-mix(in oklab, var(--bg), transparent 8%);
+  backdrop-filter: blur(5px);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 1rem clamp(1rem, 4vw, 3rem);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.top {
+  top: 0;
   border-bottom: 1px solid var(--line);
 }
 
-.top-nav ul {
-  list-style: none;
+.bottom {
+  bottom: 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.nav-links {
   display: flex;
-  gap: 1.25rem;
-  margin: 0;
-  padding: 0;
+  gap: 0.95rem;
+  align-items: center;
+  font-size: 0.92rem;
 }
 
-.brand,
-.top-nav a {
-  color: var(--text);
-  text-decoration: none;
-  font-size: 0.95rem;
+button {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.2rem 0.55rem;
+  cursor: pointer;
 }
 
-.hero,
-.content {
-  width: min(980px, 100% - 2rem);
-  margin-inline: auto;
+.column {
+  width: min(42rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 5.7rem 0 4.9rem;
 }
 
-.hero {
-  padding: clamp(2.5rem, 7vw, 6rem) 0 2rem;
-  border-bottom: 1px solid var(--line);
+.intro {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.2rem;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-.eyebrow {
-  margin: 0 0 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  font-size: 0.75rem;
+.portrait {
+  width: 4.8rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.82rem;
 }
 
 h1,
-h2,
 p {
   margin: 0;
 }
 
 h1 {
-  max-width: 24ch;
-  font-size: clamp(1.8rem, 4.4vw, 3.25rem);
-  line-height: 1.08;
+  font-size: clamp(1.45rem, 4vw, 2.2rem);
+  line-height: 1.2;
+  margin-bottom: 0.55rem;
 }
 
-.placeholder {
-  margin-top: 1rem;
-  color: var(--text-muted);
-}
-
-.content {
-  display: grid;
-  gap: 1rem;
-  padding: 2rem 0 5.25rem;
-}
-
-.card {
-  border: 1px solid var(--line);
-  border-radius: 0.75rem;
-  background: linear-gradient(180deg, var(--surface), var(--surface-soft));
-  padding: 1.4rem;
-}
-
-.card h2 {
-  font-size: 1rem;
-  margin-bottom: 0.6rem;
-}
-
-.card p,
-.footer p {
-  color: var(--text-muted);
-}
-
-.footer {
-  bottom: 0;
+section,
+details {
   border-top: 1px solid var(--line);
-  padding: 1rem clamp(1rem, 4vw, 3rem);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+details p {
+  margin-top: 0.65rem;
+  color: var(--muted);
 }
 
 @media (max-width: 640px) {
-  .top-nav {
-    gap: 0.85rem;
-    flex-direction: column;
-    align-items: flex-start;
+  .intro {
+    grid-template-columns: 1fr;
   }
 
-  .top-nav ul {
-    gap: 0.85rem;
+  .bottom span:last-child {
+    display: none;
   }
 }
