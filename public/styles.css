@@ -2,13 +2,56 @@
   box-sizing: border-box;
 }
 
+:root {
+  color-scheme: dark;
+  --bg-1: #2a2a2a;
+  --bg-2: #161616;
+  --bg-3: #090909;
+  --text: #f2f2f2;
+}
+
 body {
+  position: relative;
+  min-height: 100vh;
   margin: 0;
+  overflow-x: hidden;
   font-family: system-ui, sans-serif;
+  color: var(--text);
+  background: linear-gradient(140deg, var(--bg-1), var(--bg-2) 52%, var(--bg-3));
+  background-size: 108% 108%;
+  animation: drift-gradient 60s ease-in-out infinite alternate;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18) 0.4px, transparent 0.8px),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.14) 0.4px, transparent 0.8px);
+  background-size: 3px 3px, 4px 4px;
 }
 
 .shell {
+  position: relative;
+  z-index: 1;
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+a {
+  color: inherit;
+}
+
+@keyframes drift-gradient {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 4% 4%;
+  }
 }
