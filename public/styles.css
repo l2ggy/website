@@ -2,13 +2,33 @@
   box-sizing: border-box;
 }
 
+:root {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  background: #171717;
+  color: #ececec;
+}
+
+#smoke-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .shell {
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+  line-height: 1.55;
+}
+
+.shell a {
+  color: #f3f3f3;
 }
