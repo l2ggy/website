@@ -4,11 +4,95 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 20% 15%, rgb(51 58 78 / 45%), transparent 48%),
+    radial-gradient(circle at 80% 0%, rgb(32 39 58 / 40%), transparent 44%),
+    linear-gradient(160deg, #090d16 0%, #0d1422 55%, #090b14 100%);
+  color: #e8eefb;
 }
 
 .shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+  overflow: hidden;
+}
+
+.shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgb(255 255 255 / 2.2%) 0 2px,
+      transparent 2px 9px
+    ),
+    linear-gradient(180deg, rgb(255 255 255 / 2.2%), rgb(255 255 255 / 0%));
+}
+
+.shell::after {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    transparent 38%,
+    rgb(255 255 255 / 2.5%) 49%,
+    rgb(255 255 255 / 5%) 52%,
+    transparent 63%
+  );
+  transform: translate3d(-16%, -16%, 0);
+  animation: glass-sweep 20s linear infinite;
+  mix-blend-mode: screen;
+}
+
+.glass-panel {
+  width: min(640px, 100%);
+  padding: 2.25rem 2rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgb(255 255 255 / 16%);
+  background: linear-gradient(
+    150deg,
+    rgb(255 255 255 / 10%) 0%,
+    rgb(255 255 255 / 5%) 100%
+  );
+  box-shadow:
+    0 20px 44px rgb(0 0 0 / 42%),
+    inset 0 1px 0 rgb(255 255 255 / 18%);
+  backdrop-filter: blur(8px) saturate(120%);
+}
+
+h1 {
+  margin: 0 0 0.9rem;
+  color: #f7faff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 55%);
+}
+
+p {
+  margin: 0.7rem 0;
+  color: rgb(236 241 255 / 90%);
+}
+
+.cta-link {
+  color: #ffffff;
+  font-weight: 600;
+  text-underline-offset: 0.18em;
+}
+
+@keyframes glass-sweep {
+  0% {
+    transform: translate3d(-18%, -18%, 0);
+  }
+  100% {
+    transform: translate3d(18%, 18%, 0);
+  }
 }
