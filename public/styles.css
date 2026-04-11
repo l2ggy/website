@@ -2,13 +2,66 @@
   box-sizing: border-box;
 }
 
+:root {
+  --ambient-base: #07090f;
+  --ambient-accent: #0b1222;
+  --ambient-vignette: rgba(0, 0, 0, 0.5);
+  --ambient-noise-opacity: 0.055;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
 }
 
+.app-root {
+  position: relative;
+  min-height: 100dvh;
+  color: #ecf1ff;
+  background: radial-gradient(circle at 50% 18%, var(--ambient-accent), var(--ambient-base) 60%);
+  animation: ambient-luminance 140s ease-in-out infinite alternate;
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+.app-root::before,
+.app-root::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.app-root::before {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 1) 0,
+    rgba(255, 255, 255, 1) 1px,
+    rgba(0, 0, 0, 1) 1px,
+    rgba(0, 0, 0, 1) 2px
+  );
+  background-size: 2px 2px;
+  opacity: var(--ambient-noise-opacity);
+  mix-blend-mode: soft-light;
+}
+
+.app-root::after {
+  background: radial-gradient(circle at center, transparent 52%, var(--ambient-vignette) 100%);
+}
+
 .shell {
+  position: relative;
+  z-index: 1;
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+@keyframes ambient-luminance {
+  from {
+    filter: brightness(0.985);
+  }
+  to {
+    filter: brightness(1.015);
+  }
 }
