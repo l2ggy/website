@@ -1,14 +1,140 @@
+:root {
+  --bg: #171717;
+  --surface: #1f1f1f;
+  --surface-soft: #242424;
+  --text: #f2f2f2;
+  --text-muted: #a0a0a0;
+  --line: #343434;
+}
+
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  min-height: 100%;
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+body {
+  min-height: 100vh;
+}
+
+.site-frame {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.top-nav,
+.footer {
+  position: sticky;
+  z-index: 10;
+  backdrop-filter: blur(6px);
+  background: color-mix(in oklab, var(--bg) 88%, black);
+}
+
+.top-nav {
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem clamp(1rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.top-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+.brand,
+.top-nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.hero,
+.content {
+  width: min(980px, 100% - 2rem);
+  margin-inline: auto;
+}
+
+.hero {
+  padding: clamp(2.5rem, 7vw, 6rem) 0 2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  max-width: 24ch;
+  font-size: clamp(1.8rem, 4.4vw, 3.25rem);
+  line-height: 1.08;
+}
+
+.placeholder {
+  margin-top: 1rem;
+  color: var(--text-muted);
+}
+
+.content {
+  display: grid;
+  gap: 1rem;
+  padding: 2rem 0 5.25rem;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: linear-gradient(180deg, var(--surface), var(--surface-soft));
+  padding: 1.4rem;
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.card p,
+.footer p {
+  color: var(--text-muted);
+}
+
+.footer {
+  bottom: 0;
+  border-top: 1px solid var(--line);
+  padding: 1rem clamp(1rem, 4vw, 3rem);
+}
+
+@media (max-width: 640px) {
+  .top-nav {
+    gap: 0.85rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .top-nav ul {
+    gap: 0.85rem;
+  }
 }

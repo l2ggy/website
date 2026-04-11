@@ -3,15 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Placeholder</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
-    </main>
+    <div class="site-frame">
+      <nav class="top-nav" aria-label="Primary navigation">
+        <a class="brand" href="#">Your Name</a>
+        <ul>
+          <li><a href="#">Work</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </nav>
+
+      <header class="hero" aria-labelledby="hero-title">
+        <p class="eyebrow">Portfolio</p>
+        <h1 id="hero-title">A clean, modern space for your future work.</h1>
+        <p class="placeholder">Header placeholder — intro copy goes here.</p>
+      </header>
+
+      <main class="content" aria-label="Content placeholders">
+        <section class="card">
+          <h2>Featured Project Placeholder</h2>
+          <p>Add your first case study here.</p>
+        </section>
+        <section class="card">
+          <h2>About Placeholder</h2>
+          <p>Short bio and experience snapshot.</p>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>Footer placeholder — © Your Name</p>
+      </footer>
+    </div>
 
     <script src="script.js"></script>
   </body>
