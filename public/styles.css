@@ -2,13 +2,53 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg-charcoal: #1a1a1d;
+  --bg-near-black: #070708;
+  --text-primary: #f3f3f3;
+  --text-link: #ffffff;
+}
+
 body {
+  position: relative;
   margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
   font-family: system-ui, sans-serif;
+  color: var(--text-primary);
+  background: linear-gradient(125deg, var(--bg-charcoal), var(--bg-near-black));
+  background-size: 112% 112%;
+  animation: bg-shift 80s ease-in-out infinite alternate;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.35) 0.75px, transparent 0);
+  background-size: 3px 3px;
 }
 
 .shell {
+  position: relative;
+  z-index: 1;
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+a {
+  color: var(--text-link);
+}
+
+@keyframes bg-shift {
+  from {
+    background-position: 49% 50%;
+  }
+
+  to {
+    background-position: 51% 50%;
+  }
 }
