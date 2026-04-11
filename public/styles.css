@@ -2,13 +2,173 @@
   box-sizing: border-box;
 }
 
+:root {
+  --particle-color: 208 84% 92%;
+  --particle-opacity-near: 0.2;
+  --particle-opacity-mid: 0.15;
+  --particle-opacity-far: 0.1;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: system-ui, sans-serif;
+  color: #e8ecff;
+  background: #070a15;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 999px;
+  background: hsl(var(--particle-color));
+  animation: float 14s ease-in-out infinite alternate;
+}
+
+.particle--near {
+  opacity: var(--particle-opacity-near);
+  animation-duration: 12s;
+  animation-name: float-near;
+}
+
+.particle--mid {
+  opacity: var(--particle-opacity-mid);
+  animation-duration: 17s;
+  animation-name: float-mid;
+}
+
+.particle--far {
+  opacity: var(--particle-opacity-far);
+  animation-duration: 22s;
+  animation-name: float-far;
+}
+
+.p1 {
+  width: 10px;
+  height: 10px;
+  top: 14%;
+  left: 16%;
+}
+
+.p2 {
+  width: 6px;
+  height: 6px;
+  top: 34%;
+  left: 72%;
+}
+
+.p3 {
+  width: 12px;
+  height: 12px;
+  top: 74%;
+  left: 26%;
+}
+
+.p4 {
+  width: 7px;
+  height: 7px;
+  top: 23%;
+  left: 53%;
+}
+
+.p5 {
+  width: 4px;
+  height: 4px;
+  top: 48%;
+  left: 39%;
+}
+
+.p6 {
+  width: 9px;
+  height: 9px;
+  top: 79%;
+  left: 81%;
+}
+
+.p7 {
+  width: 5px;
+  height: 5px;
+  top: 12%;
+  left: 84%;
+}
+
+.p8 {
+  width: 3px;
+  height: 3px;
+  top: 42%;
+  left: 12%;
+}
+
+.p9 {
+  width: 6px;
+  height: 6px;
+  top: 63%;
+  left: 58%;
+}
+
+.p10 {
+  width: 4px;
+  height: 4px;
+  top: 88%;
+  left: 46%;
 }
 
 .shell {
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+a {
+  color: inherit;
+}
+
+@keyframes float-near {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(8px, -18px, 0);
+  }
+}
+
+@keyframes float-mid {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-6px, -12px, 0);
+  }
+}
+
+@keyframes float-far {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(4px, -7px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particle {
+    animation-duration: 60s;
+    animation-timing-function: linear;
+  }
+
+  .particle--near,
+  .particle--mid,
+  .particle--far {
+    animation-name: none;
+  }
 }
