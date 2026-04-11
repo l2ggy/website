@@ -2,13 +2,78 @@
   box-sizing: border-box;
 }
 
+:root {
+  color-scheme: dark;
+  --ambient-bg: #0a0d12;
+  --ambient-bg-deep: #06080c;
+  --ambient-fg: #f4f6fb;
+  --ambient-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  color: var(--ambient-fg);
+  background: linear-gradient(180deg, var(--ambient-bg), var(--ambient-bg-deep));
+}
+
+.app-root {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.ambient-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-color: var(--ambient-bg);
+}
+
+.ambient-layer::before,
+.ambient-layer::after {
+  content: "";
+  position: absolute;
+  inset: -20vmax;
+}
+
+.ambient-layer::before {
+  background-image: var(--ambient-noise);
+  background-size: 180px 180px;
+  opacity: 0.055;
+  mix-blend-mode: soft-light;
+}
+
+.ambient-layer::after {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.08), transparent 55%),
+    radial-gradient(circle at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.42) 100%);
+  animation: ambient-luminance 150s ease-in-out infinite alternate;
+  will-change: opacity;
 }
 
 .shell {
+  position: relative;
+  z-index: 1;
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+@keyframes ambient-luminance {
+  from {
+    opacity: 0.9;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-layer::after {
+    animation: none;
+  }
 }
