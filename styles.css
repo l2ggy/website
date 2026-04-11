@@ -4,11 +4,45 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
   font-family: system-ui, sans-serif;
+  color: #f1f1f1;
+  background: linear-gradient(135deg, #2f2f2f, #111111 45%, #080808);
+  background-size: 112% 112%;
+  animation: bg-shift 72s ease-in-out infinite alternate;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.2) 0.5px, transparent 0.75px);
+  background-size: 3px 3px;
+  mix-blend-mode: soft-light;
 }
 
 .shell {
   max-width: 640px;
   margin: 4rem auto;
   padding: 0 1rem;
+}
+
+a {
+  color: #d7d7d7;
+}
+
+@keyframes bg-shift {
+  0% {
+    background-position: 49% 50%;
+  }
+  50% {
+    background-position: 51% 49%;
+  }
+  100% {
+    background-position: 50% 51%;
+  }
 }
