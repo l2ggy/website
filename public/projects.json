@@ -1,0 +1,17 @@
+[
+  {
+    "title": "Project One",
+    "summary": "A short one-line project description.",
+    "tools": "Next.js · TypeScript · Claude API · MCP · Vercel AI SDK · Three.js · ElevenLabs"
+  },
+  {
+    "title": "Project Two",
+    "summary": "Another short one-line project description.",
+    "tools": "React · Node.js · PostgreSQL · Prisma · Docker"
+  },
+  {
+    "title": "Project Three",
+    "summary": "Third short one-line project description.",
+    "tools": "Python · FastAPI · Redis · OpenAI API"
+  }
+]

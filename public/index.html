@@ -3,15 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Template</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="bar topbar">
+      <div class="container topbar-content">
+        <a class="logo-slot" href="#" aria-label="Logo placeholder">Logo</a>
+        <a class="btn resume-link" href="resume.pdf">Resume</a>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <section class="hero">
+        <h1>Your Name</h1>
+        <p>Minimal one-page portfolio template.</p>
+      </section>
+
+      <section class="section" id="education">
+        <h2>Education</h2>
+        <div class="entries" data-source="education.json" data-kind="entry"></div>
+      </section>
+
+      <section class="section" id="experience">
+        <h2>Experience</h2>
+        <div class="entries" data-source="experience.json" data-kind="entry"></div>
+      </section>
+
+      <section class="section" id="projects">
+        <h2>Projects</h2>
+        <div class="entries" data-source="projects.json" data-kind="project"></div>
+      </section>
+
+      <section class="section">
+        <h2>Volunteer and leadership</h2>
+        <p>Organization or group · Position · One-line contribution</p>
+      </section>
+
+      <section class="section">
+        <h2>Contact me</h2>
+        <p>email@example.com</p>
+      </section>
     </main>
+
+    <footer class="bar bottombar">
+      <div class="container bar-content footer-content">
+        <p>© 2026 Your Name</p>
+        <nav class="footer-links" aria-label="External profile links">
+          <a class="btn" href="#" aria-label="LinkedIn placeholder">LinkedIn</a>
+          <a class="btn" href="#" aria-label="GitHub placeholder">GitHub</a>
+          <a class="btn" href="#" aria-label="LeetCode placeholder">LeetCode</a>
+          <a class="btn" href="mailto:email@example.com">Email</a>
+        </nav>
+      </div>
+    </footer>
 
     <script src="script.js"></script>
   </body>
