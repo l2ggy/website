@@ -141,6 +141,13 @@ button {
   gap: var(--space-1);
 }
 
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
 .hero h1 {
   font-size: 2.8rem;
   font-weight: 560;
@@ -211,6 +218,12 @@ button {
   font-size: 0.9em;
 }
 
+.github-heatmap {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+}
+
 .footer-content {
   font-size: 0.8rem;
 }
@@ -232,6 +245,12 @@ button {
 
   .entry-dates {
     text-align: left;
+  }
+
+  .section-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.08rem;
   }
 
   .footer-content {
