@@ -8,6 +8,12 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --surface-bg: color-mix(in srgb, var(--text) 2%, var(--bg));
+  --surface-line: color-mix(in srgb, var(--line) 80%, var(--bg));
+  --surface-line-active: color-mix(in srgb, var(--line) 55%, var(--text));
+  --surface-shift-y: -1px;
+  --surface-scale: 1.002;
+  --surface-transition: border-color 180ms ease, transform 180ms ease;
 }
 
 :root[data-theme="light"] {
@@ -111,6 +117,19 @@ button {
 .section {
   display: grid;
   gap: var(--space-1);
+  border: 1px solid var(--surface-line);
+  background: var(--surface-bg);
+  border-radius: 0.45rem;
+  padding: var(--space-2);
+  transition: var(--surface-transition);
+}
+
+.hero:hover,
+.section:hover,
+.hero:focus-within,
+.section:focus-within {
+  border-color: var(--surface-line-active);
+  transform: translateY(var(--surface-shift-y)) scale(var(--surface-scale));
 }
 
 .hero h1 {
