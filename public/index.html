@@ -3,16 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Template</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="topbar">
+      <div class="container bar-content">
+        <a class="brand" href="#">Your Name</a>
+        <nav aria-label="Primary">
+          <ul class="nav-list">
+            <li><a href="#about">About</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <section id="about" class="card">
+        <p class="eyebrow">ABOUT</p>
+        <h1>Minimal portfolio template</h1>
+        <p>
+          A clean, compact starting point with slim UI chrome and muted surfaces.
+          Replace this with your intro and value statement.
+        </p>
+      </section>
+
+      <section id="work" class="grid">
+        <article class="card project">
+          <p class="eyebrow">PROJECT 01</p>
+          <h2>Placeholder project title</h2>
+          <p>Short one-line project description for quick scanning.</p>
+        </article>
+        <article class="card project">
+          <p class="eyebrow">PROJECT 02</p>
+          <h2>Another project title</h2>
+          <p>Use this area for featured builds, products, or case studies.</p>
+        </article>
+        <article class="card project">
+          <p class="eyebrow">PROJECT 03</p>
+          <h2>Third project title</h2>
+          <p>Keep details concise and link out to deeper project pages.</p>
+        </article>
+      </section>
+
+      <section id="contact" class="card">
+        <p class="eyebrow">CONTACT</p>
+        <p>
+          email@example.com ·
+          <a href="#" aria-label="LinkedIn placeholder">LinkedIn</a> ·
+          <a href="#" aria-label="GitHub placeholder">GitHub</a>
+        </p>
+      </section>
     </main>
 
-    <script src="script.js"></script>
+    <footer class="bottombar">
+      <div class="container bar-content">
+        <p>© 2026 Your Name</p>
+        <p>Available for freelance / full-time</p>
+      </div>
+    </footer>
   </body>
 </html>
