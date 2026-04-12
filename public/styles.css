@@ -1,14 +1,180 @@
+:root {
+  --bg: #121212;
+  --text: #dbdbdb;
+  --muted: #a4a4a4;
+  --line: #2a2a2a;
+  --header-h: 50px;
+  --footer-h: 52px;
+  --space-1: 0.55rem;
+  --space-2: 1rem;
+  --space-3: 1.65rem;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 15px/1.56 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  width: min(820px, calc(100% - 1.5rem));
+  margin: 0 auto;
+}
+
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background: var(--bg);
+}
+
+.topbar {
+  top: 0;
+  height: var(--header-h);
+  border-bottom: 1px solid var(--line);
+}
+
+.bottombar {
+  bottom: 0;
+  height: var(--footer-h);
+  border-top: 1px solid var(--line);
+}
+
+.bar-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.logo-slot {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+}
+
+.header-nav,
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.btn {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.layout {
+  padding-block: calc(var(--header-h) + var(--space-3)) calc(var(--footer-h) + var(--space-3));
+  display: grid;
+  gap: var(--space-3);
+}
+
+.hero {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  font-weight: 560;
+  line-height: 1.1;
+}
+
+.hero p,
+.section p,
+.entry-subtext {
+  color: var(--muted);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.section h2 {
+  font-size: 1.28rem;
+  font-weight: 520;
+}
+
+.entry-list {
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  align-items: start;
+  gap: 0.7rem;
+}
+
+.entry-icon {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.entry-title {
+  font-size: 1rem;
+}
+
+.entry-subtext {
+  font-size: 0.92rem;
+  margin-top: 0.1rem;
+}
+
+.footer-content {
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+@media (max-width: 720px) {
+  :root {
+    --footer-h: 80px;
+  }
+
+  .hero h1 {
+    font-size: 2.3rem;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-block: 0.35rem;
+  }
 }
