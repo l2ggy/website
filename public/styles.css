@@ -4,6 +4,7 @@
   --space-1: 0.55rem;
   --space-2: 1rem;
   --space-3: 1.6rem;
+  --hero-copy-h: 5rem;
   --bg: #121212;
   --text: #d7d7d7;
   --muted: #a1a1a1;
@@ -135,10 +136,48 @@ button {
   gap: var(--space-3);
 }
 
-.hero,
+.layout > * {
+  margin: 0;
+  padding: 0;
+}
+
 .section {
   display: grid;
   gap: var(--space-1);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: var(--space-2);
+  row-gap: var(--space-1);
+}
+
+.hero-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.hero-heatmap-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.hero-heatmap {
+  width: auto;
+  height: var(--hero-copy-h);
+  max-width: min(48vw, 520px);
+  display: block;
+}
+
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .hero h1 {
@@ -184,13 +223,6 @@ button {
   gap: 0.18rem;
 }
 
-.entry-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .entry h3 {
   font-size: 1.02rem;
   font-weight: 520;
@@ -218,20 +250,33 @@ button {
 @media (max-width: 700px) {
   :root {
     --footer-h: 64px;
+    --hero-copy-h: 4.2rem;
   }
 
   .container {
     width: calc(100% - 1.2rem);
   }
 
+  .entry-dates {
+    text-align: left;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-heatmap-wrap {
+    justify-content: flex-start;
+  }
+
+  .hero-heatmap {
+    max-width: 100%;
+  }
+
   .entry-head {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.08rem;
-  }
-
-  .entry-dates {
-    text-align: left;
   }
 
   .footer-content {
