@@ -8,6 +8,9 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --surface-bg: color-mix(in srgb, var(--bg) 96%, var(--text) 4%);
+  --surface-line: color-mix(in srgb, var(--line) 86%, var(--text) 14%);
+  --surface-line-hover: color-mix(in srgb, var(--line) 72%, var(--text) 28%);
 }
 
 :root[data-theme="light"] {
@@ -111,6 +114,19 @@ button {
 .section {
   display: grid;
   gap: var(--space-1);
+  border: 1px solid var(--surface-line);
+  background: var(--surface-bg);
+  border-radius: 0.4rem;
+  padding: var(--space-2);
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.hero:hover,
+.hero:focus-within,
+.section:hover,
+.section:focus-within {
+  border-color: var(--surface-line-hover);
+  transform: translateY(-1px) scale(1.003);
 }
 
 .hero h1 {
