@@ -80,3 +80,26 @@ document.querySelectorAll(".entries").forEach((element) => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
 });
+
+const hero = document.querySelector(".hero");
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+
+if (hero) {
+  const setHeroPointer = (x, y) => {
+    hero.style.setProperty("--mx", `${x}px`);
+    hero.style.setProperty("--my", `${y}px`);
+  };
+
+  setHeroPointer(hero.clientWidth / 2, hero.clientHeight / 2);
+
+  hero.addEventListener("pointermove", (event) => {
+    if (reducedMotionQuery.matches || coarsePointerQuery.matches) return;
+    const rect = hero.getBoundingClientRect();
+    setHeroPointer(event.clientX - rect.left, event.clientY - rect.top);
+  });
+
+  hero.addEventListener("pointerleave", () => {
+    setHeroPointer(hero.clientWidth / 2, hero.clientHeight / 2);
+  });
+}
