@@ -3,15 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Template</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="topbar">
+      <div class="container row">
+        <strong class="brand">YOUR NAME</strong>
+        <nav class="nav">
+          <a href="#about">About</a>
+          <a href="#work">Work</a>
+          <a href="#notes">Notes</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container main">
+      <section id="about" class="panel hero">
+        <p class="eyebrow">PORTFOLIO TEMPLATE</p>
+        <h1>Minimal, flat, compact portfolio structure.</h1>
+        <p>
+          Placeholder intro text. Use this area for a concise summary of your
+          work, approach, and what you build.
+        </p>
+      </section>
+
+      <section id="work" class="panel">
+        <h2>Selected Work</h2>
+        <div class="grid">
+          <article class="item">
+            <h3>Project One</h3>
+            <p>Short project summary placeholder.</p>
+          </article>
+          <article class="item">
+            <h3>Project Two</h3>
+            <p>Short project summary placeholder.</p>
+          </article>
+          <article class="item">
+            <h3>Project Three</h3>
+            <p>Short project summary placeholder.</p>
+          </article>
+          <article class="item">
+            <h3>Project Four</h3>
+            <p>Short project summary placeholder.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="notes" class="panel">
+        <h2>Notes</h2>
+        <p>
+          Add compact writing snippets, changelog-style updates, or recent
+          experiments.
+        </p>
+      </section>
+
+      <section id="contact" class="panel">
+        <h2>Contact</h2>
+        <p>name@email.com · linkedin · github</p>
+      </section>
     </main>
+
+    <footer class="footer">
+      <div class="container row">
+        <small>© 2026 Your Name</small>
+        <small>Minimal dark template</small>
+      </div>
+    </footer>
 
     <script src="script.js"></script>
   </body>
