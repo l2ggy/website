@@ -8,9 +8,12 @@
   </head>
   <body>
     <header class="bar topbar">
-      <div class="container bar-content">
+      <div class="container topbar-content">
         <a class="logo-slot" href="#" aria-label="Logo placeholder">Logo</a>
-        <a class="btn" href="resume.pdf">Resume</a>
+        <nav class="topbar-nav" aria-label="Primary">
+          <a class="link-btn" href="resume.pdf">Resume</a>
+        </nav>
+        <span class="topbar-spacer" aria-hidden="true"></span>
       </div>
     </header>
 
@@ -22,12 +25,12 @@
 
       <section class="section">
         <h2>Education</h2>
-        <p>School name · Degree program · Graduation year</p>
+        <div id="education-list" class="entry-list" aria-live="polite"></div>
       </section>
 
       <section class="section">
         <h2>Experience</h2>
-        <p>Role title · Company · Dates · Brief impact statement</p>
+        <div id="experience-list" class="entry-list" aria-live="polite"></div>
       </section>
 
       <section class="section">
@@ -52,12 +55,14 @@
       <div class="container bar-content footer-content">
         <p>© 2026 Your Name</p>
         <nav class="footer-links" aria-label="External profile links">
-          <a class="btn" href="#" aria-label="LinkedIn placeholder">LinkedIn</a>
-          <a class="btn" href="#" aria-label="GitHub placeholder">GitHub</a>
-          <a class="btn" href="#" aria-label="LeetCode placeholder">LeetCode</a>
-          <a class="btn" href="mailto:email@example.com">Email</a>
+          <a class="link-btn" href="#" aria-label="LinkedIn placeholder">LinkedIn</a>
+          <a class="link-btn" href="#" aria-label="GitHub placeholder">GitHub</a>
+          <a class="link-btn" href="#" aria-label="LeetCode placeholder">LeetCode</a>
+          <a class="link-btn" href="mailto:email@example.com">Email</a>
         </nav>
       </div>
     </footer>
+
+    <script src="script.js"></script>
   </body>
 </html>
