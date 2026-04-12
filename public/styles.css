@@ -1,14 +1,133 @@
+:root {
+  --bg: #121212;
+  --text: #d8d8d8;
+  --muted: #9a9a9a;
+  --line: #2a2a2a;
+  --header-h: 48px;
+  --footer-h: 42px;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 14px/1.55 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  width: min(760px, calc(100% - 1.5rem));
+  margin: 0 auto;
+}
+
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background: var(--bg);
+}
+
+.topbar {
+  top: 0;
+  height: var(--header-h);
+  border-bottom: 1px solid var(--line);
+}
+
+.bottombar {
+  bottom: 0;
+  height: var(--footer-h);
+  border-top: 1px solid var(--line);
+}
+
+.bar-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+
+.layout {
+  padding-block: calc(var(--header-h) + 1.5rem) calc(var(--footer-h) + 1.5rem);
+  display: grid;
+  gap: 1.35rem;
+}
+
+.hero {
+  display: grid;
+  gap: 0.55rem;
+  padding-bottom: 0.3rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 7vw, 3.3rem);
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.hero p,
+.section p {
+  color: var(--muted);
+}
+
+.section {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.section h2 {
+  font-size: 1.08rem;
+  line-height: 1.3;
+  font-weight: 520;
+  color: var(--text);
+}
+
+.footer-content {
+  gap: 1rem;
+}
+
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --footer-h: 72px;
+  }
+
+  .footer-content {
+    align-items: flex-start;
+    padding-block: 0.45rem;
+  }
 }
