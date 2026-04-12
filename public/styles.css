@@ -113,6 +113,22 @@ button {
   gap: var(--space-1);
 }
 
+.hero {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-glow {
+  position: absolute;
+  inset: -2.5rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(560px circle at var(--mx) var(--my), color-mix(in srgb, var(--text) 10%, transparent), transparent 70%);
+  opacity: 0.12;
+}
+
 .hero h1 {
   font-size: 2.8rem;
   font-weight: 560;
@@ -216,5 +232,11 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .hero-glow {
+    display: none;
   }
 }
