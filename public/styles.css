@@ -21,13 +21,6 @@
   box-sizing: border-box;
 }
 
-.icon-defs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-}
-
 body {
   margin: 0;
   background: var(--bg);
@@ -98,23 +91,14 @@ button {
   gap: 0.85rem;
 }
 
-.logo-slot {
+.text-btn:hover {
+  color: var(--text);
+}
+
+.logo-slot,
+.text-btn {
   color: var(--muted);
   font-size: 0.84rem;
-}
-
-.icon-btn {
-  color: var(--text);
-  width: 16px;
-  height: 16px;
-  display: inline-grid;
-  place-items: center;
-}
-
-.icon-btn svg {
-  width: 100%;
-  height: 100%;
-  stroke: currentColor;
 }
 
 .layout {

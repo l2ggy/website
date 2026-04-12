@@ -43,18 +43,12 @@ let overrideTheme = localStorage.getItem(storedThemeKey);
 
 const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
 
-const setThemeIcon = (theme) => {
-  if (!themeToggle) return;
-  const icon = theme === "dark" ? "#icon-sun" : "#icon-moon";
-  const nextModeLabel = theme === "dark" ? "light" : "dark";
-  themeToggle.innerHTML = `<svg viewBox="0 0 24 24"><use href="${icon}"></use></svg>`;
-  themeToggle.setAttribute("aria-label", `Switch to ${nextModeLabel} mode`);
-  themeToggle.setAttribute("title", `Switch to ${nextModeLabel} mode`);
-};
-
 const applyTheme = (theme) => {
   document.documentElement.dataset.theme = theme;
-  setThemeIcon(theme);
+  if (themeToggle) {
+    themeToggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+    themeToggle.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} mode`);
+  }
 };
 
 applyTheme(overrideTheme || getSystemTheme());
