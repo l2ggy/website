@@ -36,6 +36,29 @@ const loadEntries = async (element) => {
   element.innerHTML = items.map(renderByKind[kind]).join("");
 };
 
+const setupGitHubHeatmap = () => {
+  const section = document.querySelector("#github-activity");
+  if (!section) return;
+
+  const username = section.dataset.githubUser?.trim();
+  const image = section.querySelector(".github-heatmap");
+  const profileLink = section.querySelector(".github-heatmap-link");
+  const note = section.querySelector(".github-note");
+
+  if (!username || username === "your-github-username") {
+    if (image) image.remove();
+    if (profileLink) profileLink.removeAttribute("href");
+    return;
+  }
+
+  const heatmapUrl = `https://ghchart.rshah.org/${encodeURIComponent(username)}`;
+  const profileUrl = `https://github.com/${encodeURIComponent(username)}`;
+
+  if (image) image.src = heatmapUrl;
+  if (profileLink) profileLink.href = profileUrl;
+  if (note) note.textContent = `Public contribution chart for @${username}.`;
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -80,3 +103,5 @@ document.querySelectorAll(".entries").forEach((element) => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
 });
+
+setupGitHubHeatmap();

@@ -211,6 +211,22 @@ button {
   font-size: 0.9em;
 }
 
+.github-note code {
+  font-size: 0.9em;
+}
+
+.github-heatmap-link {
+  display: block;
+  width: fit-content;
+}
+
+.github-heatmap {
+  width: min(100%, 720px);
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
 .footer-content {
   font-size: 0.8rem;
 }
