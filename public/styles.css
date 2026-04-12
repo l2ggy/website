@@ -140,6 +140,7 @@ button {
   grid-template-columns: 38px minmax(0, 1fr);
   gap: var(--space-2);
   align-items: center;
+  transition: color 140ms ease, transform 140ms ease;
 }
 
 .entry-icon {
@@ -149,6 +150,23 @@ button {
   place-items: center;
   color: var(--muted);
   font-size: 0.8rem;
+  transition: color 140ms ease, transform 140ms ease;
+}
+
+.entry:hover,
+.entry:focus-within {
+  color: var(--text);
+}
+
+.entry:hover .entry-icon,
+.entry:focus-within .entry-icon {
+  color: var(--text);
+  transform: translateX(1px);
+}
+
+.entry:hover h3,
+.entry:focus-within h3 {
+  font-weight: 560;
 }
 
 .entry-main {

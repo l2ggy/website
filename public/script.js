@@ -1,5 +1,5 @@
 const renderEntry = ({ icon, title, subtitle, dates }) => `
-  <article class="entry">
+  <article class="entry" tabindex="0">
     <div class="entry-icon" aria-hidden="true">${icon || "Icon"}</div>
     <div class="entry-main">
       <div class="entry-head">
@@ -12,7 +12,7 @@ const renderEntry = ({ icon, title, subtitle, dates }) => `
 `;
 
 const renderProject = ({ title, summary, tools }) => `
-  <article class="entry project-entry">
+  <article class="entry project-entry" tabindex="0">
     <div class="entry-main">
       <h3>${title}</h3>
       <p>${summary}</p>
