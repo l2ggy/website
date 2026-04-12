@@ -1,14 +1,178 @@
+:root {
+  --bg: #121212;
+  --text: #d7d7d7;
+  --muted: #a1a1a1;
+  --line: #2a2a2a;
+  --header-h: 48px;
+  --footer-h: 38px;
+  --space-1: 0.55rem;
+  --space-2: 1rem;
+  --space-3: 1.6rem;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 15px/1.55 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  width: min(840px, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background: var(--bg);
+}
+
+.topbar {
+  top: 0;
+  height: var(--header-h);
+  border-bottom: 1px solid var(--line);
+}
+
+.bottombar {
+  bottom: 0;
+  height: var(--footer-h);
+  border-top: 1px solid var(--line);
+}
+
+.topbar-content,
+.bar-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.logo-slot,
+.btn {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.resume-link {
+  color: var(--text);
+}
+
+.layout {
+  padding-block: calc(var(--header-h) + var(--space-3)) calc(var(--footer-h) + var(--space-3));
+  display: grid;
+  gap: var(--space-3);
+}
+
+.hero,
+.section {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  font-weight: 560;
+  line-height: 1.1;
+}
+
+.hero p,
+.section p,
+.entry-dates {
+  color: var(--muted);
+}
+
+.section h2 {
+  font-size: 1.3rem;
+  font-weight: 530;
+}
+
+.entries {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+}
+
+.entry-icon {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.entry-body {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.entry-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.entry h3 {
+  font-size: 1.02rem;
+  font-weight: 520;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+@media (max-width: 700px) {
+  :root {
+    --footer-h: 56px;
+  }
+
+  .container {
+    width: calc(100% - 1.2rem);
+  }
+
+  .bar-content {
+    font-size: 0.8rem;
+  }
+
+  .hero h1 {
+    font-size: 2.3rem;
+  }
+
+  .entry-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
 }
