@@ -141,6 +141,40 @@ button {
   gap: var(--space-1);
 }
 
+.hero {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.hero-copy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.hero-heatmap-wrap {
+  min-height: var(--hero-heatmap-height, 96px);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.hero-heatmap {
+  height: var(--hero-heatmap-height, 96px);
+  width: auto;
+  max-width: min(430px, 44vw);
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+}
+
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
 .hero h1 {
   font-size: 2.8rem;
   font-weight: 560;
@@ -184,13 +218,6 @@ button {
   gap: 0.18rem;
 }
 
-.entry-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .entry h3 {
   font-size: 1.02rem;
   font-weight: 520;
@@ -224,14 +251,27 @@ button {
     width: calc(100% - 1.2rem);
   }
 
+  .entry-dates {
+    text-align: left;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-heatmap-wrap {
+    min-height: var(--hero-heatmap-height, 96px);
+    justify-content: flex-start;
+  }
+
+  .hero-heatmap {
+    max-width: min(420px, 100%);
+  }
+
   .entry-head {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.08rem;
-  }
-
-  .entry-dates {
-    text-align: left;
   }
 
   .footer-content {
