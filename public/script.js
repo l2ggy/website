@@ -37,13 +37,16 @@ const renderGitHubHeatmap = () => {
   }
 
   const syncHeatmapHeight = () => {
-    heatmapImage.style.height = `${Math.max(heroCopy.offsetHeight, 1)}px`;
+    const copyHeight = heroCopy.getBoundingClientRect().height;
+    const nextHeight = Math.max(80, Math.min(Math.round(copyHeight), 220));
+    heatmapImage.style.height = `${nextHeight}px`;
   };
 
   heatmapImage.src = `https://ghchart.rshah.org/${encodeURIComponent(user)}`;
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
   syncHeatmapHeight();
   window.addEventListener("resize", syncHeatmapHeight);
+  new ResizeObserver(syncHeatmapHeight).observe(heroCopy);
 };
 
 const loadEntries = async (element) => {
