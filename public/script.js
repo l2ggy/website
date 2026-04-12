@@ -28,15 +28,22 @@ const renderByKind = {
 
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
+  const heroCopy = document.querySelector(".hero-copy");
   const heatmapImage = document.querySelector("#github-heatmap");
   const user = section?.dataset.githubUser?.trim();
 
-  if (!section || !heatmapImage || !user) {
+  if (!section || !heroCopy || !heatmapImage || !user) {
     return;
   }
 
+  const syncHeatmapHeight = () => {
+    heatmapImage.style.height = `${Math.max(heroCopy.offsetHeight, 1)}px`;
+  };
+
   heatmapImage.src = `https://ghchart.rshah.org/${encodeURIComponent(user)}`;
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
+  syncHeatmapHeight();
+  window.addEventListener("resize", syncHeatmapHeight);
 };
 
 const loadEntries = async (element) => {
