@@ -30,12 +30,13 @@ const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
   const user = section?.dataset.githubUser?.trim();
+  const chartColor = "7d8fa6";
 
   if (!section || !heatmapImage || !user) {
     return;
   }
 
-  heatmapImage.src = `https://ghchart.rshah.org/${encodeURIComponent(user)}`;
+  heatmapImage.src = `https://ghchart.rshah.org/${chartColor}/${encodeURIComponent(user)}`;
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
