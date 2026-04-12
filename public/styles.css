@@ -1,14 +1,143 @@
+:root {
+  --bg: #16181b;
+  --surface: #1b1e22;
+  --surface-soft: #20242a;
+  --text: #d8dde6;
+  --text-muted: #8e97a6;
+  --border: #2b3038;
+  --max-width: 840px;
+  --bar-height: 44px;
+}
+
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
 }
 
-.shell {
-  max-width: 640px;
-  margin: 4rem auto;
-  padding: 0 1rem;
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 400 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--text-muted);
+  text-underline-offset: 0.2rem;
+}
+
+.site-bar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: var(--bar-height);
+  background: var(--surface);
+  border-color: var(--border);
+  border-style: solid;
+  z-index: 10;
+}
+
+.top-bar {
+  top: 0;
+  border-width: 0 0 1px;
+}
+
+.bottom-bar {
+  bottom: 0;
+  border-width: 1px 0 0;
+}
+
+.bar-inner {
+  max-width: var(--max-width);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.brand {
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+
+.site-nav {
+  display: flex;
+  gap: 14px;
+}
+
+.site-nav a {
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
+.layout {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: calc(var(--bar-height) + 20px) 14px calc(var(--bar-height) + 20px);
+  display: grid;
+  gap: 14px;
+}
+
+.hero,
+.panel {
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  padding: 14px;
+}
+
+.hero h1,
+.panel h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.hero p,
+.panel p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.hero p + p,
+.panel p + p {
+  margin-top: 8px;
+}
+
+.eyebrow {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  margin-bottom: 8px;
+}
+
+.stack {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.stack li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stack li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.stack small {
+  color: var(--text-muted);
 }

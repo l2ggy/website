@@ -3,15 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Template</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="site-bar top-bar">
+      <div class="bar-inner">
+        <a class="brand" href="#">your name</a>
+        <nav class="site-nav" aria-label="Primary">
+          <a href="#about">about</a>
+          <a href="#work">work</a>
+          <a href="#contact">contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="hero" id="about">
+        <p class="eyebrow">portfolio template</p>
+        <h1>Clean, compact, and modern personal site.</h1>
+        <p>
+          Placeholder intro text for your positioning, focus, and what you build.
+          Keep this short and specific.
+        </p>
+      </section>
+
+      <section class="panel" id="work">
+        <h2>selected work</h2>
+        <ul class="stack">
+          <li>
+            <span>Project placeholder one</span>
+            <small>Case study / app / brand</small>
+          </li>
+          <li>
+            <span>Project placeholder two</span>
+            <small>Site / product / experiment</small>
+          </li>
+          <li>
+            <span>Project placeholder three</span>
+            <small>Tool / concept / launch</small>
+          </li>
+        </ul>
+      </section>
+
+      <section class="panel" id="contact">
+        <h2>contact</h2>
+        <p>email@example.com</p>
+        <p><a href="resume.pdf">resume.pdf</a></p>
+      </section>
     </main>
+
+    <footer class="site-bar bottom-bar">
+      <div class="bar-inner">
+        <small>© 2026 your name</small>
+        <small>available for freelance</small>
+      </div>
+    </footer>
 
     <script src="script.js"></script>
   </body>
