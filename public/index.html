@@ -11,10 +11,20 @@
       <div class="container topbar-content">
         <a class="logo-slot" href="#" aria-label="Logo placeholder">Logo</a>
         <div class="topbar-actions">
-          <button class="btn toggle-btn" id="theme-toggle" type="button" aria-label="Toggle color mode">
-            Toggle theme
+          <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to light mode">
+            <svg class="icon icon-solid icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12.4 3.2a1 1 0 0 0-1.2 1.2A8 8 0 1 1 4.4 12a1 1 0 0 0-1.2-1.2A10 10 0 1 0 12.4 3.2z" />
+            </svg>
+            <svg class="icon icon-solid icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1zm0 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7-5a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1zM7 12a1 1 0 0 1-1 1H5a1 1 0 1 1 0-2h1a1 1 0 0 1 1 1zm9.07 5.66a1 1 0 0 1 1.41 0l.71.71a1 1 0 0 1-1.41 1.41l-.71-.71a1 1 0 0 1 0-1.41zM6.52 6.52a1 1 0 0 1 1.41 0l.71.71A1 1 0 1 1 7.23 8.64l-.71-.71a1 1 0 0 1 0-1.41zm10.96 0a1 1 0 0 1 0 1.41l-.71.71a1 1 0 1 1-1.41-1.41l.71-.71a1 1 0 0 1 1.41 0zm-10.96 10.96a1 1 0 0 1 1.41 1.41l-.71.71a1 1 0 1 1-1.41-1.41l.71-.71z" />
+            </svg>
           </button>
-          <a class="btn resume-link" href="resume.pdf">Resume</a>
+          <a class="icon-btn" href="resume.pdf" aria-label="Resume">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm6 1v5h5" />
+              <path d="M9 13h6M9 17h6" />
+            </svg>
+          </a>
         </div>
       </div>
     </header>
@@ -55,10 +65,28 @@
       <div class="container bar-content footer-content">
         <p>© 2026 Your Name</p>
         <nav class="footer-links" aria-label="External profile links">
-          <a class="btn" href="#" aria-label="LinkedIn placeholder">LinkedIn</a>
-          <a class="btn" href="#" aria-label="GitHub placeholder">GitHub</a>
-          <a class="btn" href="#" aria-label="LeetCode placeholder">LeetCode</a>
-          <a class="btn" href="mailto:placeholder@email.com">Email</a>
+          <a class="icon-btn" href="#" aria-label="LinkedIn">
+            <svg class="icon icon-solid" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 9h4v11H6zM8 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 9h4v1.8c.7-1.1 1.8-2 3.5-2 2.8 0 3.5 1.9 3.5 4.7V20h-4v-5.5c0-1.3 0-2.9-1.8-2.9s-2.1 1.4-2.1 2.8V20h-4z" />
+            </svg>
+          </a>
+          <a class="icon-btn" href="#" aria-label="GitHub">
+            <svg class="icon icon-solid" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 3 .9.1-.7.4-1.1.7-1.4-2.2-.3-4.5-1.1-4.5-4.8 0-1 .4-1.9 1-2.6-.1-.3-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.3 9.3 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.7.7 1 1.6 1 2.6 0 3.7-2.3 4.5-4.5 4.8.4.3.8 1 .8 2v2.9c0 .3.2.6.7.5A10 10 0 0 0 12 2z" />
+            </svg>
+          </a>
+          <a class="icon-btn" href="#" aria-label="LeetCode">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15.8 3.6 7.9 11.5a1 1 0 0 0 0 1.4l7.9 7.9M20 12H10" />
+              <path d="M13 5.5 18.5 0" />
+            </svg>
+          </a>
+          <a class="icon-btn" href="mailto:placeholder@email.com" aria-label="Email">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 6h18v12H3z" />
+              <path d="m3 7 9 7 9-7" />
+            </svg>
+          </a>
         </nav>
       </div>
     </footer>
