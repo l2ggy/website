@@ -1,12 +1,12 @@
 [
   {
-    "title": "Project One",
-    "summary": "One-line project summary and outcome.",
-    "tools": "Next.js · TypeScript · Claude API · MCP · Vercel AI SDK · Three.js · ElevenLabs"
+    "title": "Project Placeholder One",
+    "summary": "Brief placeholder summary of purpose and outcome.",
+    "tools": "Framework · Language · API · Data Store · Hosting"
   },
   {
-    "title": "Project Two",
-    "summary": "One-line project summary and outcome.",
-    "tools": "React · Node.js · PostgreSQL · Prisma · Docker"
+    "title": "Project Placeholder Two",
+    "summary": "Brief placeholder summary of purpose and outcome.",
+    "tools": "Library · Runtime · Styling · Testing · Deployment"
   }
 ]

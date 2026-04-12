@@ -1,8 +1,8 @@
 [
   {
-    "icon": "C",
-    "title": "Company Name",
-    "subtitle": "Role title",
-    "dates": "Date range"
+    "icon": "Icon",
+    "title": "Company Placeholder",
+    "subtitle": "Role Placeholder",
+    "dates": "Start Date – End Date"
   }
 ]
