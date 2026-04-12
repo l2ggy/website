@@ -36,6 +36,21 @@ const loadEntries = async (element) => {
   element.innerHTML = items.map(renderByKind[kind]).join("");
 };
 
+const setupHeroPointerGlow = () => {
+  const hero = document.querySelector(".hero");
+  if (!hero) return;
+
+  const updatePointerVars = (event) => {
+    const { left, top, width, height } = hero.getBoundingClientRect();
+    const x = ((event.clientX - left) / width) * 100;
+    const y = ((event.clientY - top) / height) * 100;
+    hero.style.setProperty("--mx", `${Math.min(100, Math.max(0, x))}%`);
+    hero.style.setProperty("--my", `${Math.min(100, Math.max(0, y))}%`);
+  };
+
+  hero.addEventListener("pointermove", updatePointerVars);
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -80,3 +95,5 @@ document.querySelectorAll(".entries").forEach((element) => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
 });
+
+setupHeroPointerGlow();
