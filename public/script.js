@@ -1,10 +1,12 @@
-const renderEntry = ({ icon, title, subtitle, detail }) => `
+const renderEntry = ({ icon, title, subtitle, date }) => `
   <article class="entry">
     <div class="entry-icon" aria-hidden="true">${icon || "Logo"}</div>
-    <div>
-      <h3>${title}</h3>
+    <div class="entry-main">
+      <div class="entry-head">
+        <h3>${title}</h3>
+        <p class="entry-date">${date || ""}</p>
+      </div>
       <p>${subtitle}</p>
-      <p>${detail}</p>
     </div>
   </article>
 `;

@@ -2,7 +2,7 @@
   {
     "icon": "U",
     "title": "University Name",
-    "subtitle": "Degree name · Graduation year",
-    "detail": "Optional line for honors, coursework, or focus area."
+    "subtitle": "Degree name",
+    "date": "Graduation year"
   }
 ]
