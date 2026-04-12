@@ -26,6 +26,20 @@ const renderByKind = {
   project: renderProject,
 };
 
+const renderGitHubHeatmap = () => {
+  const section = document.querySelector("#github-contributions");
+  const heatmapImage = document.querySelector("#github-heatmap");
+  const profileLink = document.querySelector("#github-profile-link");
+  const user = section?.dataset.githubUser?.trim();
+
+  if (!section || !heatmapImage || !profileLink || !user) {
+    return;
+  }
+
+  heatmapImage.src = `https://ghchart.rshah.org/${encodeURIComponent(user)}`;
+  profileLink.href = `https://github.com/${encodeURIComponent(user)}`;
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -80,3 +94,5 @@ document.querySelectorAll(".entries").forEach((element) => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
 });
+
+renderGitHubHeatmap();
