@@ -135,6 +135,11 @@ button {
   gap: var(--space-3);
 }
 
+.layout > * {
+  margin: 0;
+  padding: 0;
+}
+
 .section {
   display: grid;
   gap: var(--space-1);
@@ -143,7 +148,7 @@ button {
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  align-items: start;
   column-gap: var(--space-2);
   row-gap: var(--space-1);
 }
@@ -155,15 +160,15 @@ button {
 
 .hero-heatmap-wrap {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
   min-width: 0;
 }
 
 .hero-heatmap {
   width: auto;
-  height: clamp(92px, 12vw, 138px);
-  max-width: min(48vw, 520px);
+  height: 5rem;
+  max-width: min(48vw, 460px);
   display: block;
 }
 
