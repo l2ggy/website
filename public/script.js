@@ -26,6 +26,10 @@ const renderByKind = {
   project: renderProject,
 };
 
+const githubUsername = "your-github-username";
+const githubHeatmap = document.querySelector("#github-heatmap");
+const githubHeatmapLink = document.querySelector("#github-heatmap-link");
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -51,7 +55,23 @@ const applyTheme = (theme) => {
   }
 };
 
+const setupGithubHeatmap = () => {
+  if (!githubHeatmap || !githubHeatmapLink) {
+    return;
+  }
+
+  if (!githubUsername || githubUsername === "your-github-username") {
+    githubHeatmapLink.hidden = true;
+    return;
+  }
+
+  const username = encodeURIComponent(githubUsername.trim());
+  githubHeatmap.src = `https://ghchart.rshah.org/${username}`;
+  githubHeatmapLink.href = `https://github.com/${username}`;
+};
+
 applyTheme(overrideTheme || getSystemTheme());
+setupGithubHeatmap();
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
