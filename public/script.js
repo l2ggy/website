@@ -80,3 +80,20 @@ document.querySelectorAll(".entries").forEach((element) => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
 });
+
+const hero = document.querySelector(".hero");
+const disableHeroMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce), (pointer: coarse)");
+
+if (hero) {
+  const setHeroPointerPosition = (event) => {
+    if (disableHeroMotionQuery.matches) return;
+
+    const rect = hero.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    hero.style.setProperty("--mx", `${Math.max(0, Math.min(100, x)).toFixed(2)}%`);
+    hero.style.setProperty("--my", `${Math.max(0, Math.min(100, y)).toFixed(2)}%`);
+  };
+
+  hero.addEventListener("pointermove", setHeroPointerPosition);
+}

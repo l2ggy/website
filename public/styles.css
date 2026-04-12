@@ -113,6 +113,21 @@ button {
   gap: var(--space-1);
 }
 
+.hero {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
+}
+
+.hero-glow {
+  position: absolute;
+  inset: -2.25rem -2rem -1.4rem;
+  pointer-events: none;
+  background: radial-gradient(circle 20rem at var(--mx) var(--my), color-mix(in srgb, var(--text) 9%, transparent), transparent 72%);
+  opacity: 0.2;
+  z-index: -1;
+}
+
 .hero h1 {
   font-size: 2.8rem;
   font-weight: 560;
@@ -185,6 +200,12 @@ button {
 
 .footer-content {
   font-size: 0.8rem;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .hero-glow {
+    display: none;
+  }
 }
 
 @media (max-width: 700px) {
