@@ -1,0 +1,12 @@
+[
+  {
+    "title": "Project One",
+    "summary": "One-line project summary and outcome.",
+    "tools": "Next.js · TypeScript · Claude API · MCP · Vercel AI SDK · Three.js · ElevenLabs"
+  },
+  {
+    "title": "Project Two",
+    "summary": "One-line project summary and outcome.",
+    "tools": "React · Node.js · PostgreSQL · Prisma · Docker"
+  }
+]

@@ -11,13 +11,29 @@ const renderEntry = ({ icon, title, subtitle, dates }) => `
   </article>
 `;
 
+const renderProject = ({ title, summary, tools }) => `
+  <article class="entry project-entry">
+    <div class="entry-main">
+      <h3>${title}</h3>
+      <p>${summary}</p>
+      <p class="project-tools">${tools}</p>
+    </div>
+  </article>
+`;
+
+const renderByKind = {
+  entry: renderEntry,
+  project: renderProject,
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
-  if (!source) return;
+  const kind = element.dataset.kind || "entry";
+  if (!source || !renderByKind[kind]) return;
 
   const response = await fetch(source);
   const items = await response.json();
-  element.innerHTML = items.map(renderEntry).join("");
+  element.innerHTML = items.map(renderByKind[kind]).join("");
 };
 
 document.querySelectorAll(".entries").forEach((element) => {
