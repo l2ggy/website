@@ -3,16 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Site</title>
+    <title>Portfolio Template</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <h1>New Site Shell</h1>
-      <p>Start building here.</p>
-      <p><a href="resume.pdf">resume.pdf</a></p>
+    <header class="bar topbar">
+      <div class="container bar-content">
+        <a class="logo-slot" href="#" aria-label="Logo placeholder"></a>
+        <a class="button" href="resume.pdf">Resume</a>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <section class="hero">
+        <h1>Your Name</h1>
+        <p>
+          Minimal one-page portfolio template with clear hierarchy and compact,
+          consistent spacing.
+        </p>
+      </section>
+
+      <section class="section" id="education">
+        <h2>Education</h2>
+        <p>School name — degree, dates, highlights, and notable coursework.</p>
+      </section>
+
+      <section class="section" id="experience">
+        <h2>Experience</h2>
+        <p>Role title — company, dates, and one concise impact statement.</p>
+      </section>
+
+      <section class="section" id="projects">
+        <h2>Projects</h2>
+        <p>Project one — short summary of what you built and why it matters.</p>
+        <p>Project two — short summary with stack or measurable outcome.</p>
+      </section>
+
+      <section class="section" id="leadership">
+        <h2>Volunteer and Leadership</h2>
+        <p>Organization — position, dates, and contribution summary.</p>
+      </section>
+
+      <section class="section" id="contact">
+        <h2>Contact me</h2>
+        <p>Email, social links, and preferred way to connect.</p>
+      </section>
     </main>
 
-    <script src="script.js"></script>
+    <footer class="bar bottombar">
+      <div class="container bar-content footer-links">
+        <p>© 2026 Your Name</p>
+        <div class="link-row" aria-label="Footer links">
+          <a class="button" href="#" aria-label="LinkedIn placeholder">LinkedIn</a>
+          <a class="button" href="#" aria-label="GitHub placeholder">GitHub</a>
+          <a class="button" href="#" aria-label="LeetCode placeholder">LeetCode</a>
+          <a class="button" href="mailto:email@example.com" aria-label="Email placeholder">Email</a>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>
