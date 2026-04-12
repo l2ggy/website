@@ -1,0 +1,12 @@
+[
+  {
+    "title": "Project placeholder one",
+    "summary": "One-line summary placeholder.",
+    "tools": "Tool A · Tool B · Tool C · Tool D"
+  },
+  {
+    "title": "Project placeholder two",
+    "summary": "One-line summary placeholder.",
+    "tools": "Framework X · Service Y · Library Z"
+  }
+]
