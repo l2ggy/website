@@ -27,18 +27,16 @@ const renderByKind = {
 };
 
 const renderGitHubHeatmap = () => {
-  const section = document.querySelector("#github-contributions");
+  const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
-  const profileLink = document.querySelector("#github-profile-link");
   const user = section?.dataset.githubUser?.trim();
 
-  if (!section || !heatmapImage || !profileLink || !user) {
+  if (!section || !heatmapImage || !user) {
     return;
   }
 
   heatmapImage.src = `https://ghchart.rshah.org/${encodeURIComponent(user)}`;
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
-  profileLink.href = `https://github.com/${encodeURIComponent(user)}`;
 };
 
 const loadEntries = async (element) => {

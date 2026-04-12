@@ -141,7 +141,32 @@ button {
   gap: var(--space-1);
 }
 
-.section-head {
+.hero {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-2);
+}
+
+.hero-copy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.hero-heatmap-wrap {
+  width: 228px;
+  height: 82px;
+  overflow: hidden;
+}
+
+.hero-heatmap {
+  width: 248px;
+  height: 102px;
+  margin-top: -10px;
+  margin-left: -12px;
+  display: block;
+}
+
+.entry-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -191,13 +216,6 @@ button {
   gap: 0.18rem;
 }
 
-.entry-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .entry h3 {
   font-size: 1.02rem;
   font-weight: 520;
@@ -218,12 +236,6 @@ button {
   font-size: 0.9em;
 }
 
-.github-heatmap {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 0.4rem;
-}
-
 .footer-content {
   font-size: 0.8rem;
 }
@@ -237,17 +249,20 @@ button {
     width: calc(100% - 1.2rem);
   }
 
-  .entry-head {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.08rem;
-  }
-
   .entry-dates {
     text-align: left;
   }
 
-  .section-head {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-heatmap-wrap {
+    width: 100%;
+    max-width: 228px;
+  }
+
+  .entry-head {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.08rem;
