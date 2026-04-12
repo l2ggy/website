@@ -162,8 +162,6 @@ button {
   width: auto;
   height: 100%;
   display: block;
-  border: 1px solid var(--line);
-  border-radius: 0.4rem;
 }
 
 .entry-head {
