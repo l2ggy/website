@@ -91,14 +91,46 @@ button {
   gap: 0.85rem;
 }
 
-.text-btn:hover {
+.logo-slot,
+.text-btn {
+  position: relative;
+  display: inline-block;
+  color: var(--muted);
+  font-size: 0.84rem;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.logo-slot::after,
+.text-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.08rem;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.logo-slot:hover,
+.logo-slot:focus-visible,
+.text-btn:hover,
+.text-btn:focus-visible {
   color: var(--text);
 }
 
-.logo-slot,
-.text-btn {
-  color: var(--muted);
-  font-size: 0.84rem;
+.logo-slot:hover::after,
+.logo-slot:focus-visible::after,
+.text-btn:hover::after,
+.text-btn:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.logo-slot:active,
+.text-btn:active {
+  transform: translateY(1px);
 }
 
 .layout {
