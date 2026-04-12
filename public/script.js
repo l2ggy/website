@@ -39,6 +39,8 @@ const loadEntries = async (element) => {
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
+const githubHeatmap = document.querySelector("#github-heatmap");
+const githubUsername = document.body.dataset.githubUsername;
 let overrideTheme = localStorage.getItem(storedThemeKey);
 
 const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
@@ -80,3 +82,21 @@ document.querySelectorAll(".entries").forEach((element) => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
 });
+
+if (githubHeatmap) {
+  if (githubUsername) {
+    const safeUsername = encodeURIComponent(githubUsername.trim());
+    githubHeatmap.innerHTML = `
+      <a class="heatmap-link" href="https://github.com/${safeUsername}" target="_blank" rel="noreferrer noopener">
+        <img
+          class="heatmap-image"
+          src="https://ghchart.rshah.org/${safeUsername}"
+          alt="GitHub contribution heatmap for ${githubUsername}"
+          loading="lazy"
+        />
+      </a>
+    `;
+  } else {
+    githubHeatmap.innerHTML = "<p>Add your GitHub username to <code>data-github-username</code> on the <code>&lt;body&gt;</code> tag.</p>";
+  }
+}

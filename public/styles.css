@@ -211,6 +211,22 @@ button {
   font-size: 0.9em;
 }
 
+.github-heatmap {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: var(--space-2);
+}
+
+.heatmap-link,
+.heatmap-image {
+  display: block;
+  width: 100%;
+}
+
+.heatmap-image {
+  height: auto;
+}
+
 .footer-content {
   font-size: 0.8rem;
 }

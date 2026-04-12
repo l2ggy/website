@@ -6,7 +6,7 @@
     <title>Portfolio Template</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body data-github-username="octocat">
     <header class="bar topbar">
       <div class="container topbar-content">
         <a class="logo-slot" href="#" aria-label="Logo placeholder">Logo</a>
@@ -38,6 +38,11 @@
       <section class="section" id="projects">
         <h2>Projects</h2>
         <div class="entries" data-source="projects.json" data-kind="project"></div>
+      </section>
+
+      <section class="section" id="contributions">
+        <h2>GitHub Contributions</h2>
+        <div class="github-heatmap" id="github-heatmap"></div>
       </section>
 
       <section class="section">
