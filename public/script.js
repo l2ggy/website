@@ -40,6 +40,55 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const renderLeetCodeStats = ({ username, solved, contestRating }) => {
+  const metrics = [
+    ["Solved", solved.total],
+    ["Easy", solved.easy],
+    ["Medium", solved.medium],
+    ["Hard", solved.hard],
+    ["Rating", contestRating || "N/A"],
+  ];
+
+  return `
+    <p class="stat-subtitle">@${username}</p>
+    <div class="stat-row" role="list">
+      ${metrics
+        .map(
+          ([label, value]) => `
+            <p class="stat-item" role="listitem">
+              <span class="stat-label">${label}</span>
+              <span class="stat-value">${value}</span>
+            </p>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+};
+
+const loadLeetCodeStats = async () => {
+  const section = document.querySelector("#leetcode");
+  const container = document.querySelector("#leetcode-stats");
+  const username = section?.dataset.leetcodeUser?.trim();
+
+  if (!section || !container || !username) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/leetcode/${encodeURIComponent(username)}`);
+
+    if (!response.ok) {
+      throw new Error("Unable to load LeetCode stats");
+    }
+
+    const payload = await response.json();
+    container.innerHTML = renderLeetCodeStats(payload);
+  } catch {
+    container.innerHTML = '<p class="stat-loading">Unable to load LeetCode stats.</p>';
+  }
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -96,3 +145,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 });
 
 renderGitHubHeatmap();
+loadLeetCodeStats();
