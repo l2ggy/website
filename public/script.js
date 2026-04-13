@@ -285,6 +285,37 @@ const setStatsFallback = () => {
   renderPercentile("#monkeytype-percentile", null);
 };
 
+const splitHeroNameLetters = () => {
+  const heroName = document.querySelector("#hero-name");
+  if (!heroName) {
+    return;
+  }
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  const originalText = heroName.textContent || "";
+  const staggerOrder = Array.from({ length: originalText.length }, (_, index) => index);
+  for (let index = staggerOrder.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [staggerOrder[index], staggerOrder[swapIndex]] = [staggerOrder[swapIndex], staggerOrder[index]];
+  }
+
+  heroName.setAttribute("aria-label", originalText);
+  heroName.textContent = "";
+
+  Array.from(originalText).forEach((letter, index) => {
+    const span = document.createElement("span");
+    span.className = "hero-letter";
+    span.style.setProperty("--hero-letter-i", staggerOrder[index]);
+    span.style.setProperty("--hero-letter-seed", (Math.random() * 2 - 1).toFixed(3));
+    span.textContent = letter === " " ? "\u00A0" : letter;
+    span.setAttribute("aria-hidden", "true");
+    heroName.append(span);
+  });
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -323,6 +354,8 @@ systemThemeQuery.addEventListener("change", () => {
     applyTheme(systemTheme);
   }
 });
+
+splitHeroNameLetters();
 
 document.querySelectorAll(".entries").forEach((element) => {
   loadEntries(element).catch(() => {
