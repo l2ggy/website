@@ -176,15 +176,21 @@ const setStatsFallback = () => {
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
+const themeToggleLabel = document.querySelector("#theme-toggle-label");
 let overrideTheme = localStorage.getItem(storedThemeKey);
 
 const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
 
 const applyTheme = (theme) => {
+  const isDark = theme === "dark";
   document.documentElement.dataset.theme = theme;
   if (themeToggle) {
-    themeToggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
-    themeToggle.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} mode`);
+    const label = isDark ? "Dark mode" : "Light mode";
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeToggle.setAttribute("aria-label", `Theme: ${label}`);
+    if (themeToggleLabel) {
+      themeToggleLabel.textContent = label;
+    }
   }
 };
 
@@ -200,15 +206,8 @@ if (themeToggle) {
 }
 
 systemThemeQuery.addEventListener("change", () => {
-  const systemTheme = getSystemTheme();
-
-  if (overrideTheme && overrideTheme !== systemTheme) {
-    overrideTheme = null;
-    localStorage.removeItem(storedThemeKey);
-  }
-
   if (!overrideTheme) {
-    applyTheme(systemTheme);
+    applyTheme(getSystemTheme());
   }
 });
 
