@@ -277,6 +277,42 @@ const loadStats = async () => {
   renderStats(payload);
 };
 
+
+const enhanceHeroName = () => {
+  const heroName = document.querySelector("#hero-name");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!heroName || reduceMotion || heroName.dataset.split === "true") {
+    return;
+  }
+
+  const originalText = heroName.textContent || "";
+  heroName.setAttribute("aria-label", originalText);
+  heroName.dataset.split = "true";
+
+  const fragment = document.createDocumentFragment();
+  let index = 0;
+
+  for (const char of originalText) {
+    if (char === " ") {
+      fragment.appendChild(document.createTextNode(" "));
+      continue;
+    }
+
+    const letter = document.createElement("span");
+    letter.className = "hero-letter";
+    letter.textContent = char;
+    letter.setAttribute("aria-hidden", "true");
+    letter.style.setProperty("--letter-index", String(index));
+    letter.style.setProperty("--letter-seed", String(Math.random() * 2 - 1));
+    fragment.appendChild(letter);
+    index += 1;
+  }
+
+  heroName.textContent = "";
+  heroName.appendChild(fragment);
+};
+
 const setStatsFallback = () => {
   ["#leetcode-solved", "#leetcode-contest", "#monkeytype-summary", "#monkeytype-pb"].forEach((selector) => {
     setText(selector, unavailableText);
@@ -330,5 +366,6 @@ document.querySelectorAll(".entries").forEach((element) => {
   });
 });
 
+enhanceHeroName();
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();

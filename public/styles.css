@@ -194,6 +194,24 @@ button {
   font-weight: 560;
   line-height: 1.1;
 }
+#hero-name {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+#hero-name .hero-letter {
+  display: inline-block;
+  transform: translate3d(0, 0, 0) rotate(0deg);
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--letter-index, 0) * 20ms);
+}
+
+#hero-name:hover .hero-letter,
+#hero-name:focus-visible .hero-letter {
+  transform: translate3d(calc(var(--letter-seed, 0) * 0.08em), calc(var(--letter-seed, 0) * var(--letter-index, 0) * -0.01em), 0)
+    rotate(calc(var(--letter-seed, 0) * 6deg));
+}
+
 
 .hero p,
 .section p {
