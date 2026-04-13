@@ -3,6 +3,7 @@ const storedThemeKey = "portfolio-theme-override";
 export const setupTheme = () => {
   const themeToggle = document.querySelector("#theme-toggle");
   const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let overrideTheme = localStorage.getItem(storedThemeKey);
 
   const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
@@ -19,6 +20,18 @@ export const setupTheme = () => {
     themeToggle.setAttribute("title", `Switch to ${nextTheme} mode`);
   };
 
+  const canAnimateTheme = () => !reducedMotionQuery.matches && typeof document.startViewTransition === "function";
+  const setTheme = (theme) => {
+    if (!canAnimateTheme()) {
+      applyTheme(theme);
+      return;
+    }
+
+    document.startViewTransition(() => {
+      applyTheme(theme);
+    });
+  };
+
   applyTheme(overrideTheme || getSystemTheme());
 
   if (themeToggle) {
@@ -26,7 +39,7 @@ export const setupTheme = () => {
       const currentTheme = document.documentElement.dataset.theme || getSystemTheme();
       overrideTheme = currentTheme === "dark" ? "light" : "dark";
       localStorage.setItem(storedThemeKey, overrideTheme);
-      applyTheme(overrideTheme);
+      setTheme(overrideTheme);
     });
   }
 
@@ -38,7 +51,7 @@ export const setupTheme = () => {
     }
 
     if (!overrideTheme) {
-      applyTheme(systemTheme);
+      setTheme(systemTheme);
     }
   });
 };
