@@ -130,12 +130,12 @@ const renderPercentile = (selector, percentile) => {
     return;
   }
 
-  const chartWidth = 132;
-  const chartHeight = 54;
-  const left = 6;
-  const right = chartWidth - 6;
+  const chartWidth = 156;
+  const chartHeight = 78;
+  const left = 7;
+  const right = chartWidth - 7;
   const top = 6;
-  const baseline = chartHeight - 8;
+  const baseline = chartHeight - 9;
   const xMin = -3.5;
   const xMax = 3.5;
   const yMax = normalPdf(0);
