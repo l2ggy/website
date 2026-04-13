@@ -259,12 +259,36 @@ button {
 
 
 .project-title-link {
+  position: relative;
   text-decoration: none;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.project-title-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.1em;
+  height: 1px;
+  background: var(--text);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 180ms ease;
 }
 
 .project-title-link:hover,
 .project-title-link:focus-visible {
-  color: var(--muted);
+  color: var(--text);
+}
+
+.project-title-link:hover::after,
+.project-title-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.project-title-link:active {
+  transform: translateY(1px);
 }
 
 .leadership-list {
