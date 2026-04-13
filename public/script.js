@@ -48,6 +48,126 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const setupHeroPointerPoints = () => {
+  const section = document.querySelector(".hero");
+  const svg = document.querySelector("#hero-points");
+  if (!section || !svg) return;
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const touchDevice =
+    window.matchMedia("(hover: none), (pointer: coarse)").matches ||
+    navigator.maxTouchPoints > 0 ||
+    "ontouchstart" in window;
+  if (reduceMotion || touchDevice) {
+    svg.remove();
+    return;
+  }
+
+  const pointRatios = [
+    [0.08, 0.24],
+    [0.2, 0.62],
+    [0.31, 0.18],
+    [0.42, 0.52],
+    [0.53, 0.28],
+    [0.62, 0.7],
+    [0.72, 0.38],
+    [0.81, 0.58],
+    [0.9, 0.22],
+    [0.93, 0.78],
+  ];
+  const circles = pointRatios.map(() => {
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("r", "2.4");
+    circle.setAttribute("fill", "var(--line)");
+    circle.setAttribute("opacity", "0.8");
+    svg.append(circle);
+    return circle;
+  });
+
+  const lines = [0, 1, 2].map(() => {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("stroke", "var(--text)");
+    line.setAttribute("stroke-opacity", "0");
+    line.setAttribute("stroke-width", "1");
+    svg.append(line);
+    return line;
+  });
+
+  let points = [];
+  let pointer = null;
+  let frame = 0;
+
+  const layout = () => {
+    const box = section.getBoundingClientRect();
+    svg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
+    points = pointRatios.map(([x, y], i) => {
+      const point = { x: x * box.width, y: y * box.height };
+      circles[i].setAttribute("cx", point.x);
+      circles[i].setAttribute("cy", point.y);
+      return point;
+    });
+  };
+
+  const draw = () => {
+    frame = 0;
+    if (!pointer || !points.length) return;
+
+    const nearest = points
+      .map((point, i) => {
+        const dx = pointer.x - point.x;
+        const dy = pointer.y - point.y;
+        return { i, distance: dx * dx + dy * dy, point };
+      })
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, lines.length);
+
+    circles.forEach((circle, i) => {
+      const active = nearest.some((entry) => entry.i === i);
+      circle.setAttribute("fill", active ? "var(--text)" : "var(--line)");
+      circle.setAttribute("opacity", active ? "1" : "0.8");
+    });
+
+    lines.forEach((line, i) => {
+      const active = nearest[i];
+      if (!active) {
+        line.setAttribute("stroke-opacity", "0");
+        return;
+      }
+      line.setAttribute("x1", active.point.x);
+      line.setAttribute("y1", active.point.y);
+      line.setAttribute("x2", pointer.x);
+      line.setAttribute("y2", pointer.y);
+      line.setAttribute("stroke-opacity", "0.35");
+    });
+  };
+
+  const requestDraw = () => {
+    if (!frame) {
+      frame = requestAnimationFrame(draw);
+    }
+  };
+
+  const onMove = (event) => {
+    const box = section.getBoundingClientRect();
+    pointer = { x: event.clientX - box.left, y: event.clientY - box.top };
+    requestDraw();
+  };
+
+  const onLeave = () => {
+    pointer = null;
+    lines.forEach((line) => line.setAttribute("stroke-opacity", "0"));
+    circles.forEach((circle) => {
+      circle.setAttribute("fill", "var(--line)");
+      circle.setAttribute("opacity", "0.8");
+    });
+  };
+
+  layout();
+  window.addEventListener("resize", layout);
+  section.addEventListener("pointermove", onMove);
+  section.addEventListener("pointerleave", onLeave);
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -220,3 +340,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+setupHeroPointerPoints();

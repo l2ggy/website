@@ -157,6 +157,22 @@ button {
 .hero {
   position: relative;
   padding-right: min(48vw, 540px);
+  overflow: hidden;
+}
+
+.hero-points {
+  position: absolute;
+  inset: -0.4rem;
+  width: calc(100% + 0.8rem);
+  height: calc(100% + 0.8rem);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-copy,
+.hero-heatmap-wrap {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-copy {
