@@ -306,9 +306,7 @@ button {
 }
 
 #hero-name {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.01em;
+  display: inline-block;
 }
 
 #hero-name:focus-visible {
@@ -324,8 +322,13 @@ button {
   transition-delay: calc(var(--hero-letter-stagger, var(--hero-letter-i)) * 18ms);
 }
 
-#hero-name:hover .hero-letter,
-#hero-name:focus-visible .hero-letter {
+#hero-name.is-split {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.01em;
+}
+
+#hero-name.is-split .hero-letter {
   transform: translateY(var(--hero-letter-lift)) rotate(var(--hero-letter-tilt));
 }
 

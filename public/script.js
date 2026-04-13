@@ -297,16 +297,8 @@ const splitHeroNameLetters = () => {
 
   const originalText = heroName.textContent || "";
   heroName.setAttribute("aria-label", originalText);
-  heroName.textContent = "";
-
-  const letterSpans = Array.from(originalText).map((letter, index) => {
-    const span = document.createElement("span");
-    span.className = "hero-letter";
-    span.style.setProperty("--hero-letter-i", index);
-    span.textContent = letter === " " ? "\u00A0" : letter;
-    span.setAttribute("aria-hidden", "true");
-    return span;
-  });
+  let letterSpans = [];
+  let isSplit = false;
 
   const randomizeHeroLetters = () => {
     letterSpans.forEach((span) => {
@@ -315,13 +307,44 @@ const splitHeroNameLetters = () => {
     });
   };
 
-  randomizeHeroLetters();
-  letterSpans.forEach((span) => {
-    heroName.append(span);
-  });
+  const splitText = () => {
+    if (isSplit) {
+      randomizeHeroLetters();
+      return;
+    }
 
-  heroName.addEventListener("pointerenter", randomizeHeroLetters);
-  heroName.addEventListener("focusin", randomizeHeroLetters);
+    letterSpans = Array.from(originalText).map((letter, index) => {
+      const span = document.createElement("span");
+      span.className = "hero-letter";
+      span.style.setProperty("--hero-letter-i", index);
+      span.textContent = letter === " " ? "\u00A0" : letter;
+      span.setAttribute("aria-hidden", "true");
+      return span;
+    });
+
+    randomizeHeroLetters();
+    heroName.textContent = "";
+    heroName.classList.add("is-split");
+    letterSpans.forEach((span) => {
+      heroName.append(span);
+    });
+    isSplit = true;
+  };
+
+  const restoreText = () => {
+    if (!isSplit) {
+      return;
+    }
+
+    heroName.textContent = originalText;
+    heroName.classList.remove("is-split");
+    isSplit = false;
+  };
+
+  heroName.addEventListener("pointerenter", splitText);
+  heroName.addEventListener("pointerleave", restoreText);
+  heroName.addEventListener("focusin", splitText);
+  heroName.addEventListener("focusout", restoreText);
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
