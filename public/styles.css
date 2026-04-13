@@ -354,11 +354,13 @@ button {
   .hero-heatmap-wrap {
     position: static;
     transform: none;
+    width: 100%;
     justify-content: flex-start;
     margin-top: var(--space-1);
   }
 
   .hero-heatmap {
+    width: 100%;
     max-width: 100%;
   }
 
