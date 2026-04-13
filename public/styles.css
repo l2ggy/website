@@ -150,13 +150,66 @@ button {
 }
 
 .section {
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: var(--space-1);
 }
 
 .hero {
   position: relative;
+  isolation: isolate;
   padding-right: min(48vw, 540px);
+}
+
+.hero > *,
+.section > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero::before,
+.hero::after,
+.section::before,
+.section::after {
+  content: "";
+  position: absolute;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 50%;
+  filter: blur(55px);
+  opacity: 0.14;
+  pointer-events: none;
+  z-index: 0;
+  animation: blob-drift 30s ease-in-out infinite alternate;
+}
+
+.hero::before,
+.section::before {
+  top: -7rem;
+  left: -6rem;
+  background: radial-gradient(circle at 35% 35%, #8b5cf6 0%, rgba(139, 92, 246, 0) 72%);
+}
+
+.hero::after,
+.section::after {
+  right: -7rem;
+  bottom: -8rem;
+  background: radial-gradient(circle at 60% 60%, #22d3ee 0%, rgba(34, 211, 238, 0) 72%);
+  animation-duration: 38s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes blob-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(1.4rem, -1.1rem, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-1.2rem, 1.2rem, 0) scale(0.94);
+  }
 }
 
 .hero-copy {
@@ -378,5 +431,15 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before,
+  .hero::after,
+  .section::before,
+  .section::after {
+    animation: none;
+    transform: none;
   }
 }
