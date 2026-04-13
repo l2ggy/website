@@ -59,6 +59,7 @@ button {
   left: 0;
   right: 0;
   background: var(--bg);
+  z-index: 20;
 }
 
 .topbar {
