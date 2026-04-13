@@ -149,6 +149,52 @@ button {
   gap: var(--space-3);
 }
 
+.layout > section {
+  position: relative;
+  isolation: isolate;
+}
+
+.layout > section > * {
+  position: relative;
+  z-index: 2;
+}
+
+.layout > section::before,
+.layout > section::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(48px);
+  opacity: 0.13;
+  pointer-events: none;
+  z-index: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.layout > section::before {
+  inset: -28% auto auto -14%;
+  width: min(42vw, 360px);
+  height: min(42vw, 360px);
+  background: radial-gradient(circle at 28% 30%, #7ec5ff 0%, #3f7fd6 44%, transparent 72%);
+  animation: blob-drift-a 52s ease-in-out infinite alternate;
+}
+
+.layout > section::after {
+  inset: auto -16% -34% auto;
+  width: min(46vw, 400px);
+  height: min(46vw, 400px);
+  background: radial-gradient(circle at 70% 68%, #b28dff 0%, #6c77ff 45%, transparent 72%);
+  animation: blob-drift-b 68s ease-in-out infinite alternate;
+}
+
+.layout > section:nth-of-type(2n)::before {
+  background: radial-gradient(circle at 34% 34%, #84ffd6 0%, #39b8a5 46%, transparent 73%);
+}
+
+.layout > section:nth-of-type(3n)::after {
+  background: radial-gradient(circle at 66% 66%, #ffc2dd 0%, #da88ca 45%, transparent 72%);
+}
+
 .section {
   display: grid;
   gap: var(--space-1);
@@ -332,6 +378,31 @@ button {
 
 .footer-content {
   font-size: 0.8rem;
+}
+
+@keyframes blob-drift-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(3%, -4%, 0) scale(1.08);
+  }
+}
+
+@keyframes blob-drift-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(-4%, 5%, 0) scale(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout > section::before,
+  .layout > section::after {
+    animation: none;
+  }
 }
 
 @media (max-width: 700px) {
