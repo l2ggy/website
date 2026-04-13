@@ -9,6 +9,9 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --logo-glow-a: rgba(120, 188, 255, 0.68);
+  --logo-glow-b: rgba(165, 112, 255, 0.52);
+  --logo-glow-c: rgba(120, 255, 226, 0.38);
 }
 
 :root[data-theme="light"] {
@@ -16,6 +19,9 @@
   --text: #161616;
   --muted: #505050;
   --line: #d5d5d5;
+  --logo-glow-a: rgba(44, 123, 214, 0.58);
+  --logo-glow-b: rgba(133, 87, 226, 0.45);
+  --logo-glow-c: rgba(0, 151, 122, 0.3);
 }
 
 * {
@@ -381,11 +387,49 @@ button {
 .entry-thumb {
   border-radius: 8px;
   object-fit: cover;
-  border: 1px solid var(--line);
+  border: 0;
+  transform: translateZ(0);
+  filter: drop-shadow(0 0 0 transparent);
+  transition: filter 260ms ease, transform 260ms ease;
+  will-change: filter, transform;
 }
 
-#education .entry-thumb {
-  border: 0;
+.subsection-item:hover .entry-thumb,
+.subsection-item:focus-within .entry-thumb {
+  animation: logo-glow-orbit 1400ms linear infinite;
+  transform: scale(1.045);
+}
+
+@keyframes logo-glow-orbit {
+  0% {
+    filter: drop-shadow(6px 0 0 var(--logo-glow-a))
+      drop-shadow(0 0 8px var(--logo-glow-b))
+      drop-shadow(-2px -3px 0 var(--logo-glow-c));
+  }
+
+  25% {
+    filter: drop-shadow(0 6px 0 var(--logo-glow-a))
+      drop-shadow(0 0 10px var(--logo-glow-b))
+      drop-shadow(3px -2px 0 var(--logo-glow-c));
+  }
+
+  50% {
+    filter: drop-shadow(-6px 0 0 var(--logo-glow-a))
+      drop-shadow(0 0 12px var(--logo-glow-b))
+      drop-shadow(2px 3px 0 var(--logo-glow-c));
+  }
+
+  75% {
+    filter: drop-shadow(0 -6px 0 var(--logo-glow-a))
+      drop-shadow(0 0 10px var(--logo-glow-b))
+      drop-shadow(-3px 2px 0 var(--logo-glow-c));
+  }
+
+  100% {
+    filter: drop-shadow(6px 0 0 var(--logo-glow-a))
+      drop-shadow(0 0 8px var(--logo-glow-b))
+      drop-shadow(-2px -3px 0 var(--logo-glow-c));
+  }
 }
 
 .entry-main {
