@@ -321,20 +321,10 @@ button {
 }
 
 .stats-item {
+  position: relative;
   display: grid;
   gap: 0.15rem;
-}
-
-.stats-item-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-1);
-  align-items: start;
-}
-
-.stats-copy {
-  display: grid;
-  gap: 0.15rem;
+  padding-right: 10.4rem;
 }
 
 .stats-item h3 {
@@ -364,15 +354,17 @@ button {
 }
 
 .percentile-viz {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
   display: grid;
   grid-template-rows: 1fr auto;
   gap: 0.22rem;
   justify-items: end;
-  align-self: stretch;
   align-content: center;
   color: var(--muted);
   width: 9.8rem;
-  min-height: 5.2rem;
 }
 
 .percentile-viz svg {
@@ -449,11 +441,12 @@ button {
     gap: 0.08rem;
   }
 
-  .stats-item-body {
-    grid-template-columns: 1fr;
+  .stats-item {
+    padding-right: 0;
   }
 
   .percentile-viz {
+    position: static;
     width: min(100%, 12rem);
     min-height: 5.4rem;
     justify-items: start;
