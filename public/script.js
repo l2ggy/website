@@ -78,42 +78,101 @@ const setText = (selector, text) => {
   }
 };
 
+const setStatMarkup = (selector, markup) => {
+  const element = document.querySelector(selector);
+  if (element) {
+    element.innerHTML = markup;
+  }
+};
+
+const bellCurvePath = () => {
+  const width = 100;
+  const baseline = 33;
+  const amplitude = 21;
+  const sigma = 0.85;
+  const points = [];
+
+  for (let x = 0; x <= width; x += 2) {
+    const t = x / width;
+    const z = (t - 0.5) * 6;
+    const y = baseline - amplitude * Math.exp(-(z * z) / (2 * sigma * sigma));
+    points.push(`${x},${y.toFixed(2)}`);
+  }
+
+  return points.join(" ");
+};
+
+const renderPercentileCurve = (selector, topPercentage) => {
+  const element = document.querySelector(selector);
+  if (!element) return;
+
+  if (!(topPercentage > 0 && topPercentage <= 100)) {
+    element.innerHTML = "";
+    element.classList.add("is-hidden");
+    return;
+  }
+
+  const percentile = 100 - topPercentage;
+  const markerX = 8 + (percentile / 100) * 100;
+  element.classList.remove("is-hidden");
+  element.innerHTML = `
+    <svg viewBox="0 0 116 58" role="presentation" focusable="false">
+      <line x1="8" y1="33" x2="108" y2="33" stroke="currentColor" stroke-opacity="0.3" />
+      <polyline points="${bellCurvePath()}" transform="translate(8 0)" fill="none" stroke="currentColor" stroke-opacity="0.8" stroke-width="1.6" />
+      <line x1="${markerX}" y1="13" x2="${markerX}" y2="33" stroke="var(--text)" stroke-width="1.4" />
+      <circle cx="${markerX}" cy="13" r="2.7" fill="var(--text)" />
+      <text x="${markerX}" y="54" text-anchor="middle" fill="currentColor" font-size="8.5">${formatNumber(percentile, 1)}th</text>
+    </svg>
+  `;
+};
+
 const renderStats = ({ leetcode, monkeytype }) => {
   const solved = leetcode?.solved;
   const contest = leetcode?.contest;
   const leaderboard = monkeytype?.leaderboard;
   setText(
     "#leetcode-solved",
-    solved
-      ? `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`
-      : unavailableText
+    unavailableText
   );
+  if (solved) {
+    setStatMarkup(
+      "#leetcode-solved",
+      `<span class="stat-value">${formatNumber(solved.all)}</span> solved (<span class="stat-value">${formatNumber(solved.easy)}</span> easy · <span class="stat-value">${formatNumber(solved.medium)}</span> medium · <span class="stat-value">${formatNumber(solved.hard)}</span> hard)`
+    );
+  }
   setText(
     "#leetcode-contest",
-    contest?.rating && contest?.topPercentage
-      ? `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`
-      : unavailableText
+    unavailableText
   );
+  if (contest?.rating && contest?.topPercentage) {
+    setStatMarkup(
+      "#leetcode-contest",
+      `Contest rating: <span class="stat-value">${formatNumber(Math.round(contest.rating))}</span> · top <span class="stat-value">${formatNumber(contest.topPercentage, 2)}%</span>`
+    );
+  }
+  renderPercentileCurve("#leetcode-curve", contest?.topPercentage || null);
 
   if (!monkeytype) {
     setText("#monkeytype-summary", unavailableText);
     setText("#monkeytype-pb", unavailableText);
+    renderPercentileCurve("#monkeytype-curve", null);
     return;
   }
 
   const typingHours = monkeytype.timeTypingSeconds / 3600;
   const topPercent = leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
-  setText(
+  setStatMarkup(
     "#monkeytype-summary",
-    `${formatNumber(monkeytype.completedTests)} tests completed · ${formatNumber(typingHours, 1)}h total typing`
+    `<span class="stat-value">${formatNumber(monkeytype.completedTests)}</span> tests completed · <span class="stat-value">${formatNumber(typingHours, 1)}h</span> total typing`
   );
-  setText(
+  setStatMarkup(
     "#monkeytype-pb",
     topPercent
-      ? `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM`
+      ? `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span> · top <span class="stat-value">${formatNumber(topPercent, 2)}%</span>`
+      : `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span>`
   );
+  renderPercentileCurve("#monkeytype-curve", topPercent);
 };
 
 const parseMonkeytypeProfile = (payload) => {
