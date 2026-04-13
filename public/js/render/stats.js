@@ -1,4 +1,12 @@
 export const unavailableText = "Unavailable right now.";
+export const STATS_SELECTORS = {
+  leetcodeSolved: "#leetcode-solved",
+  leetcodeContest: "#leetcode-contest",
+  leetcodePercentile: "#leetcode-percentile",
+  monkeytypeSummary: "#monkeytype-summary",
+  monkeytypePb: "#monkeytype-pb",
+  monkeytypePercentile: "#monkeytype-percentile",
+};
 
 export const formatNumber = (value, digits = 0) =>
   new Intl.NumberFormat("en-US", {
@@ -117,27 +125,27 @@ export const renderStats = ({ leetcode, monkeytype }) => {
   const contest = leetcode?.contest;
   const leaderboard = monkeytype?.leaderboard;
 
-  setText("#leetcode-solved", unavailableText);
+  setText(STATS_SELECTORS.leetcodeSolved, unavailableText);
   if (solved) {
     setStatMarkup(
-      "#leetcode-solved",
+      STATS_SELECTORS.leetcodeSolved,
       `<span class="stat-value">${formatNumber(solved.all)}</span> solved (<span class="stat-value">${formatNumber(solved.easy)}</span> easy · <span class="stat-value">${formatNumber(solved.medium)}</span> medium · <span class="stat-value">${formatNumber(solved.hard)}</span> hard)`
     );
   }
 
-  setText("#leetcode-contest", unavailableText);
+  setText(STATS_SELECTORS.leetcodeContest, unavailableText);
   if (contest?.rating && contest?.topPercentage) {
     setStatMarkup(
-      "#leetcode-contest",
+      STATS_SELECTORS.leetcodeContest,
       `Contest rating: <span class="stat-value">${formatNumber(Math.round(contest.rating))}</span> · top <span class="stat-value">${formatNumber(contest.topPercentage, 2)}%</span>`
     );
   }
-  renderPercentile("#leetcode-percentile", contest?.topPercentage);
+  renderPercentile(STATS_SELECTORS.leetcodePercentile, contest?.topPercentage);
 
   if (!monkeytype) {
-    setText("#monkeytype-summary", unavailableText);
-    setText("#monkeytype-pb", unavailableText);
-    renderPercentile("#monkeytype-percentile", null);
+    setText(STATS_SELECTORS.monkeytypeSummary, unavailableText);
+    setText(STATS_SELECTORS.monkeytypePb, unavailableText);
+    renderPercentile(STATS_SELECTORS.monkeytypePercentile, null);
     return;
   }
 
@@ -145,22 +153,27 @@ export const renderStats = ({ leetcode, monkeytype }) => {
   const topPercent = leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
   setStatMarkup(
-    "#monkeytype-summary",
+    STATS_SELECTORS.monkeytypeSummary,
     `<span class="stat-value">${formatNumber(monkeytype.completedTests)}</span> tests completed · <span class="stat-value">${formatNumber(typingHours, 1)}h</span> total typing`
   );
   setStatMarkup(
-    "#monkeytype-pb",
+    STATS_SELECTORS.monkeytypePb,
     topPercent
       ? `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span> · top <span class="stat-value">${formatNumber(topPercent, 2)}%</span>`
       : `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span>`
   );
-  renderPercentile("#monkeytype-percentile", topPercent);
+  renderPercentile(STATS_SELECTORS.monkeytypePercentile, topPercent);
 };
 
 export const setStatsFallback = () => {
-  ["#leetcode-solved", "#leetcode-contest", "#monkeytype-summary", "#monkeytype-pb"].forEach((selector) => {
+  [
+    STATS_SELECTORS.leetcodeSolved,
+    STATS_SELECTORS.leetcodeContest,
+    STATS_SELECTORS.monkeytypeSummary,
+    STATS_SELECTORS.monkeytypePb,
+  ].forEach((selector) => {
     setText(selector, unavailableText);
   });
-  renderPercentile("#leetcode-percentile", null);
-  renderPercentile("#monkeytype-percentile", null);
+  renderPercentile(STATS_SELECTORS.leetcodePercentile, null);
+  renderPercentile(STATS_SELECTORS.monkeytypePercentile, null);
 };
