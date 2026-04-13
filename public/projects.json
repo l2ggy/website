@@ -1,12 +1,12 @@
 [
   {
-    "title": "Project Placeholder One",
-    "summary": "Brief placeholder summary of purpose and outcome.",
-    "tools": "Framework · Language · API · Data Store · Hosting"
+    "title": "APA Site Choice Transformer",
+    "summary": "Co-led a 5-person team at the Toronto Bioinformatics Hackathon 2025 (2nd place). Built and trained a DNABERT-2 model with PyTorch + Hugging Face on ~800k labeled sequence windows using A100 GPUs.",
+    "tools": "Python · PyTorch · Hugging Face · GCP · AWS · Git LFS"
   },
   {
-    "title": "Project Placeholder Two",
-    "summary": "Brief placeholder summary of purpose and outcome.",
-    "tools": "Library · Runtime · Styling · Testing · Deployment"
+    "title": "CreditCombo — Credit Card Rewards Optimization Engine",
+    "summary": "Built a polished static web app with a cap-aware optimization engine that models card setups under real constraints, including guided onboarding, deep-link state transfer, and responsive computation via Web Worker.",
+    "tools": "JavaScript · HTML/CSS · JSON · Web Workers · Cloudflare Workers"
   }
 ]

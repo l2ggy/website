@@ -1,6 +1,14 @@
+const renderIcon = (icon, title) => {
+  if (!icon) {
+    return '<div class="entry-icon" aria-hidden="true">Icon</div>';
+  }
+
+  return `<img class="entry-icon entry-thumb" src="${icon}" alt="${title} logo" loading="lazy" />`;
+};
+
 const renderEntry = ({ icon, title, subtitle, dates }) => `
   <article class="entry">
-    <div class="entry-icon" aria-hidden="true">${icon || "Icon"}</div>
+    ${renderIcon(icon, title)}
     <div class="entry-main">
       <div class="entry-head">
         <h3>${title}</h3>

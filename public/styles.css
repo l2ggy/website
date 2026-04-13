@@ -98,6 +98,19 @@ button {
   font-size: 0.84rem;
 }
 
+.logo-slot {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.site-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: block;
+}
+
 .text-btn {
   position: relative;
   transition: color 180ms ease, transform 180ms ease;
@@ -211,6 +224,12 @@ button {
   place-items: center;
   color: var(--muted);
   font-size: 0.8rem;
+}
+
+.entry-thumb {
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--line);
 }
 
 .entry-main {
