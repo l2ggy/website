@@ -327,8 +327,7 @@ button {
   transition-delay: calc(var(--hero-letter-stagger, var(--hero-letter-i)) * 18ms);
 }
 
-#hero-name:hover .hero-letter,
-#hero-name:focus-visible .hero-letter {
+#hero-name.hero-name-animate .hero-letter {
   transform: translateY(var(--hero-letter-lift)) rotate(var(--hero-letter-tilt));
 }
 

@@ -317,6 +317,7 @@ const splitHeroNameLetters = () => {
   };
 
   const showPlainName = () => {
+    heroName.classList.remove("hero-name-animate");
     heroName.classList.remove("hero-name-split");
     heroName.removeAttribute("aria-label");
     heroName.textContent = originalText;
@@ -324,11 +325,15 @@ const splitHeroNameLetters = () => {
 
   const showAnimatedName = () => {
     randomizeHeroLetters();
+    heroName.classList.remove("hero-name-animate");
     heroName.classList.add("hero-name-split");
     heroName.setAttribute("aria-label", originalText);
     heroName.textContent = "";
     letterSpans.forEach((span) => {
       heroName.append(span);
+    });
+    requestAnimationFrame(() => {
+      heroName.classList.add("hero-name-animate");
     });
   };
 
