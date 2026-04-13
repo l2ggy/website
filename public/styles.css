@@ -290,6 +290,24 @@ button {
   gap: 0.2rem;
 }
 
+.hero-globe {
+  width: min(32vw, 188px);
+  min-width: 132px;
+  height: auto;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+}
+
+.hero-globe:active {
+  cursor: grabbing;
+}
+
+.globe-section {
+  justify-items: center;
+  margin-top: -0.3rem;
+}
+
 .hero-heatmap-wrap {
   position: absolute;
   top: 50%;
@@ -608,6 +626,11 @@ button {
   .hero-heatmap {
     width: 100%;
     max-width: 100%;
+  }
+
+  .hero-globe {
+    width: min(48vw, 176px);
+    min-width: 126px;
   }
 
   .entry-head {
