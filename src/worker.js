@@ -59,12 +59,32 @@ const getLeetCodeStats = async (username) => {
 };
 
 const getMonkeytypeStats = async (username) => {
-  const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`);
-  if (!response.ok) {
+  const requestHeaders = {
+    accept: "application/json",
+    origin: "https://monkeytype.com",
+    referer: `https://monkeytype.com/profile/${encodeURIComponent(username)}`,
+    "user-agent": "Mozilla/5.0",
+  };
+  const requestUrls = [
+    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`,
+    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile?isUid=false`,
+  ];
+
+  let payload = null;
+  for (const url of requestUrls) {
+    const response = await fetch(url, { headers: requestHeaders });
+    if (!response.ok) {
+      continue;
+    }
+
+    payload = await response.json();
+    break;
+  }
+
+  if (!payload) {
     throw new Error("Monkeytype request failed");
   }
 
-  const payload = await response.json();
   const data = payload?.data || {};
   const typingStats = data.typingStats || {};
   const personalBest60 = data?.personalBests?.time?.["60"] || [];
@@ -85,8 +105,12 @@ const getMonkeytypeStats = async (username) => {
 const getStats = async (requestUrl) => {
   const leetcode = requestUrl.searchParams.get("leetcode") || "lagsterino";
   const monkeytype = requestUrl.searchParams.get("monkeytype") || "laggy";
-
-  const [leetcodeStats, monkeytypeStats] = await Promise.all([getLeetCodeStats(leetcode), getMonkeytypeStats(monkeytype)]);
+  const [leetcodeResult, monkeytypeResult] = await Promise.allSettled([
+    getLeetCodeStats(leetcode),
+    getMonkeytypeStats(monkeytype),
+  ]);
+  const leetcodeStats = leetcodeResult.status === "fulfilled" ? leetcodeResult.value : null;
+  const monkeytypeStats = monkeytypeResult.status === "fulfilled" ? monkeytypeResult.value : null;
 
   return {
     fetchedAt: new Date().toISOString(),
@@ -102,12 +126,8 @@ export default {
     const requestUrl = new URL(request.url);
 
     if (requestUrl.pathname === "/api/stats") {
-      try {
-        const stats = await getStats(requestUrl);
-        return jsonResponse(stats);
-      } catch {
-        return jsonResponse({ error: "Unable to load stats right now." }, { status: 502 });
-      }
+      const stats = await getStats(requestUrl);
+      return jsonResponse(stats);
     }
 
     return env.ASSETS.fetch(request);
