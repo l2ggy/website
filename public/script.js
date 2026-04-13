@@ -34,6 +34,28 @@ const renderByKind = {
   project: renderProject,
 };
 
+const attachLogoAnimation = () => {
+  const logo = document.querySelector(".logo-slot");
+  if (!logo) return;
+
+  const animationClass = "is-animating";
+  const animationMs = 420;
+  let isCoolingDown = false;
+
+  logo.addEventListener("click", () => {
+    if (isCoolingDown) return;
+
+    isCoolingDown = true;
+    logo.classList.remove(animationClass);
+    void logo.offsetWidth;
+    logo.classList.add(animationClass);
+    window.setTimeout(() => {
+      logo.classList.remove(animationClass);
+      isCoolingDown = false;
+    }, animationMs);
+  });
+};
+
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
@@ -218,5 +240,6 @@ document.querySelectorAll(".entries").forEach((element) => {
   });
 });
 
+attachLogoAnimation();
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();

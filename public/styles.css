@@ -102,6 +102,7 @@ button {
   display: inline-flex;
   gap: 0.5rem;
   align-items: center;
+  position: relative;
 }
 
 .site-icon {
@@ -109,6 +110,51 @@ button {
   height: 32px;
   border-radius: 6px;
   display: block;
+}
+
+.logo-slot::after {
+  content: "";
+  position: absolute;
+  inset: -0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.logo-slot.is-animating {
+  animation: logo-bounce 420ms ease;
+}
+
+.logo-slot.is-animating::after {
+  animation: logo-ring-pulse 420ms ease;
+}
+
+@keyframes logo-bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.08);
+  }
+  65% {
+    transform: scale(0.97);
+  }
+}
+
+@keyframes logo-ring-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  35% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
 }
 
 .text-btn {
