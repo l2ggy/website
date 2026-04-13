@@ -58,6 +58,33 @@ const loadEntries = async (element) => {
   element.innerHTML = items.map(renderByKind[kind]).join("");
 };
 
+const setStatText = (field, text) => {
+  const element = document.querySelector(`[data-stats-field="${field}"]`);
+  if (element) {
+    element.textContent = text;
+  }
+};
+
+const loadStats = async () => {
+  const response = await fetch("/api/stats");
+  if (!response.ok) {
+    throw new Error("stats fetch failed");
+  }
+
+  const data = await response.json();
+  const { leetcode, monkeytype } = data;
+
+  setStatText(
+    "leetcode",
+    `${leetcode.easy} easy · ${leetcode.medium} medium · ${leetcode.hard} hard · rating ${leetcode.contestRating} (${leetcode.percentile}th percentile)`
+  );
+
+  setStatText(
+    "monkeytype",
+    `${monkeytype.testsCompleted.toLocaleString()} tests · ${monkeytype.hoursTyping} hours typing · best ${monkeytype.bestWpm} WPM (60s)`
+  );
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -101,6 +128,11 @@ document.querySelectorAll(".entries").forEach((element) => {
   loadEntries(element).catch(() => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
+});
+
+loadStats().catch(() => {
+  setStatText("leetcode", "LeetCode stats unavailable right now.");
+  setStatText("monkeytype", "Monkeytype stats unavailable right now.");
 });
 
 renderGitHubHeatmap();

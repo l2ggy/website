@@ -310,6 +310,26 @@ button {
   color: var(--muted);
 }
 
+
+.stats-list {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.stats-item {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.stats-item h3 {
+  font-size: 1.02rem;
+  font-weight: 520;
+}
+
+.stats-item p {
+  color: var(--muted);
+}
+
 .footer-content {
   font-size: 0.8rem;
 }
