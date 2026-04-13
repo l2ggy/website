@@ -330,6 +330,47 @@ button {
   font-weight: 520;
 }
 
+.delight p {
+  max-width: 42ch;
+}
+
+.orb-playground {
+  --orb-size: 40px;
+  position: relative;
+  width: min(320px, 100%);
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--line) 55%, transparent) 0 14px, transparent 14px),
+    linear-gradient(180deg, color-mix(in srgb, var(--line) 25%, transparent), transparent);
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--orb-size);
+  height: var(--orb-size);
+  border-radius: 50%;
+  border: 0;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #a8a8ff 46%, #6767ff);
+  box-shadow: 0 10px 20px color-mix(in srgb, #6767ff 28%, transparent);
+  transform: translate(-50%, -50%);
+  transition: transform 260ms cubic-bezier(0.2, 0.9, 0.25, 1);
+  touch-action: none;
+  cursor: grab;
+}
+
+.orb:active {
+  cursor: grabbing;
+}
+
+.orb.is-dragging {
+  transition: none;
+}
+
 .footer-content {
   font-size: 0.8rem;
 }

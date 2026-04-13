@@ -173,6 +173,59 @@ const setStatsFallback = () => {
   });
 };
 
+const initOrbPlayground = () => {
+  const playground = document.querySelector("[data-orb-playground]");
+  const orb = playground?.querySelector(".orb");
+  if (!playground || !orb) return;
+
+  let offsetX = 0;
+  let offsetY = 0;
+  let pointerId = null;
+
+  const updateOrb = () => {
+    orb.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
+  };
+
+  const clampOffset = (clientX, clientY) => {
+    const bounds = playground.getBoundingClientRect();
+    const orbRect = orb.getBoundingClientRect();
+    const radius = orbRect.width / 2;
+    const centerX = bounds.left + bounds.width / 2;
+    const centerY = bounds.top + bounds.height / 2;
+    const maxX = bounds.width / 2 - radius;
+    const maxY = bounds.height / 2 - radius;
+
+    offsetX = Math.max(-maxX, Math.min(maxX, clientX - centerX));
+    offsetY = Math.max(-maxY, Math.min(maxY, clientY - centerY));
+  };
+
+  const releaseOrb = () => {
+    pointerId = null;
+    offsetX = 0;
+    offsetY = 0;
+    orb.classList.remove("is-dragging");
+    updateOrb();
+  };
+
+  orb.addEventListener("pointerdown", (event) => {
+    pointerId = event.pointerId;
+    orb.classList.add("is-dragging");
+    orb.setPointerCapture(pointerId);
+    clampOffset(event.clientX, event.clientY);
+    updateOrb();
+  });
+
+  orb.addEventListener("pointermove", (event) => {
+    if (event.pointerId !== pointerId) return;
+    event.preventDefault();
+    clampOffset(event.clientX, event.clientY);
+    updateOrb();
+  });
+
+  orb.addEventListener("pointerup", releaseOrb);
+  orb.addEventListener("pointercancel", releaseOrb);
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -220,3 +273,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+initOrbPlayground();
