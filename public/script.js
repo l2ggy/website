@@ -85,6 +85,35 @@ const setStatMarkup = (selector, markup) => {
   }
 };
 
+const setPercentileChart = (selector, topPercentage) => {
+  const element = document.querySelector(selector);
+  if (!element) {
+    return;
+  }
+
+  if (!topPercentage) {
+    element.hidden = true;
+    element.innerHTML = "";
+    return;
+  }
+
+  const percentile = Math.max(0, Math.min(99.9, 100 - topPercentage));
+  const x = 6 + (percentile / 100) * 108;
+  const label = `${formatNumber(percentile, 1)}th percentile`;
+
+  element.hidden = false;
+  element.innerHTML = `
+    <svg viewBox="0 0 120 64" role="img" aria-label="${label}">
+      <path class="percentile-fill" d="M6 46 C 32 8, 88 8, 114 46 L 114 46 L 6 46 Z"></path>
+      <path class="percentile-curve" d="M6 46 C 32 8, 88 8, 114 46"></path>
+      <line class="percentile-marker" x1="${x}" y1="46" x2="${x}" y2="18"></line>
+      <circle class="percentile-dot" cx="${x}" cy="18" r="2.2"></circle>
+      <text class="percentile-label" x="6" y="58">0</text>
+      <text class="percentile-label" x="106" y="58">100</text>
+    </svg>
+  `;
+};
+
 const renderStats = ({ leetcode, monkeytype }) => {
   const solved = leetcode?.solved;
   const contest = leetcode?.contest;
@@ -109,10 +138,12 @@ const renderStats = ({ leetcode, monkeytype }) => {
       `Contest rating: <span class="stat-value">${formatNumber(Math.round(contest.rating))}</span> · top <span class="stat-value">${formatNumber(contest.topPercentage, 2)}%</span>`
     );
   }
+  setPercentileChart("#leetcode-percentile", contest?.topPercentage || null);
 
   if (!monkeytype) {
     setText("#monkeytype-summary", unavailableText);
     setText("#monkeytype-pb", unavailableText);
+    setPercentileChart("#monkeytype-percentile", null);
     return;
   }
 
@@ -129,6 +160,7 @@ const renderStats = ({ leetcode, monkeytype }) => {
       ? `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span> · top <span class="stat-value">${formatNumber(topPercent, 2)}%</span>`
       : `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span>`
   );
+  setPercentileChart("#monkeytype-percentile", topPercent);
 };
 
 const parseMonkeytypeProfile = (payload) => {
@@ -186,6 +218,8 @@ const setStatsFallback = () => {
   ["#leetcode-solved", "#leetcode-contest", "#monkeytype-summary", "#monkeytype-pb"].forEach((selector) => {
     setText(selector, unavailableText);
   });
+  setPercentileChart("#leetcode-percentile", null);
+  setPercentileChart("#monkeytype-percentile", null);
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");

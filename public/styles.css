@@ -325,6 +325,18 @@ button {
   gap: 0.15rem;
 }
 
+.stats-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.stats-copy {
+  display: grid;
+  gap: 0.15rem;
+}
+
 .stats-item h3 {
   font-size: 1.02rem;
   font-weight: 520;
@@ -349,6 +361,48 @@ button {
   font-variant-numeric: tabular-nums;
   font-weight: 520;
   line-height: 1.3;
+}
+
+.percentile-chart {
+  width: 120px;
+  min-height: 64px;
+  color: var(--muted);
+}
+
+.percentile-chart[hidden] {
+  display: none;
+}
+
+.percentile-chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.percentile-curve {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.6;
+}
+
+.percentile-fill {
+  fill: rgba(127, 127, 127, 0.08);
+  stroke: none;
+}
+
+.percentile-marker {
+  stroke: var(--text);
+  stroke-width: 1.4;
+}
+
+.percentile-dot {
+  fill: var(--text);
+}
+
+.percentile-label {
+  fill: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.02em;
 }
 
 .footer-content {
@@ -396,6 +450,14 @@ button {
     flex-direction: column;
     gap: 0.2rem;
     padding-block: 0.2rem;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  .percentile-chart {
+    width: 108px;
   }
 
   .hero h1 {
