@@ -77,21 +77,37 @@ const setText = (selector, text) => {
     element.textContent = text;
   }
 };
+const setHtml = (selector, html) => {
+  const element = document.querySelector(selector);
+  if (element) {
+    element.innerHTML = html;
+  }
+};
+const statMetric = (value, label) => `<span class="stat-metric"><span class="stat-value">${value}</span><span class="stat-label">${label}</span></span>`;
+const statLine = (...parts) => `<span class="stat-line">${parts.join('<span class="stat-sep">·</span>')}</span>`;
 
 const renderStats = ({ leetcode, monkeytype }) => {
   const solved = leetcode?.solved;
   const contest = leetcode?.contest;
   const leaderboard = monkeytype?.leaderboard;
-  setText(
+  setHtml(
     "#leetcode-solved",
     solved
-      ? `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`
+      ? statLine(
+          statMetric(formatNumber(solved.all), "solved"),
+          statMetric(formatNumber(solved.easy), "easy"),
+          statMetric(formatNumber(solved.medium), "medium"),
+          statMetric(formatNumber(solved.hard), "hard")
+        )
       : unavailableText
   );
-  setText(
+  setHtml(
     "#leetcode-contest",
     contest?.rating && contest?.topPercentage
-      ? `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`
+      ? statLine(
+          statMetric(formatNumber(Math.round(contest.rating)), "contest rating"),
+          statMetric(`${formatNumber(contest.topPercentage, 2)}%`, "top")
+        )
       : unavailableText
   );
 
@@ -104,15 +120,21 @@ const renderStats = ({ leetcode, monkeytype }) => {
   const typingHours = monkeytype.timeTypingSeconds / 3600;
   const topPercent = leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
-  setText(
+  setHtml(
     "#monkeytype-summary",
-    `${formatNumber(monkeytype.completedTests)} tests completed · ${formatNumber(typingHours, 1)}h total typing`
+    statLine(
+      statMetric(formatNumber(monkeytype.completedTests), "tests"),
+      statMetric(`${formatNumber(typingHours, 1)}h`, "typing")
+    )
   );
-  setText(
+  setHtml(
     "#monkeytype-pb",
     topPercent
-      ? `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM`
+      ? statLine(
+          statMetric(`${formatNumber(monkeytype.pb60, 2)} WPM`, "pb (60s)"),
+          statMetric(`${formatNumber(topPercent, 2)}%`, "top")
+        )
+      : statLine(statMetric(`${formatNumber(monkeytype.pb60, 2)} WPM`, "pb (60s)"))
   );
 };
 

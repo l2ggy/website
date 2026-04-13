@@ -330,6 +330,35 @@ button {
   font-weight: 520;
 }
 
+.stat-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.stat-sep {
+  color: var(--line);
+}
+
+.stat-metric {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.stat-value {
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.08rem 0.52rem;
+}
+
+.stat-label {
+  color: var(--muted);
+}
+
 .footer-content {
   font-size: 0.8rem;
 }
