@@ -448,9 +448,15 @@ button {
   .percentile-viz {
     position: static;
     transform: none;
-    width: min(100%, 14rem);
+    order: 2;
+    width: min(100%, 11.8rem);
     min-height: 4.9rem;
     align-items: center;
+    margin: 0.12rem auto 0;
+  }
+
+  .stats-copy {
+    order: 1;
   }
 
   .footer-content {
