@@ -3,6 +3,7 @@ const storedThemeKey = "portfolio-theme-override";
 export const setupTheme = () => {
   const themeToggle = document.querySelector("#theme-toggle");
   const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let overrideTheme = localStorage.getItem(storedThemeKey);
 
   const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
@@ -19,14 +20,28 @@ export const setupTheme = () => {
     themeToggle.setAttribute("title", `Switch to ${nextTheme} mode`);
   };
 
-  applyTheme(overrideTheme || getSystemTheme());
+  const setTheme = (theme, withAnimation = false) => {
+    const canAnimate =
+      withAnimation && !reducedMotionQuery.matches && typeof document.startViewTransition === "function";
+
+    if (!canAnimate) {
+      applyTheme(theme);
+      return;
+    }
+
+    document.startViewTransition(() => {
+      applyTheme(theme);
+    });
+  };
+
+  setTheme(overrideTheme || getSystemTheme());
 
   if (themeToggle) {
     themeToggle.addEventListener("click", () => {
       const currentTheme = document.documentElement.dataset.theme || getSystemTheme();
       overrideTheme = currentTheme === "dark" ? "light" : "dark";
       localStorage.setItem(storedThemeKey, overrideTheme);
-      applyTheme(overrideTheme);
+      setTheme(overrideTheme, true);
     });
   }
 
@@ -38,7 +53,7 @@ export const setupTheme = () => {
     }
 
     if (!overrideTheme) {
-      applyTheme(systemTheme);
+      setTheme(systemTheme);
     }
   });
 };

@@ -9,6 +9,7 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --theme-transition: 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 :root[data-theme="light"] {
@@ -27,6 +28,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
+  transition: background-color var(--theme-transition), color var(--theme-transition);
 }
 
 h1,
@@ -61,6 +63,7 @@ button {
   right: 0;
   background: var(--bg);
   z-index: 20;
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 .topbar {
@@ -97,6 +100,7 @@ button {
 .text-btn {
   color: var(--muted);
   font-size: 0.84rem;
+  transition: color var(--theme-transition);
 }
 
 .logo-slot {
@@ -114,7 +118,7 @@ button {
 
 .text-btn {
   position: relative;
-  transition: color 180ms ease, transform 180ms ease;
+  transition: color var(--theme-transition), transform 180ms ease;
 }
 
 .text-btn::after {
@@ -196,7 +200,7 @@ button {
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: transform 260ms ease;
+  transition: transform 260ms ease, fill var(--theme-transition), stroke var(--theme-transition);
 }
 
 .theme-icon__sun,
@@ -544,6 +548,10 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :root {
+    --theme-transition: 0ms linear;
+  }
+
   .theme-icon,
   .theme-icon__sun,
   .theme-icon__moon,
