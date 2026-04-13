@@ -78,42 +78,153 @@ const setText = (selector, text) => {
   }
 };
 
+const setStatMarkup = (selector, markup) => {
+  const element = document.querySelector(selector);
+  if (element) {
+    element.innerHTML = markup;
+  }
+};
+
+const erf = (x) => {
+  const sign = x < 0 ? -1 : 1;
+  const absX = Math.abs(x);
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+  const t = 1 / (1 + p * absX);
+  const y = 1 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX));
+  return sign * y;
+};
+
+const standardNormalPdf = (z) => Math.exp(-(z * z) / 2) / Math.sqrt(2 * Math.PI);
+
+const standardNormalCdf = (z) => 0.5 * (1 + erf(z / Math.SQRT2));
+
+const standardNormalInvCdf = (p) => {
+  if (p <= 0 || p >= 1) {
+    return null;
+  }
+
+  let low = -8;
+  let high = 8;
+  for (let i = 0; i < 70; i += 1) {
+    const mid = (low + high) / 2;
+    if (standardNormalCdf(mid) < p) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+  return (low + high) / 2;
+};
+
+const renderPercentile = (selector, percentile) => {
+  const element = document.querySelector(selector);
+  if (!element) {
+    return;
+  }
+
+  if (!percentile || percentile <= 0 || percentile > 100) {
+    element.hidden = true;
+    element.innerHTML = "";
+    return;
+  }
+
+  const chartWidth = 124;
+  const chartHeight = 52;
+  const baseline = 44;
+  const left = 4;
+  const right = chartWidth - 4;
+  const zMin = -3.8;
+  const zMax = 3.8;
+  const peak = standardNormalPdf(0);
+  const topPercentile = percentile / 100;
+  const zCutoff = standardNormalInvCdf(1 - topPercentile);
+  const points = [];
+  const tailPoints = [];
+
+  for (let i = 0; i <= 64; i += 1) {
+    const ratio = i / 64;
+    const z = zMin + (zMax - zMin) * ratio;
+    const x = left + (right - left) * ratio;
+    const y = baseline - (standardNormalPdf(z) / peak) * 22;
+    points.push(`${x},${y}`);
+    if (z >= zCutoff) {
+      tailPoints.push(`${x},${y}`);
+    }
+  }
+
+  const clampedCutoff = Math.max(zMin, Math.min(zMax, zCutoff));
+  const cutoffRatio = (clampedCutoff - zMin) / (zMax - zMin);
+  const markerX = left + (right - left) * cutoffRatio;
+  const markerY = baseline - (standardNormalPdf(clampedCutoff) / peak) * 22;
+  const fillPath = tailPoints.length
+    ? `M ${markerX} ${baseline} L ${tailPoints.join(" L ")} L ${right} ${baseline} Z`
+    : "";
+
+  element.hidden = false;
+  element.innerHTML = `
+    <svg viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-label="Percentile distribution">
+      <line class="percentile-baseline" x1="${left}" y1="${baseline}" x2="${right}" y2="${baseline}" />
+      <path class="percentile-tail" d="${fillPath}" />
+      <polyline class="percentile-curve" points="${points.join(" ")}" />
+      <line class="percentile-marker" x1="${markerX}" y1="${baseline}" x2="${markerX}" y2="${markerY}" />
+      <circle class="percentile-dot" cx="${markerX}" cy="${markerY}" r="2" />
+    </svg>
+    <p><span class="stat-value">Top ${formatNumber(percentile, 2)}%</span> shaded tail</p>
+  `;
+};
+
 const renderStats = ({ leetcode, monkeytype }) => {
   const solved = leetcode?.solved;
   const contest = leetcode?.contest;
   const leaderboard = monkeytype?.leaderboard;
   setText(
     "#leetcode-solved",
-    solved
-      ? `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`
-      : unavailableText
+    unavailableText
   );
+  if (solved) {
+    setStatMarkup(
+      "#leetcode-solved",
+      `<span class="stat-value">${formatNumber(solved.all)}</span> solved (<span class="stat-value">${formatNumber(solved.easy)}</span> easy · <span class="stat-value">${formatNumber(solved.medium)}</span> medium · <span class="stat-value">${formatNumber(solved.hard)}</span> hard)`
+    );
+  }
   setText(
     "#leetcode-contest",
-    contest?.rating && contest?.topPercentage
-      ? `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`
-      : unavailableText
+    unavailableText
   );
+  if (contest?.rating && contest?.topPercentage) {
+    setStatMarkup(
+      "#leetcode-contest",
+      `Contest rating: <span class="stat-value">${formatNumber(Math.round(contest.rating))}</span> · top <span class="stat-value">${formatNumber(contest.topPercentage, 2)}%</span>`
+    );
+  }
+  renderPercentile("#leetcode-percentile", contest?.topPercentage);
 
   if (!monkeytype) {
     setText("#monkeytype-summary", unavailableText);
     setText("#monkeytype-pb", unavailableText);
+    renderPercentile("#monkeytype-percentile", null);
     return;
   }
 
   const typingHours = monkeytype.timeTypingSeconds / 3600;
   const topPercent = leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
-  setText(
+  setStatMarkup(
     "#monkeytype-summary",
-    `${formatNumber(monkeytype.completedTests)} tests completed · ${formatNumber(typingHours, 1)}h total typing`
+    `<span class="stat-value">${formatNumber(monkeytype.completedTests)}</span> tests completed · <span class="stat-value">${formatNumber(typingHours, 1)}h</span> total typing`
   );
-  setText(
+  setStatMarkup(
     "#monkeytype-pb",
     topPercent
-      ? `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM`
+      ? `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span> · top <span class="stat-value">${formatNumber(topPercent, 2)}%</span>`
+      : `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span>`
   );
+  renderPercentile("#monkeytype-percentile", topPercent);
 };
 
 const parseMonkeytypeProfile = (payload) => {
@@ -171,6 +282,8 @@ const setStatsFallback = () => {
   ["#leetcode-solved", "#leetcode-contest", "#monkeytype-summary", "#monkeytype-pb"].forEach((selector) => {
     setText(selector, unavailableText);
   });
+  renderPercentile("#leetcode-percentile", null);
+  renderPercentile("#monkeytype-percentile", null);
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
