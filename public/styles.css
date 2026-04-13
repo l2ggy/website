@@ -323,11 +323,99 @@ button {
 .stats-item {
   display: grid;
   gap: 0.15rem;
+  position: relative;
+  padding-right: 10.4rem;
+}
+
+.stats-copy {
+  display: grid;
+  gap: 0.15rem;
 }
 
 .stats-item h3 {
   font-size: 1.02rem;
   font-weight: 520;
+}
+
+.stats-item p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.stat-value {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.02rem 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  background: rgba(127, 127, 127, 0.12);
+  color: var(--text);
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 520;
+  line-height: 1.3;
+}
+
+.percentile-viz {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 0.3rem;
+  justify-items: end;
+  align-content: stretch;
+  color: var(--muted);
+  width: 9.6rem;
+  padding-block: 0.05rem;
+}
+
+.percentile-plot {
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.percentile-viz svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 152 / 72;
+  display: block;
+}
+
+.percentile-viz p {
+  font-size: 0.75rem;
+  gap: 0.2rem;
+  justify-self: end;
+}
+
+.percentile-curve {
+  stroke: var(--line);
+  stroke-width: 1.2;
+  fill: none;
+}
+
+.percentile-axis {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.percentile-fill {
+  fill: rgba(127, 127, 127, 0.18);
+}
+
+.percentile-marker {
+  stroke: var(--text);
+  stroke-width: 1.15;
+  stroke-linecap: round;
+}
+
+.percentile-dot {
+  fill: var(--text);
 }
 
 .footer-content {
@@ -367,6 +455,22 @@ button {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.08rem;
+  }
+
+  .stats-item {
+    padding-right: 0;
+  }
+
+  .percentile-viz {
+    position: static;
+    width: min(100%, 12rem);
+    margin-top: 0.14rem;
+    padding-block: 0;
+    justify-items: start;
+  }
+
+  .percentile-viz p {
+    justify-self: start;
   }
 
   .footer-content {
