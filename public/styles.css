@@ -290,6 +290,55 @@ button {
   gap: 0.2rem;
 }
 
+.hero-globe-wrap {
+  margin-top: 0.5rem;
+}
+
+.hero-globe {
+  --globe-size: clamp(68px, 8vw, 94px);
+  --globe-rotate-x: -10deg;
+  --globe-rotate-y: 18deg;
+  width: var(--globe-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  cursor: grab;
+  transform-style: preserve-3d;
+  transform: perspective(520px) rotateX(var(--globe-rotate-x)) rotateY(var(--globe-rotate-y));
+  transition: transform 220ms ease-out;
+}
+
+.hero-globe:active {
+  cursor: grabbing;
+}
+
+.hero-globe-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.hero-globe-base {
+  fill: color-mix(in srgb, var(--bg) 30%, var(--text) 70%);
+}
+
+.hero-globe-grid {
+  fill: none;
+  stroke: color-mix(in srgb, var(--line) 50%, var(--text) 50%);
+  stroke-width: 1.4;
+  opacity: 0.85;
+}
+
+.hero-globe-land {
+  fill: color-mix(in srgb, var(--line) 20%, var(--text) 80%);
+  opacity: 0.62;
+}
+
+.hero-globe-shine {
+  fill: color-mix(in srgb, var(--bg) 80%, white 20%);
+  opacity: 0.32;
+}
+
 .hero-heatmap-wrap {
   position: absolute;
   top: 50%;
@@ -572,7 +621,8 @@ button {
   .theme-icon,
   .theme-icon__sun,
   .theme-icon__moon,
-  .theme-icon__rays {
+  .theme-icon__rays,
+  .hero-globe {
     transition: none;
   }
 
@@ -644,5 +694,9 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+
+  .hero-globe {
+    --globe-size: clamp(60px, 18vw, 82px);
   }
 }
