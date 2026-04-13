@@ -77,23 +77,53 @@ const setText = (selector, text) => {
     element.textContent = text;
   }
 };
+const setStatLine = (selector, parts) => {
+  const element = document.querySelector(selector);
+  if (!element) return;
+
+  element.textContent = "";
+  parts.forEach((part) => {
+    if (typeof part === "string") {
+      element.append(document.createTextNode(part));
+      return;
+    }
+
+    const token = document.createElement("span");
+    token.className = "stat-token";
+    token.textContent = part.value;
+    element.append(token);
+  });
+};
 
 const renderStats = ({ leetcode, monkeytype }) => {
   const solved = leetcode?.solved;
   const contest = leetcode?.contest;
   const leaderboard = monkeytype?.leaderboard;
-  setText(
-    "#leetcode-solved",
-    solved
-      ? `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`
-      : unavailableText
-  );
-  setText(
-    "#leetcode-contest",
-    contest?.rating && contest?.topPercentage
-      ? `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`
-      : unavailableText
-  );
+  if (!solved) {
+    setText("#leetcode-solved", unavailableText);
+  } else {
+    setStatLine("#leetcode-solved", [
+      { value: formatNumber(solved.all) },
+      " solved (",
+      { value: formatNumber(solved.easy) },
+      " easy · ",
+      { value: formatNumber(solved.medium) },
+      " medium · ",
+      { value: formatNumber(solved.hard) },
+      " hard)",
+    ]);
+  }
+
+  if (!(contest?.rating && contest?.topPercentage)) {
+    setText("#leetcode-contest", unavailableText);
+  } else {
+    setStatLine("#leetcode-contest", [
+      "Contest rating: ",
+      { value: formatNumber(Math.round(contest.rating)) },
+      " · top ",
+      { value: `${formatNumber(contest.topPercentage, 2)}%` },
+    ]);
+  }
 
   if (!monkeytype) {
     setText("#monkeytype-summary", unavailableText);
@@ -104,16 +134,24 @@ const renderStats = ({ leetcode, monkeytype }) => {
   const typingHours = monkeytype.timeTypingSeconds / 3600;
   const topPercent = leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
-  setText(
-    "#monkeytype-summary",
-    `${formatNumber(monkeytype.completedTests)} tests completed · ${formatNumber(typingHours, 1)}h total typing`
-  );
-  setText(
-    "#monkeytype-pb",
-    topPercent
-      ? `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM`
-  );
+  setStatLine("#monkeytype-summary", [
+    { value: formatNumber(monkeytype.completedTests) },
+    " tests completed · ",
+    { value: `${formatNumber(typingHours, 1)}h` },
+    " total typing",
+  ]);
+
+  if (topPercent) {
+    setStatLine("#monkeytype-pb", [
+      "PB (60s): ",
+      { value: `${formatNumber(monkeytype.pb60, 2)} WPM` },
+      " · top ",
+      { value: `${formatNumber(topPercent, 2)}%` },
+    ]);
+    return;
+  }
+
+  setStatLine("#monkeytype-pb", ["PB (60s): ", { value: `${formatNumber(monkeytype.pb60, 2)} WPM` }]);
 };
 
 const parseMonkeytypeProfile = (payload) => {

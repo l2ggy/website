@@ -330,6 +330,18 @@ button {
   font-weight: 520;
 }
 
+.stat-token {
+  display: inline-block;
+  padding: 0.02rem 0.34rem;
+  margin-inline: 0.03rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.84em;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+
 .footer-content {
   font-size: 0.8rem;
 }
