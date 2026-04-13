@@ -26,6 +26,45 @@ const renderByKind = {
   project: renderProject,
 };
 
+const monkeytypeDurations = [15, 30, 60, 120];
+
+const getBestWpm = (entries = []) =>
+  entries.reduce((best, entry) => Math.max(best, Number(entry?.wpm) || 0), 0);
+
+const formatDurationLabel = (seconds) => `${seconds}s best`;
+
+const renderMonkeytypeStats = async () => {
+  const section = document.querySelector("#typing");
+  const statsContainer = document.querySelector("#typing-stats");
+  const user = section?.dataset.monkeytypeUser?.trim();
+  if (!section || !statsContainer || !user) return;
+
+  try {
+    const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(user)}/profile`);
+    if (!response.ok) throw new Error("Request failed");
+
+    const payload = await response.json();
+    const profile = payload?.data;
+    if (!profile) throw new Error("Profile missing");
+
+    const bests = profile.personalBests?.time || {};
+    const rows = monkeytypeDurations
+      .map((duration) => {
+        const wpm = getBestWpm(bests[duration]);
+        return `<li><span>${formatDurationLabel(duration)}</span><strong>${wpm ? `${wpm.toFixed(1)} WPM` : "—"}</strong></li>`;
+      })
+      .join("");
+
+    const completedTests = profile.typingStats?.completedTests || 0;
+    statsContainer.innerHTML = `
+      <ul class="typing-stats-list">${rows}</ul>
+      <p class="typing-meta">${completedTests.toLocaleString()} tests completed</p>
+    `;
+  } catch {
+    statsContainer.innerHTML = "<p class=\"typing-status\">Unable to load Monkeytype stats.</p>";
+  }
+};
+
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
@@ -96,3 +135,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 });
 
 renderGitHubHeatmap();
+renderMonkeytypeStats();
