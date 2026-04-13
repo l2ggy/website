@@ -173,6 +173,42 @@ const setStatsFallback = () => {
   });
 };
 
+const scrollMoodFace = document.querySelector("#scroll-mood-face");
+const scrollMoodRoot = document.querySelector("#scroll-mood");
+const scrollMoodStates = [
+  { max: 0.15, face: "•ᴗ•", animation: "blink" },
+  { max: 0.35, face: "•◡•", animation: "bounce" },
+  { max: 0.55, face: "◕‿◕", animation: "wave" },
+  { max: 0.8, face: "•̀ᴗ•́", animation: "bounce" },
+  { max: 1, face: "✦ᴗ✦", animation: "blink" },
+];
+
+const updateScrollMood = () => {
+  if (!scrollMoodFace || !scrollMoodRoot) return;
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+  const state = scrollMoodStates.find(({ max }) => progress <= max) || scrollMoodStates[scrollMoodStates.length - 1];
+  if (scrollMoodFace.textContent !== state.face) {
+    scrollMoodFace.textContent = state.face;
+    scrollMoodRoot.dataset.state = state.animation;
+    window.setTimeout(() => {
+      if (scrollMoodRoot.dataset.state === state.animation) {
+        delete scrollMoodRoot.dataset.state;
+      }
+    }, 340);
+  }
+};
+
+let scrollMoodTicking = false;
+const requestMoodUpdate = () => {
+  if (scrollMoodTicking) return;
+  scrollMoodTicking = true;
+  window.requestAnimationFrame(() => {
+    updateScrollMood();
+    scrollMoodTicking = false;
+  });
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -220,3 +256,6 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+requestMoodUpdate();
+window.addEventListener("scroll", requestMoodUpdate, { passive: true });
+window.addEventListener("resize", requestMoodUpdate);

@@ -149,6 +149,76 @@ button {
   gap: var(--space-3);
 }
 
+.scroll-mood {
+  position: fixed;
+  right: 0.9rem;
+  bottom: calc(var(--footer-h) + 0.75rem);
+  z-index: 5;
+  pointer-events: none;
+  user-select: none;
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  opacity: 0.78;
+}
+
+.scroll-mood-face {
+  font-size: 0.95rem;
+  line-height: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace;
+}
+
+.scroll-mood[data-state="blink"] .scroll-mood-face {
+  animation: mood-blink 300ms steps(2, end);
+}
+
+.scroll-mood[data-state="bounce"] .scroll-mood-face {
+  animation: mood-bounce 320ms ease-out;
+}
+
+.scroll-mood[data-state="wave"] .scroll-mood-face {
+  animation: mood-wave 320ms ease-out;
+}
+
+@keyframes mood-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes mood-bounce {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes mood-wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(-7deg);
+  }
+  70% {
+    transform: rotate(7deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
 .section {
   display: grid;
   gap: var(--space-1);
@@ -378,5 +448,9 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+
+  .scroll-mood {
+    display: none;
   }
 }
