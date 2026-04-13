@@ -324,7 +324,7 @@ button {
   display: grid;
   gap: 0.15rem;
   position: relative;
-  padding-right: 10.4rem;
+  padding-right: clamp(8rem, 27vw, 10.4rem);
 }
 
 .stats-copy {
@@ -365,21 +365,28 @@ button {
   bottom: 0;
   display: grid;
   grid-template-rows: 1fr auto;
-  gap: 0.22rem;
+  gap: 0.28rem;
   justify-items: end;
   align-content: center;
+  align-items: end;
   color: var(--muted);
-  width: 9.6rem;
+  width: clamp(7.2rem, 24vw, 9.8rem);
+  min-height: 5.2rem;
+  padding-block: 0.08rem;
 }
 
 .percentile-viz svg {
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 152 / 72;
+  max-height: 100%;
 }
 
 .percentile-viz p {
   font-size: 0.75rem;
   gap: 0.2rem;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .percentile-curve {
@@ -447,11 +454,11 @@ button {
   }
 
   .stats-item {
-    padding-right: 8.2rem;
+    padding-right: clamp(7.4rem, 31vw, 8.4rem);
   }
 
   .percentile-viz {
-    width: 7.4rem;
+    width: clamp(6.8rem, 28vw, 7.8rem);
     justify-items: start;
   }
 
