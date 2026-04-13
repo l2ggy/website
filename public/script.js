@@ -285,6 +285,86 @@ const setStatsFallback = () => {
   renderPercentile("#monkeytype-percentile", null);
 };
 
+const decorToggle = document.querySelector("#decor-toggle");
+const decorContainer = document.querySelector(".decor-particles");
+const storedDecorKey = "portfolio-decor-override";
+const decorIcons = {
+  day: ["☀", "✦", "✧", "☁", "✦", "✧"],
+  night: ["☾", "✦", "✧", "✦", "✧", "✦"],
+};
+const decorPoints = [
+  { x: 8, y: 18, size: 1, delay: "0s" },
+  { x: 26, y: 52, size: 0.7, delay: "-0.8s" },
+  { x: 43, y: 14, size: 0.6, delay: "-1.2s" },
+  { x: 58, y: 47, size: 0.95, delay: "-2s" },
+  { x: 76, y: 22, size: 0.75, delay: "-1.4s" },
+  { x: 91, y: 59, size: 0.6, delay: "-0.4s" },
+];
+
+let decorOverride = localStorage.getItem(storedDecorKey);
+let decorHourTimeout;
+let decorHourInterval;
+
+const getHourDecorPreset = () => {
+  const localHour = new Date().getHours();
+  return localHour >= 7 && localHour < 19 ? "day" : "night";
+};
+
+const getActiveDecorPreset = () => decorOverride || getHourDecorPreset();
+
+const renderDecorParticles = (preset) => {
+  if (!decorContainer) {
+    return;
+  }
+
+  const icons = decorIcons[preset] || decorIcons.day;
+  decorContainer.innerHTML = decorPoints
+    .map(
+      (point, index) =>
+        `<span class="decor-particle" style="left:${point.x}%;top:${point.y}%;--size:${point.size};--delay:${point.delay}">${icons[index % icons.length]}</span>`
+    )
+    .join("");
+};
+
+const updateDecorToggle = () => {
+  if (!decorToggle) {
+    return;
+  }
+
+  const mode = decorOverride || "auto";
+  decorToggle.textContent = `Decor: ${mode[0].toUpperCase()}${mode.slice(1)}`;
+  decorToggle.setAttribute("aria-label", `Decor preset ${mode}`);
+};
+
+const applyDecorPreset = (preset) => {
+  document.documentElement.dataset.decor = preset;
+  renderDecorParticles(preset);
+  updateDecorToggle();
+};
+
+const clearDecorTimers = () => {
+  window.clearTimeout(decorHourTimeout);
+  window.clearInterval(decorHourInterval);
+};
+
+const scheduleDecorByHour = () => {
+  clearDecorTimers();
+
+  if (decorOverride) {
+    return;
+  }
+
+  const now = new Date();
+  const nextHour = new Date(now);
+  nextHour.setHours(now.getHours() + 1, 0, 0, 0);
+  decorHourTimeout = window.setTimeout(() => {
+    applyDecorPreset(getActiveDecorPreset());
+    decorHourInterval = window.setInterval(() => {
+      applyDecorPreset(getActiveDecorPreset());
+    }, 60 * 60 * 1000);
+  }, nextHour.getTime() - now.getTime());
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -301,6 +381,8 @@ const applyTheme = (theme) => {
 };
 
 applyTheme(overrideTheme || getSystemTheme());
+applyDecorPreset(getActiveDecorPreset());
+scheduleDecorByHour();
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
@@ -308,6 +390,21 @@ if (themeToggle) {
     overrideTheme = currentTheme === "dark" ? "light" : "dark";
     localStorage.setItem(storedThemeKey, overrideTheme);
     applyTheme(overrideTheme);
+  });
+}
+
+if (decorToggle) {
+  decorToggle.addEventListener("click", () => {
+    decorOverride = decorOverride === "day" ? "night" : decorOverride === "night" ? null : "day";
+
+    if (decorOverride) {
+      localStorage.setItem(storedDecorKey, decorOverride);
+    } else {
+      localStorage.removeItem(storedDecorKey);
+    }
+
+    applyDecorPreset(getActiveDecorPreset());
+    scheduleDecorByHour();
   });
 }
 
