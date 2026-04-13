@@ -188,7 +188,71 @@ const applyTheme = (theme) => {
   }
 };
 
+const initCustomCursor = () => {
+  const root = document.documentElement;
+  const coarsePointer = window.matchMedia("(hover: none), (pointer: coarse)");
+  let enabled = window.CUSTOM_CURSOR_ENABLED !== false;
+
+  const supportsCustomCursor = () => !coarsePointer.matches && enabled;
+
+  const layer = document.createElement("div");
+  layer.className = "custom-cursor-layer";
+  layer.setAttribute("aria-hidden", "true");
+  layer.dataset.variant = "default";
+  document.body.append(layer);
+
+  const updateState = () => {
+    const active = supportsCustomCursor();
+    root.classList.toggle("custom-cursor-active", active);
+    root.classList.remove("custom-cursor-precision");
+    layer.classList.toggle("is-hidden", !active);
+  };
+
+  const setEnabled = (value) => {
+    enabled = Boolean(value);
+    updateState();
+  };
+
+  window.setCustomCursorEnabled = setEnabled;
+  window.toggleCustomCursor = () => setEnabled(!enabled);
+
+  const hideSelectors = "a, button, input, select, textarea, label, summary, [contenteditable], [role='button'], [role='link']";
+
+  const setVariant = (target) => {
+    const section = target.closest("[data-cursor-variant]");
+    layer.dataset.variant = section?.dataset.cursorVariant || "default";
+  };
+
+  const toggleHidden = (target) => {
+    const hide = Boolean(target.closest(hideSelectors));
+    layer.classList.toggle("is-hidden", hide || !supportsCustomCursor());
+    root.classList.toggle("custom-cursor-precision", hide);
+  };
+
+  const move = (event) => {
+    if (!supportsCustomCursor()) {
+      return;
+    }
+
+    layer.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+    setVariant(event.target);
+    toggleHidden(event.target);
+  };
+
+  document.addEventListener("pointermove", move);
+  document.addEventListener("pointerleave", () => layer.classList.add("is-hidden"));
+  document.addEventListener("pointerdown", () => {
+    if (supportsCustomCursor()) {
+      layer.classList.remove("is-hidden");
+    }
+  });
+
+  updateState();
+  coarsePointer.addEventListener("change", updateState);
+};
+
 applyTheme(overrideTheme || getSystemTheme());
+initCustomCursor();
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {

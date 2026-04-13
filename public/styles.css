@@ -334,6 +334,49 @@ button {
   font-size: 0.8rem;
 }
 
+html.custom-cursor-active body {
+  cursor: none;
+}
+
+html.custom-cursor-active.custom-cursor-precision body {
+  cursor: auto;
+}
+
+.custom-cursor-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--text);
+  border-radius: 50%;
+  transform: translate3d(-999px, -999px, 0);
+  pointer-events: none;
+  z-index: 40;
+  transition: width 160ms ease, height 160ms ease, opacity 140ms ease, border-color 160ms ease;
+}
+
+.custom-cursor-layer[data-variant="focus"] {
+  width: 30px;
+  height: 30px;
+  border-color: var(--muted);
+}
+
+.custom-cursor-layer[data-variant="dense"] {
+  width: 14px;
+  height: 14px;
+}
+
+.custom-cursor-layer.is-hidden {
+  opacity: 0;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .custom-cursor-layer {
+    display: none;
+  }
+}
+
 @media (max-width: 700px) {
   :root {
     --footer-h: 64px;
