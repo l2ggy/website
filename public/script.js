@@ -285,6 +285,37 @@ const setStatsFallback = () => {
   renderPercentile("#monkeytype-percentile", null);
 };
 
+const splitHeroNameLetters = () => {
+  const heroName = document.querySelector("#hero-name");
+  if (!heroName || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  const text = heroName.textContent || "";
+  if (!text.trim()) {
+    return;
+  }
+
+  heroName.setAttribute("aria-label", text);
+  heroName.textContent = "";
+
+  let letterIndex = 0;
+  for (const character of text) {
+    if (character === " ") {
+      heroName.append(document.createTextNode(" "));
+      continue;
+    }
+
+    const letter = document.createElement("span");
+    letter.className = "hero-letter";
+    letter.textContent = character;
+    letter.style.setProperty("--letter-index", letterIndex);
+    letter.style.setProperty("--letter-seed", ((Math.random() * 2) - 1).toFixed(3));
+    heroName.append(letter);
+    letterIndex += 1;
+  }
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -323,6 +354,8 @@ systemThemeQuery.addEventListener("change", () => {
     applyTheme(systemTheme);
   }
 });
+
+splitHeroNameLetters();
 
 document.querySelectorAll(".entries").forEach((element) => {
   loadEntries(element).catch(() => {

@@ -195,6 +195,24 @@ button {
   line-height: 1.1;
 }
 
+#hero-name {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.hero-letter {
+  display: inline-block;
+  transform: translateY(0) rotate(0deg);
+  transition: transform 280ms ease;
+  transition-delay: calc(var(--letter-index, 0) * 24ms);
+}
+
+#hero-name:hover .hero-letter,
+#hero-name:focus-visible .hero-letter {
+  transform: translateY(calc(var(--letter-seed, 0) * -0.2em)) rotate(calc(var(--letter-seed, 0) * 7deg));
+}
+
 .hero p,
 .section p {
   color: var(--muted);
