@@ -173,6 +173,71 @@ const setStatsFallback = () => {
   });
 };
 
+const setupCustomCursor = () => {
+  const coarsePointerQuery = window.matchMedia("(hover: none), (pointer: coarse)");
+  const disableStorageKey = "custom-cursor-disabled";
+  const precisionSelector = "input, textarea, select, option, button, a, summary, [contenteditable='true']";
+  let disabled = localStorage.getItem(disableStorageKey) === "true" || window.__disableCustomCursor === true;
+
+  const applyDisabled = (nextDisabled) => {
+    disabled = Boolean(nextDisabled);
+    localStorage.setItem(disableStorageKey, String(disabled));
+    window.__disableCustomCursor = disabled;
+  };
+
+  window.setCustomCursorEnabled = (enabled) => {
+    applyDisabled(!enabled);
+    updateCursorState();
+  };
+
+  window.toggleCustomCursor = () => {
+    applyDisabled(!disabled);
+    updateCursorState();
+  };
+
+  const cursor = document.createElement("div");
+  cursor.className = "custom-cursor";
+  cursor.setAttribute("aria-hidden", "true");
+  document.body.append(cursor);
+
+  const updateCursorState = () => {
+    if (disabled || coarsePointerQuery.matches) {
+      cursor.classList.remove("is-visible");
+      return false;
+    }
+
+    return true;
+  };
+
+  const setVariant = (eventTarget) => {
+    const section = eventTarget.closest("[data-cursor-variant]");
+    cursor.dataset.variant = section?.dataset.cursorVariant || "default";
+  };
+
+  document.addEventListener("pointermove", (event) => {
+    if (!updateCursorState() || event.pointerType === "touch") return;
+    if (event.target.closest(precisionSelector)) {
+      cursor.classList.remove("is-visible");
+      return;
+    }
+
+    cursor.classList.add("is-visible");
+    setVariant(event.target);
+    cursor.style.transform = `translate3d(${event.clientX - 7}px, ${event.clientY - 7}px, 0)`;
+  });
+
+  document.addEventListener("pointerleave", () => {
+    cursor.classList.remove("is-visible");
+  });
+
+  document.addEventListener("pointerdown", () => {
+    cursor.classList.remove("is-visible");
+  });
+
+  coarsePointerQuery.addEventListener("change", updateCursorState);
+  updateCursorState();
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -220,3 +285,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+setupCustomCursor();

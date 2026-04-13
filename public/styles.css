@@ -28,6 +28,42 @@ body {
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
 }
 
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 1px solid var(--text);
+  background: color-mix(in srgb, var(--text) 22%, transparent);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  transition: opacity 140ms ease, width 160ms ease, height 160ms ease, background 160ms ease, border-color 160ms ease;
+  z-index: 999;
+}
+
+.custom-cursor.is-visible {
+  opacity: 1;
+}
+
+.custom-cursor[data-variant="hero"] {
+  width: 18px;
+  height: 18px;
+}
+
+.custom-cursor[data-variant="projects"] {
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  border-style: dashed;
+}
+
+.custom-cursor[data-variant="stats"] {
+  width: 16px;
+  height: 16px;
+  border-color: var(--muted);
+}
+
 h1,
 h2,
 h3,
