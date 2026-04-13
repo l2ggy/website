@@ -8,6 +8,8 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --cursor-size: 16px;
+  --cursor-color: color-mix(in srgb, var(--text) 68%, transparent);
 }
 
 :root[data-theme="light"] {
@@ -26,6 +28,10 @@ body {
   background: var(--bg);
   color: var(--text);
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
+}
+
+body.custom-cursor-enabled {
+  cursor: none;
 }
 
 h1,
@@ -47,6 +53,53 @@ button {
   padding: 0;
   font: inherit;
   cursor: pointer;
+}
+
+body.custom-cursor-enabled a,
+body.custom-cursor-enabled button,
+body.custom-cursor-enabled input,
+body.custom-cursor-enabled textarea,
+body.custom-cursor-enabled select,
+body.custom-cursor-enabled label,
+body.custom-cursor-enabled summary,
+body.custom-cursor-enabled [contenteditable="true"],
+body.custom-cursor-enabled [role="button"],
+body.custom-cursor-enabled [role="link"] {
+  cursor: auto;
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  margin-left: calc(var(--cursor-size) * -0.5);
+  margin-top: calc(var(--cursor-size) * -0.5);
+  border-radius: 999px;
+  border: 1px solid var(--cursor-color);
+  background: color-mix(in srgb, var(--cursor-color) 16%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-100vw, -100vh, 0);
+  transition: opacity 140ms ease, width 180ms ease, height 180ms ease, border-color 180ms ease, background 180ms ease;
+  z-index: 40;
+}
+
+.custom-cursor.is-visible {
+  opacity: 1;
+}
+
+.custom-cursor[data-variant="hero"] {
+  --cursor-size: 24px;
+}
+
+.custom-cursor[data-variant="projects"] {
+  --cursor-size: 20px;
+}
+
+.custom-cursor[data-variant="contact"] {
+  border-style: dashed;
 }
 
 .container {
@@ -378,5 +431,15 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .custom-cursor {
+    display: none;
+  }
+
+  body.custom-cursor-enabled {
+    cursor: auto;
   }
 }

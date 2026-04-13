@@ -173,6 +173,67 @@ const setStatsFallback = () => {
   });
 };
 
+const customCursorConfig = {
+  disabled: false,
+};
+
+window.setCustomCursorDisabled = (disabled) => {
+  customCursorConfig.disabled = Boolean(disabled);
+  window.__DISABLE_CUSTOM_CURSOR__ = customCursorConfig.disabled;
+};
+
+const setupCustomCursor = () => {
+  const prefersCoarsePointer = window.matchMedia("(hover: none), (pointer: coarse)");
+  if (window.__DISABLE_CUSTOM_CURSOR__ || customCursorConfig.disabled || prefersCoarsePointer.matches) {
+    return;
+  }
+
+  const cursor = document.createElement("div");
+  cursor.className = "custom-cursor";
+  cursor.setAttribute("aria-hidden", "true");
+  document.body.appendChild(cursor);
+  document.body.classList.add("custom-cursor-enabled");
+
+  const interactiveSelector =
+    'a, button, input, textarea, select, label, summary, [contenteditable="true"], [role="button"], [role="link"]';
+  const state = { x: -200, y: -200, targetX: -200, targetY: -200, raf: 0 };
+
+  const draw = () => {
+    state.x += (state.targetX - state.x) * 0.18;
+    state.y += (state.targetY - state.y) * 0.18;
+    cursor.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
+    if (Math.abs(state.targetX - state.x) + Math.abs(state.targetY - state.y) > 0.12) {
+      state.raf = window.requestAnimationFrame(draw);
+      return;
+    }
+    state.raf = 0;
+  };
+
+  const requestDraw = () => {
+    if (!state.raf) {
+      state.raf = window.requestAnimationFrame(draw);
+    }
+  };
+
+  document.addEventListener("pointermove", (event) => {
+    state.targetX = event.clientX;
+    state.targetY = event.clientY;
+
+    const target = event.target instanceof Element ? event.target : null;
+    const isInteractive = Boolean(target?.closest(interactiveSelector));
+    const variant = target?.closest("[data-cursor-variant]")?.dataset.cursorVariant || "default";
+
+    cursor.dataset.variant = variant;
+    cursor.classList.toggle("is-visible", !isInteractive);
+    requestDraw();
+  });
+
+  document.addEventListener("pointerleave", () => {
+    cursor.classList.remove("is-visible");
+  });
+
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -211,6 +272,8 @@ systemThemeQuery.addEventListener("change", () => {
     applyTheme(systemTheme);
   }
 });
+
+setupCustomCursor();
 
 document.querySelectorAll(".entries").forEach((element) => {
   loadEntries(element).catch(() => {
