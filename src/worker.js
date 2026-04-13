@@ -63,16 +63,10 @@ const getMonkeytypeStats = async (username) => {
     `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile?isUid=false`,
     `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`,
   ];
-  const requestHeaders = {
-    accept: "application/json",
-    origin: "https://monkeytype.com",
-    referer: `https://monkeytype.com/profile/${encodeURIComponent(username)}`,
-    "user-agent": "Mozilla/5.0",
-  };
 
   let response = null;
   for (const endpoint of endpoints) {
-    response = await fetch(endpoint, { headers: requestHeaders });
+    response = await fetch(endpoint, { headers: { accept: "application/json" } });
     if (response.ok) {
       break;
     }
