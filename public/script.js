@@ -48,6 +48,128 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const initHeroConstellation = () => {
+  const hero = document.querySelector("#hero");
+  const svg = document.querySelector("#hero-constellation");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isTouchLike =
+    window.matchMedia("(hover: none)").matches ||
+    window.matchMedia("(pointer: coarse)").matches ||
+    navigator.maxTouchPoints > 0;
+
+  if (!hero || !svg || reduceMotion || isTouchLike) {
+    if (svg) {
+      svg.remove();
+    }
+    return;
+  }
+
+  const pointCount = 12;
+  const neighborCount = 3;
+  const points = Array.from({ length: pointCount }, (_, index) => {
+    const x = 0.1 + ((index * 0.37) % 0.8);
+    const y = 0.14 + ((index * 0.61) % 0.72);
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("r", "2");
+    circle.setAttribute("fill", "var(--muted)");
+    circle.setAttribute("opacity", "0.28");
+    svg.append(circle);
+    return { x, y, circle };
+  });
+
+  const lineElements = Array.from({ length: neighborCount }, () => {
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("stroke", "var(--text)");
+    line.setAttribute("stroke-width", "1");
+    line.setAttribute("opacity", "0");
+    svg.append(line);
+    return line;
+  });
+
+  let bounds = hero.getBoundingClientRect();
+  let pointerX = 0;
+  let pointerY = 0;
+  let rafId = 0;
+  let lastMoveAt = 0;
+
+  const updateBounds = () => {
+    bounds = hero.getBoundingClientRect();
+    svg.setAttribute("viewBox", `0 0 ${Math.max(bounds.width, 1)} ${Math.max(bounds.height, 1)}`);
+  };
+
+  const renderFrame = () => {
+    rafId = 0;
+
+    const width = Math.max(bounds.width, 1);
+    const height = Math.max(bounds.height, 1);
+    const timeSinceMove = performance.now() - lastMoveAt;
+    const fade = Math.max(0, 1 - timeSinceMove / 240);
+
+    const ranked = points
+      .map((point) => {
+        const px = point.x * width;
+        const py = point.y * height;
+        const dx = pointerX - px;
+        const dy = pointerY - py;
+        return { point, px, py, distance: Math.hypot(dx, dy) };
+      })
+      .sort((a, b) => a.distance - b.distance);
+
+    const active = ranked.slice(0, neighborCount);
+    const activeSet = new Set(active.map((item) => item.point));
+
+    points.forEach((point) => {
+      const opacity = activeSet.has(point) ? 0.82 : 0.28;
+      point.circle.setAttribute("cx", String(point.x * width));
+      point.circle.setAttribute("cy", String(point.y * height));
+      point.circle.setAttribute("opacity", String(opacity));
+    });
+
+    lineElements.forEach((line, index) => {
+      const item = active[index];
+      if (!item || fade <= 0) {
+        line.setAttribute("opacity", "0");
+        return;
+      }
+      const intensity = Math.max(0, 1 - item.distance / 220) * fade;
+      line.setAttribute("x1", String(item.px));
+      line.setAttribute("y1", String(item.py));
+      line.setAttribute("x2", String(pointerX));
+      line.setAttribute("y2", String(pointerY));
+      line.setAttribute("opacity", String(intensity * 0.8));
+    });
+
+    if (fade > 0) {
+      rafId = requestAnimationFrame(renderFrame);
+    }
+  };
+
+  const queueFrame = () => {
+    if (!rafId) {
+      rafId = requestAnimationFrame(renderFrame);
+    }
+  };
+
+  updateBounds();
+
+  hero.addEventListener("pointermove", (event) => {
+    pointerX = event.clientX - bounds.left;
+    pointerY = event.clientY - bounds.top;
+    lastMoveAt = performance.now();
+    queueFrame();
+  });
+
+  hero.addEventListener("pointerleave", () => {
+    lastMoveAt = performance.now() - 180;
+    queueFrame();
+  });
+
+  window.addEventListener("resize", () => {
+    updateBounds();
+    queueFrame();
+  });
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -220,3 +342,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+initHeroConstellation();
