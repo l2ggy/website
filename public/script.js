@@ -174,7 +174,6 @@ const renderPercentile = (selector, percentile) => {
       <line class="percentile-marker" x1="${markerX}" y1="${baseline}" x2="${markerX}" y2="${markerY}" />
       <circle class="percentile-dot" cx="${markerX}" cy="${markerY}" r="2" />
     </svg>
-    <p><span class="stat-value">Top ${formatNumber(percentile, 2)}%</span></p>
   `;
 };
 

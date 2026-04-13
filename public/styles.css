@@ -375,15 +375,9 @@ button {
 .percentile-viz svg {
   width: 100%;
   flex: 1 1 auto;
-  height: calc(100% - 1.2rem);
+  height: 100%;
   min-height: 3.2rem;
   max-height: 4.7rem;
-}
-
-.percentile-viz p {
-  margin-top: 0.16rem;
-  font-size: 0.75rem;
-  line-height: 1.2;
 }
 
 .percentile-curve {
