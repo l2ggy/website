@@ -232,6 +232,10 @@ button {
   border: 1px solid var(--line);
 }
 
+#education .entry-thumb {
+  border: 0;
+}
+
 .entry-main {
   display: grid;
   gap: 0.18rem;
