@@ -50,6 +50,44 @@ const loadEntries = async (element) => {
   element.innerHTML = items.map(renderByKind[kind]).join("");
 };
 
+const renderMonkeytypeEntry = (duration, stats) => {
+  if (!stats) return "";
+
+  return renderEntry({
+    icon: `${duration}s`,
+    title: `${stats.wpm} WPM`,
+    subtitle: `Raw ${stats.raw} · ${stats.acc}% accuracy`,
+  });
+};
+
+const renderMonkeytypeStats = async () => {
+  const section = document.querySelector("#typing-stats");
+  const statsContainer = document.querySelector("#monkeytype-stats");
+  const status = document.querySelector("#monkeytype-status");
+  const username = section?.dataset.monkeytypeUser?.trim();
+
+  if (!section || !statsContainer || !status || !username) {
+    return;
+  }
+
+  const response = await fetch(`/api/monkeytype/${encodeURIComponent(username)}`);
+  const payload = await response.json();
+
+  if (!response.ok || !payload?.bests) {
+    status.textContent = payload?.error || "Unable to load Monkeytype stats.";
+    return;
+  }
+
+  const durations = ["15", "30", "60", "120"];
+  const cards = durations.map((duration) => renderMonkeytypeEntry(duration, payload.bests[duration])).filter(Boolean);
+
+  status.textContent = cards.length
+    ? `Best time-mode scores for ${payload.username}.`
+    : `No public time-mode scores were found for ${payload.username}.`;
+
+  statsContainer.innerHTML = cards.join("");
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -89,10 +127,16 @@ systemThemeQuery.addEventListener("change", () => {
   }
 });
 
-document.querySelectorAll(".entries").forEach((element) => {
+document.querySelectorAll(".entries[data-source]").forEach((element) => {
   loadEntries(element).catch(() => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
 });
 
 renderGitHubHeatmap();
+renderMonkeytypeStats().catch(() => {
+  const status = document.querySelector("#monkeytype-status");
+  if (status) {
+    status.textContent = "Unable to load Monkeytype stats.";
+  }
+});
