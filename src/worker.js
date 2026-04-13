@@ -1,3 +1,5 @@
+import { monkeytypeProfileEndpoints, parseMonkeytypeProfile } from "./shared/monkeytype.js";
+
 const LEETCODE_QUERY = `
   query userProfile($username: String!) {
     matchedUser(username: $username) {
@@ -14,14 +16,6 @@ const LEETCODE_QUERY = `
     }
   }
 `;
-const monkeytypeProfileEndpoints = (username) => {
-  const encoded = encodeURIComponent(username);
-  return [
-    `https://api.monkeytype.com/users/${encoded}/profile?isUid=false`,
-    `https://api.monkeytype.com/users/${encoded}/profile`,
-  ];
-};
-
 const jsonResponse = (data, init = {}) =>
   new Response(JSON.stringify(data), {
     headers: {
@@ -79,21 +73,7 @@ const getMonkeytypeStats = async (username) => {
     throw new Error("Monkeytype request failed");
   }
 
-  const data = payload?.data || {};
-  const typingStats = data.typingStats || {};
-  const personalBest60 = data?.personalBests?.time?.["60"] || [];
-  const pb60 = personalBest60.reduce((best, run) => Math.max(best, run?.wpm || 0), 0);
-  const leaderboard = data?.allTimeLbs?.time?.["60"]?.english || {};
-
-  return {
-    completedTests: typingStats.completedTests ?? typingStats.testsCompleted ?? 0,
-    timeTypingSeconds: typingStats.timeTyping ?? 0,
-    pb60,
-    leaderboard: {
-      rank: leaderboard.rank || null,
-      count: leaderboard.count || null,
-    },
-  };
+  return parseMonkeytypeProfile(payload);
 };
 
 const getStats = async (requestUrl) => {
