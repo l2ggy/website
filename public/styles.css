@@ -135,10 +135,57 @@ button {
   gap: var(--space-3);
 }
 
-.hero,
 .section {
   display: grid;
   gap: var(--space-1);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 340px);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hero-copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.hero-heatmap-wrap {
+  position: relative;
+  justify-self: end;
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.8rem;
+  background: linear-gradient(145deg, rgb(125 143 166 / 14%), transparent);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 16%);
+}
+
+.hero-heatmap-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -8% -4% auto auto;
+  width: 55%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(125 143 166 / 14%) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-heatmap {
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+  display: block;
+  filter: saturate(0.92) contrast(1.04);
+}
+
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .hero h1 {
@@ -184,13 +231,6 @@ button {
   gap: 0.18rem;
 }
 
-.entry-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .entry h3 {
   font-size: 1.02rem;
   font-weight: 520;
@@ -224,14 +264,28 @@ button {
     width: calc(100% - 1.2rem);
   }
 
+  .entry-dates {
+    text-align: left;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .hero-heatmap-wrap {
+    justify-self: start;
+    max-width: 340px;
+  }
+
+  .hero-heatmap {
+    max-height: 155px;
+  }
+
   .entry-head {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.08rem;
-  }
-
-  .entry-dates {
-    text-align: left;
   }
 
   .footer-content {
