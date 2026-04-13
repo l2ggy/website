@@ -48,6 +48,202 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const setupHeroConstellation = () => {
+  const hero = document.querySelector(".hero");
+  const canvas = document.querySelector("#hero-constellation");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (!hero || !canvas || reduceMotion.matches) {
+    return;
+  }
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    return;
+  }
+
+  const particleCount = 26;
+  const maxDistance = 84;
+  const pointerRadius = 92;
+  const particles = [];
+  const pointer = { x: 0, y: 0, active: false };
+  let width = 0;
+  let height = 0;
+  let rafId = null;
+  let canRun = !document.hidden;
+  let visible = true;
+
+  const cssVar = (name, fallback) => {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return value || fallback;
+  };
+
+  const rgba = (hex, alpha) => {
+    const value = hex.replace("#", "").trim();
+    if (!/^[0-9a-fA-F]{3,8}$/.test(value)) {
+      return `rgba(255, 255, 255, ${alpha})`;
+    }
+    const expanded = value.length === 3 ? value.split("").map((part) => part + part).join("") : value.slice(0, 6);
+    const int = Number.parseInt(expanded, 16);
+    const r = (int >> 16) & 255;
+    const g = (int >> 8) & 255;
+    const b = int & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
+  const resetParticle = () => ({
+    x: Math.random() * width,
+    y: Math.random() * height,
+    vx: (Math.random() - 0.5) * 0.35,
+    vy: (Math.random() - 0.5) * 0.35,
+  });
+
+  const resize = () => {
+    const rect = hero.getBoundingClientRect();
+    width = Math.max(1, Math.round(rect.width));
+    height = Math.max(1, Math.round(rect.height));
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    if (!particles.length) {
+      for (let i = 0; i < particleCount; i += 1) {
+        particles.push(resetParticle());
+      }
+    }
+  };
+
+  const pointerFromEvent = (event) => {
+    const rect = hero.getBoundingClientRect();
+    pointer.x = event.clientX - rect.left;
+    pointer.y = event.clientY - rect.top;
+    pointer.active = true;
+  };
+
+  const tick = () => {
+    if (!canRun || !visible) {
+      rafId = null;
+      return;
+    }
+
+    const lineColor = rgba(cssVar("--line", "#888888"), 0.32);
+    const nodeColor = rgba(cssVar("--muted", "#aaaaaa"), 0.26);
+    const glowColor = rgba(cssVar("--text", "#ffffff"), 0.18);
+    context.clearRect(0, 0, width, height);
+
+    for (const particle of particles) {
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+
+      if (particle.x < 0 || particle.x > width) particle.vx *= -1;
+      if (particle.y < 0 || particle.y > height) particle.vy *= -1;
+
+      particle.x = Math.max(0, Math.min(width, particle.x));
+      particle.y = Math.max(0, Math.min(height, particle.y));
+    }
+
+    context.strokeStyle = lineColor;
+    context.lineWidth = 1;
+    for (let i = 0; i < particles.length; i += 1) {
+      for (let j = i + 1; j < particles.length; j += 1) {
+        const a = particles[i];
+        const b = particles[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance > maxDistance) continue;
+
+        context.globalAlpha = 1 - distance / maxDistance;
+        context.beginPath();
+        context.moveTo(a.x, a.y);
+        context.lineTo(b.x, b.y);
+        context.stroke();
+      }
+    }
+
+    context.globalAlpha = 1;
+    context.fillStyle = nodeColor;
+    for (const particle of particles) {
+      context.beginPath();
+      context.arc(particle.x, particle.y, 1.5, 0, Math.PI * 2);
+      context.fill();
+    }
+
+    if (pointer.active) {
+      context.strokeStyle = glowColor;
+      for (const particle of particles) {
+        const distance = Math.hypot(pointer.x - particle.x, pointer.y - particle.y);
+        if (distance > pointerRadius) continue;
+        context.globalAlpha = 1 - distance / pointerRadius;
+        context.beginPath();
+        context.moveTo(pointer.x, pointer.y);
+        context.lineTo(particle.x, particle.y);
+        context.stroke();
+      }
+    }
+
+    context.globalAlpha = 1;
+    rafId = window.requestAnimationFrame(tick);
+  };
+
+  const start = () => {
+    if (rafId || !canRun || !visible) {
+      return;
+    }
+    rafId = window.requestAnimationFrame(tick);
+  };
+
+  const stop = () => {
+    if (rafId) {
+      window.cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  };
+
+  const intersectionObserver = new IntersectionObserver(
+    ([entry]) => {
+      visible = Boolean(entry?.isIntersecting);
+      if (visible) start();
+      else stop();
+    },
+    { threshold: 0.1 }
+  );
+  intersectionObserver.observe(hero);
+
+  document.addEventListener("visibilitychange", () => {
+    canRun = !document.hidden;
+    if (canRun) start();
+    else stop();
+  });
+
+  hero.addEventListener("pointerenter", pointerFromEvent);
+  hero.addEventListener("pointermove", pointerFromEvent);
+  hero.addEventListener("pointerleave", () => {
+    pointer.active = false;
+  });
+
+  window.addEventListener("resize", () => {
+    resize();
+    start();
+  });
+
+  reduceMotion.addEventListener("change", (event) => {
+    if (event.matches) {
+      stop();
+      context.clearRect(0, 0, width, height);
+    } else {
+      resize();
+      canRun = !document.hidden;
+      start();
+    }
+  });
+
+  resize();
+  start();
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -332,3 +528,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+setupHeroConstellation();
