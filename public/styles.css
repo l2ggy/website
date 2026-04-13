@@ -306,6 +306,10 @@ button {
 }
 
 #hero-name {
+  display: inline-block;
+}
+
+#hero-name.is-split {
   display: inline-flex;
   flex-wrap: wrap;
   gap: 0.01em;

@@ -296,32 +296,54 @@ const splitHeroNameLetters = () => {
   }
 
   const originalText = heroName.textContent || "";
-  heroName.setAttribute("aria-label", originalText);
-  heroName.textContent = "";
 
-  const letterSpans = Array.from(originalText).map((letter, index) => {
-    const span = document.createElement("span");
-    span.className = "hero-letter";
-    span.style.setProperty("--hero-letter-i", index);
-    span.textContent = letter === " " ? "\u00A0" : letter;
-    span.setAttribute("aria-hidden", "true");
-    return span;
-  });
+  const createLetterSpans = () =>
+    Array.from(originalText).map((letter, index) => {
+      const span = document.createElement("span");
+      span.className = "hero-letter";
+      span.style.setProperty("--hero-letter-i", index);
+      span.textContent = letter === " " ? "\u00A0" : letter;
+      span.setAttribute("aria-hidden", "true");
+      return span;
+    });
 
   const randomizeHeroLetters = () => {
+    const letterSpans = heroName.querySelectorAll(".hero-letter");
     letterSpans.forEach((span) => {
       span.style.setProperty("--hero-letter-seed", (Math.random() * 2 - 1).toFixed(3));
       span.style.setProperty("--hero-letter-stagger", Math.floor(Math.random() * letterSpans.length).toString());
     });
   };
 
-  randomizeHeroLetters();
-  letterSpans.forEach((span) => {
-    heroName.append(span);
-  });
+  const splitName = () => {
+    if (heroName.classList.contains("is-split")) {
+      randomizeHeroLetters();
+      return;
+    }
 
-  heroName.addEventListener("pointerenter", randomizeHeroLetters);
-  heroName.addEventListener("focusin", randomizeHeroLetters);
+    heroName.setAttribute("aria-label", originalText);
+    heroName.textContent = "";
+    createLetterSpans().forEach((span) => {
+      heroName.append(span);
+    });
+    heroName.classList.add("is-split");
+    randomizeHeroLetters();
+  };
+
+  const resetName = () => {
+    if (!heroName.classList.contains("is-split")) {
+      return;
+    }
+
+    heroName.classList.remove("is-split");
+    heroName.textContent = originalText;
+    heroName.removeAttribute("aria-label");
+  };
+
+  heroName.addEventListener("pointerenter", splitName);
+  heroName.addEventListener("focusin", splitName);
+  heroName.addEventListener("pointerleave", resetName);
+  heroName.addEventListener("focusout", resetName);
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
