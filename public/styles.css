@@ -59,6 +59,7 @@ button {
   left: 0;
   right: 0;
   background: var(--bg);
+  z-index: 20;
 }
 
 .topbar {
@@ -135,10 +136,43 @@ button {
   gap: var(--space-3);
 }
 
-.hero,
 .section {
   display: grid;
   gap: var(--space-1);
+}
+
+.hero {
+  position: relative;
+  padding-right: min(48vw, 540px);
+}
+
+.hero-copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.hero-heatmap-wrap {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.hero-heatmap {
+  width: auto;
+  height: clamp(92px, 12vw, 138px);
+  max-width: min(48vw, 520px);
+  display: block;
+}
+
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .hero h1 {
@@ -184,13 +218,6 @@ button {
   gap: 0.18rem;
 }
 
-.entry-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .entry h3 {
   font-size: 1.02rem;
   font-weight: 520;
@@ -224,14 +251,29 @@ button {
     width: calc(100% - 1.2rem);
   }
 
+  .entry-dates {
+    text-align: left;
+  }
+
+  .hero {
+    padding-right: 0;
+  }
+
+  .hero-heatmap-wrap {
+    position: static;
+    transform: none;
+    justify-content: flex-start;
+    margin-top: var(--space-1);
+  }
+
+  .hero-heatmap {
+    max-width: 100%;
+  }
+
   .entry-head {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.08rem;
-  }
-
-  .entry-dates {
-    text-align: left;
   }
 
   .footer-content {
