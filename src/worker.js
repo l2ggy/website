@@ -14,6 +14,13 @@ const LEETCODE_QUERY = `
     }
   }
 `;
+const monkeytypeProfileEndpoints = (username) => {
+  const encoded = encodeURIComponent(username);
+  return [
+    `https://api.monkeytype.com/users/${encoded}/profile?isUid=false`,
+    `https://api.monkeytype.com/users/${encoded}/profile`,
+  ];
+};
 
 const jsonResponse = (data, init = {}) =>
   new Response(JSON.stringify(data), {
@@ -59,24 +66,19 @@ const getLeetCodeStats = async (username) => {
 };
 
 const getMonkeytypeStats = async (username) => {
-  const endpoints = [
-    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile?isUid=false`,
-    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`,
-  ];
-
-  let response = null;
-  for (const endpoint of endpoints) {
-    response = await fetch(endpoint, { headers: { accept: "application/json" } });
+  let payload = null;
+  for (const endpoint of monkeytypeProfileEndpoints(username)) {
+    const response = await fetch(endpoint, { headers: { accept: "application/json" } });
     if (response.ok) {
+      payload = await response.json();
       break;
     }
   }
 
-  if (!response?.ok) {
+  if (!payload) {
     throw new Error("Monkeytype request failed");
   }
 
-  const payload = await response.json();
   const data = payload?.data || {};
   const typingStats = data.typingStats || {};
   const personalBest60 = data?.personalBests?.time?.["60"] || [];
