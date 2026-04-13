@@ -296,9 +296,19 @@ button {
   gap: var(--space-1);
 }
 
+.stats-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
 .leadership-item {
   display: grid;
   gap: 0.12rem;
+}
+
+.stats-item {
+  display: grid;
+  gap: 0.16rem;
 }
 
 .leadership-item h3 {
@@ -306,7 +316,16 @@ button {
   font-weight: 520;
 }
 
+.stats-item h3 {
+  font-size: 1.02rem;
+  font-weight: 520;
+}
+
 .leadership-item p {
+  color: var(--muted);
+}
+
+.stats-item p {
   color: var(--muted);
 }
 
