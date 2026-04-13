@@ -296,8 +296,9 @@ const splitHeroNameLetters = () => {
   }
 
   const originalText = heroName.textContent || "";
-  heroName.setAttribute("aria-label", originalText);
-  heroName.textContent = "";
+  if (!originalText) {
+    return;
+  }
 
   const letterSpans = Array.from(originalText).map((letter, index) => {
     const span = document.createElement("span");
@@ -315,13 +316,32 @@ const splitHeroNameLetters = () => {
     });
   };
 
-  randomizeHeroLetters();
-  letterSpans.forEach((span) => {
-    heroName.append(span);
-  });
+  const showPlainName = () => {
+    heroName.classList.remove("hero-name-animate");
+    heroName.classList.remove("hero-name-split");
+    heroName.removeAttribute("aria-label");
+    heroName.textContent = originalText;
+  };
 
-  heroName.addEventListener("pointerenter", randomizeHeroLetters);
-  heroName.addEventListener("focusin", randomizeHeroLetters);
+  const showAnimatedName = () => {
+    randomizeHeroLetters();
+    heroName.classList.remove("hero-name-animate");
+    heroName.classList.add("hero-name-split");
+    heroName.setAttribute("aria-label", originalText);
+    heroName.textContent = "";
+    letterSpans.forEach((span) => {
+      heroName.append(span);
+    });
+    requestAnimationFrame(() => {
+      heroName.classList.add("hero-name-animate");
+    });
+  };
+
+  showPlainName();
+  heroName.addEventListener("pointerenter", showAnimatedName);
+  heroName.addEventListener("focusin", showAnimatedName);
+  heroName.addEventListener("pointerleave", showPlainName);
+  heroName.addEventListener("focusout", showPlainName);
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
