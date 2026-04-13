@@ -290,6 +290,30 @@ button {
   gap: 0.2rem;
 }
 
+.hero-globe-shell {
+  width: 138px;
+  aspect-ratio: 1;
+  margin-top: 0.72rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, rgba(127, 127, 127, 0.16), transparent 68%);
+}
+
+.hero-globe {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  touch-action: none;
+  cursor: grab;
+}
+
+.hero-globe:active {
+  cursor: grabbing;
+}
+
 .hero-heatmap-wrap {
   position: absolute;
   top: 50%;
@@ -608,6 +632,10 @@ button {
   .hero-heatmap {
     width: 100%;
     max-width: 100%;
+  }
+
+  .hero-globe-shell {
+    width: 108px;
   }
 
   .entry-head {
