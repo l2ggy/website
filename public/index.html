@@ -40,6 +40,25 @@
         <div class="hero-copy">
           <h1 id="hero-name" tabindex="0">Boris Kafidov</h1>
           <p>swe | cs + math @ uoft</p>
+          <div class="hero-globe" role="img" aria-label="Interactive globe">
+            <svg class="hero-globe-svg" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+              <defs>
+                <radialGradient id="globeGlow" cx="34%" cy="30%" r="68%">
+                  <stop offset="0%" stop-color="rgba(127,127,127,0.26)" />
+                  <stop offset="75%" stop-color="rgba(127,127,127,0.08)" />
+                  <stop offset="100%" stop-color="rgba(127,127,127,0.02)" />
+                </radialGradient>
+              </defs>
+              <circle class="hero-globe-shell" cx="60" cy="60" r="44" />
+              <circle class="hero-globe-glow" cx="60" cy="60" r="44" fill="url(#globeGlow)" />
+              <ellipse class="hero-globe-line" cx="60" cy="60" rx="44" ry="20.5" />
+              <ellipse class="hero-globe-line" cx="60" cy="60" rx="44" ry="33" />
+              <ellipse class="hero-globe-line" cx="60" cy="60" rx="19" ry="44" />
+              <ellipse class="hero-globe-line" cx="60" cy="60" rx="31" ry="44" />
+              <line class="hero-globe-line" x1="16" y1="60" x2="104" y2="60" />
+              <circle class="hero-globe-dot" cx="75" cy="50" r="2.8" />
+            </svg>
+          </div>
         </div>
         <div class="hero-heatmap-wrap" data-github-user="l2ggy" aria-label="GitHub contribution heatmap">
           <img class="hero-heatmap" id="github-heatmap" src="" alt="GitHub contribution heatmap" loading="lazy" />

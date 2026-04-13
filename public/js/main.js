@@ -3,6 +3,7 @@ import { loadEntries } from "./render/entries.js";
 import { renderStats, setStatsFallback } from "./render/stats.js";
 import { loadStats } from "./services/stats-client.js";
 import { setupTheme } from "./theme.js";
+import { setupHeroGlobe } from "./hero-globe.js";
 
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
@@ -41,4 +42,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initEntries();
   initStats();
   renderGitHubHeatmap();
+  setupHeroGlobe();
 });

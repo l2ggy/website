@@ -346,6 +346,57 @@ button {
   transform: translateY(var(--hero-letter-lift)) rotate(var(--hero-letter-tilt));
 }
 
+
+.hero-globe {
+  --globe-tilt-x: -8deg;
+  --globe-tilt-y: 12deg;
+  width: 6.2rem;
+  aspect-ratio: 1;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--text);
+  background: radial-gradient(circle at 30% 30%, rgba(127, 127, 127, 0.14), transparent 68%);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 28px -24px rgba(0, 0, 0, 0.75);
+  transform-style: preserve-3d;
+  transform: perspective(520px) rotateX(var(--globe-tilt-x)) rotateY(var(--globe-tilt-y));
+  transition: transform 190ms ease, box-shadow 190ms ease;
+  cursor: grab;
+}
+
+.hero-globe.is-active {
+  box-shadow: 0 18px 30px -24px rgba(0, 0, 0, 0.8);
+}
+
+.hero-globe:active {
+  cursor: grabbing;
+}
+
+.hero-globe-svg {
+  width: 82%;
+  height: 82%;
+}
+
+.hero-globe-shell {
+  fill: transparent;
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+
+.hero-globe-line {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0.95;
+}
+
+.hero-globe-dot {
+  fill: var(--text);
+}
+
 .hero p,
 .section p {
   color: var(--muted);
@@ -644,5 +695,9 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+
+  .hero-globe {
+    width: 5.4rem;
   }
 }
