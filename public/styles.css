@@ -8,6 +8,9 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --blob-a: rgba(130, 92, 255, 0.24);
+  --blob-b: rgba(79, 157, 255, 0.2);
+  --blob-c: rgba(69, 218, 193, 0.18);
 }
 
 :root[data-theme="light"] {
@@ -15,6 +18,9 @@
   --text: #161616;
   --muted: #505050;
   --line: #d5d5d5;
+  --blob-a: rgba(130, 92, 255, 0.14);
+  --blob-b: rgba(79, 157, 255, 0.12);
+  --blob-c: rgba(69, 218, 193, 0.1);
 }
 
 * {
@@ -147,6 +153,55 @@ button {
   padding-block: calc(var(--header-h) + var(--space-3)) calc(var(--footer-h) + var(--space-3));
   display: grid;
   gap: var(--space-3);
+}
+
+.layout > :is(.hero, .section) {
+  position: relative;
+  isolation: isolate;
+}
+
+.layout > :is(.hero, .section) > * {
+  position: relative;
+  z-index: 1;
+}
+
+.layout > :is(.hero, .section)::before,
+.layout > :is(.hero, .section)::after {
+  content: "";
+  position: absolute;
+  width: clamp(180px, 34vw, 340px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0.24;
+  filter: blur(68px);
+  z-index: 0;
+}
+
+.layout > :is(.hero, .section)::before {
+  top: -34%;
+  left: -18%;
+  background: radial-gradient(circle, var(--blob-a) 0%, transparent 70%);
+  animation: blob-drift-a 52s ease-in-out infinite alternate;
+}
+
+.layout > :is(.hero, .section)::after {
+  right: -16%;
+  bottom: -38%;
+  background: radial-gradient(circle, var(--blob-b) 0%, var(--blob-c) 45%, transparent 74%);
+  animation: blob-drift-b 64s ease-in-out infinite alternate;
+}
+
+.layout > :is(.hero, .section):nth-child(odd)::before {
+  top: auto;
+  bottom: -30%;
+  left: -14%;
+}
+
+.layout > :is(.hero, .section):nth-child(odd)::after {
+  top: -36%;
+  right: -14%;
+  bottom: auto;
 }
 
 .section {
@@ -332,6 +387,31 @@ button {
 
 .footer-content {
   font-size: 0.8rem;
+}
+
+@keyframes blob-drift-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(14px, -12px, 0) scale(1.1);
+  }
+}
+
+@keyframes blob-drift-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(-16px, 10px, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout > :is(.hero, .section)::before,
+  .layout > :is(.hero, .section)::after {
+    animation: none;
+  }
 }
 
 @media (max-width: 700px) {
