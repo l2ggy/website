@@ -99,6 +99,15 @@ button {
   gap: 0.85rem;
 }
 
+.webring-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-left: 0.7rem;
+  margin-left: 0.05rem;
+  border-left: 1px solid var(--line);
+}
+
 .logo-slot,
 .text-btn {
   color: var(--muted);
@@ -631,6 +640,22 @@ button {
     flex-direction: column;
     gap: 0.2rem;
     padding-block: 0.2rem;
+  }
+
+  .footer-links {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
+  }
+
+  .webring-links {
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+    padding-left: 0;
+    margin-left: 0;
+    border-left: 0;
   }
 
   .hero h1 {
