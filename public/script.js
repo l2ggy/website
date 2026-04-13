@@ -220,3 +220,50 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+
+const moodStates = [
+  { face: "•ᴗ•", anim: "blink" },
+  { face: "•◡•", anim: "bounce" },
+  { face: "•‿•", anim: "wave" },
+  { face: "•▿•", anim: "bounce" },
+  { face: "•ᴥ•", anim: "blink" },
+];
+
+const moodWidget = document.querySelector("#scroll-mood");
+const moodFace = document.querySelector("#scroll-mood-face");
+
+if (moodWidget && moodFace) {
+  let moodIndex = -1;
+  let ticking = false;
+
+  const updateMood = () => {
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+    const nextIndex = Math.min(moodStates.length - 1, Math.floor(progress * moodStates.length));
+
+    if (nextIndex !== moodIndex) {
+      moodIndex = nextIndex;
+      const nextMood = moodStates[moodIndex];
+      moodFace.textContent = nextMood.face;
+      moodWidget.dataset.anim = "";
+      requestAnimationFrame(() => {
+        moodWidget.dataset.anim = nextMood.anim;
+      });
+    }
+
+    ticking = false;
+  };
+
+  const queueMoodUpdate = () => {
+    if (ticking) {
+      return;
+    }
+
+    ticking = true;
+    requestAnimationFrame(updateMood);
+  };
+
+  window.addEventListener("scroll", queueMoodUpdate, { passive: true });
+  window.addEventListener("resize", queueMoodUpdate);
+  queueMoodUpdate();
+}

@@ -334,6 +334,72 @@ button {
   font-size: 0.8rem;
 }
 
+.scroll-mood {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(var(--footer-h) + 0.6rem);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  opacity: 0.75;
+  user-select: none;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.scroll-mood-face {
+  display: block;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.scroll-mood[data-anim="blink"] .scroll-mood-face {
+  animation: mood-blink 420ms ease;
+}
+
+.scroll-mood[data-anim="bounce"] .scroll-mood-face {
+  animation: mood-bounce 300ms ease;
+}
+
+.scroll-mood[data-anim="wave"] .scroll-mood-face {
+  animation: mood-wave 360ms ease;
+}
+
+@keyframes mood-blink {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  40% {
+    transform: scaleY(0.12);
+  }
+}
+
+@keyframes mood-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes mood-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(8deg);
+  }
+  60% {
+    transform: rotate(-6deg);
+  }
+}
+
 @media (max-width: 700px) {
   :root {
     --footer-h: 64px;
@@ -378,5 +444,9 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+
+  .scroll-mood {
+    display: none;
   }
 }
