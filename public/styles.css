@@ -346,6 +346,15 @@ button {
   gap: var(--space-2);
 }
 
+.subsection-item {
+  transition: transform 180ms ease;
+}
+
+.subsection-item:hover,
+.subsection-item:focus-within {
+  transform: translateX(0.35rem);
+}
+
 .entry {
   width: 100%;
   display: grid;
@@ -544,6 +553,7 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .subsection-item,
   .theme-icon,
   .theme-icon__sun,
   .theme-icon__moon,
