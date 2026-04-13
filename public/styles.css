@@ -144,6 +144,128 @@ button {
   transform: translateY(1px);
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+.theme-toggle {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.theme-toggle-icon {
+  width: 1rem;
+  height: 1rem;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: rotate(0deg);
+  transition: transform 220ms ease;
+}
+
+.theme-icon-sun,
+.theme-icon-moon {
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.theme-icon-sun {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0;
+  transform: scale(0.55);
+  transform-origin: center;
+}
+
+.theme-icon-ray {
+  transition: opacity 220ms ease, transform 220ms ease;
+  transform-origin: center;
+  opacity: 0;
+  transform: scale(0.55);
+}
+
+.theme-icon-moon {
+  fill: currentColor;
+  stroke: none;
+  opacity: 1;
+  transform: scale(1);
+  transform-origin: center;
+}
+
+.theme-toggle.is-dark .theme-toggle-icon {
+  transform: rotate(22deg);
+}
+
+.theme-toggle.is-dark .theme-icon-sun,
+.theme-toggle.is-dark .theme-icon-ray {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.theme-toggle.is-dark .theme-icon-moon {
+  opacity: 0;
+  transform: scale(0.55);
+}
+
+.theme-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, 0.28);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-toggle.is-rippling::before {
+  animation: theme-ripple 260ms ease-out;
+}
+
+@keyframes theme-ripple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.32;
+  }
+
+  100% {
+    width: 2rem;
+    height: 2rem;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-icon,
+  .theme-icon-sun,
+  .theme-icon-ray,
+  .theme-icon-moon {
+    transition: none;
+  }
+
+  .theme-toggle.is-rippling::before {
+    animation: none;
+  }
+}
+
 .layout {
   padding-block: calc(var(--header-h) + var(--space-3)) calc(var(--footer-h) + var(--space-3));
   display: grid;

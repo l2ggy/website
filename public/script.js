@@ -286,6 +286,7 @@ const setStatsFallback = () => {
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
 let overrideTheme = localStorage.getItem(storedThemeKey);
@@ -295,8 +296,9 @@ const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
 const applyTheme = (theme) => {
   document.documentElement.dataset.theme = theme;
   if (themeToggle) {
-    themeToggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
-    themeToggle.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} mode`);
+    const isDark = theme === "dark";
+    themeToggle.classList.toggle("is-dark", isDark);
+    themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
   }
 };
 
@@ -308,6 +310,18 @@ if (themeToggle) {
     overrideTheme = currentTheme === "dark" ? "light" : "dark";
     localStorage.setItem(storedThemeKey, overrideTheme);
     applyTheme(overrideTheme);
+
+    if (!reducedMotionQuery.matches) {
+      themeToggle.classList.remove("is-rippling");
+      void themeToggle.offsetWidth;
+      themeToggle.classList.add("is-rippling");
+    }
+  });
+
+  themeToggle.addEventListener("animationend", (event) => {
+    if (event.animationName === "theme-ripple") {
+      themeToggle.classList.remove("is-rippling");
+    }
   });
 }
 
