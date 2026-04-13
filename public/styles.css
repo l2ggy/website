@@ -29,6 +29,23 @@ body {
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
 }
 
+.cursor-spotlight-overlay {
+  --cursor-x: 50vw;
+  --cursor-y: 25vh;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  background: radial-gradient(320px circle at var(--cursor-x) var(--cursor-y), rgba(116, 157, 255, 0.16), transparent 75%);
+  mix-blend-mode: screen;
+}
+
+body.cursor-spotlight-active .cursor-spotlight-overlay {
+  opacity: 1;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 280ms;
@@ -269,6 +286,10 @@ button {
 .section {
   display: grid;
   gap: var(--space-1);
+}
+
+.has-cursor-spotlight {
+  position: relative;
 }
 
 .hero {
@@ -559,6 +580,18 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cursor-spotlight-overlay {
+    display: none;
+  }
+
+  body.cursor-spotlight-static .has-cursor-spotlight::before {
+    content: "";
+    position: absolute;
+    inset: -0.4rem;
+    pointer-events: none;
+    background: radial-gradient(360px circle at 50% 0%, rgba(116, 157, 255, 0.1), transparent 76%);
+  }
+
   .subsection-item,
   .theme-icon,
   .theme-icon__sun,
