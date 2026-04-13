@@ -26,6 +26,59 @@ const renderByKind = {
   project: renderProject,
 };
 
+const formatStat = (value, digits = 1) => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric.toFixed(digits) : "—";
+};
+
+const renderMonkeytypeStats = ({ username, duration, best, completedTests, timeTypingMinutes }) => `
+  <article class="entry">
+    <div class="entry-icon" aria-hidden="true">MT</div>
+    <div class="entry-main">
+      <div class="entry-head">
+        <h3>${username}</h3>
+        <p class="entry-dates">best ${duration}s</p>
+      </div>
+      <p>${formatStat(best?.wpm)} WPM · ${formatStat(best?.acc, 0)}% accuracy · ${formatStat(best?.raw)} raw</p>
+      <p>${formatStat(completedTests, 0)} tests completed · ${formatStat(timeTypingMinutes, 0)} minutes typed</p>
+    </div>
+  </article>
+`;
+
+const selectBestForDuration = (personalBests, duration) => {
+  const key = String(duration);
+  const tests = personalBests?.time?.[key];
+  return Array.isArray(tests) && tests.length > 0 ? tests[0] : null;
+};
+
+const loadMonkeytypeStats = async (element) => {
+  const username = element.dataset.monkeytypeUser?.trim();
+  const duration = Number(element.dataset.monkeytypeDuration || "60");
+
+  if (!username || !Number.isFinite(duration)) {
+    return;
+  }
+
+  const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`);
+  if (!response.ok) {
+    throw new Error("Unable to load Monkeytype profile");
+  }
+
+  const payload = await response.json();
+  const profile = payload?.data;
+  const best = selectBestForDuration(profile?.personalBests, duration);
+  const completedTests = profile?.typingStats?.completedTests;
+  const timeTypingMinutes = Number(profile?.typingStats?.timeTyping) / 60;
+
+  element.innerHTML = renderMonkeytypeStats({
+    username: profile?.name || username,
+    duration,
+    best,
+    completedTests,
+    timeTypingMinutes,
+  });
+};
+
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
@@ -94,5 +147,12 @@ document.querySelectorAll(".entries").forEach((element) => {
     element.innerHTML = "<p>Unable to load entries.</p>";
   });
 });
+
+const monkeytypeStatsElement = document.querySelector(".monkeytype-stats");
+if (monkeytypeStatsElement) {
+  loadMonkeytypeStats(monkeytypeStatsElement).catch(() => {
+    monkeytypeStatsElement.innerHTML = "<p>Unable to load Monkeytype stats.</p>";
+  });
+}
 
 renderGitHubHeatmap();
