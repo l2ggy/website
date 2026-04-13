@@ -141,39 +141,29 @@ button {
 }
 
 .hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(250px, 390px);
-  align-items: center;
-  gap: var(--space-3);
+  position: relative;
+  padding-right: min(48vw, 540px);
 }
 
 .hero-copy {
   display: grid;
-  gap: var(--space-1);
+  gap: 0.2rem;
 }
 
 .hero-heatmap-wrap {
-  display: grid;
-  justify-items: end;
-  gap: 0.45rem;
-}
-
-.hero-heatmap-kicker {
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.hero-heatmap-frame {
-  padding: 0.5rem;
-  border-radius: 0.7rem;
-  background: linear-gradient(135deg, rgba(125, 143, 166, 0.18), transparent 70%);
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .hero-heatmap {
-  width: 100%;
-  max-width: 360px;
-  height: auto;
+  width: auto;
+  height: clamp(92px, 12vw, 138px);
+  max-width: min(48vw, 520px);
   display: block;
 }
 
@@ -265,16 +255,18 @@ button {
   }
 
   .hero {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-2);
+    padding-right: 0;
   }
 
   .hero-heatmap-wrap {
-    justify-items: start;
+    position: static;
+    transform: none;
+    justify-content: flex-start;
+    margin-top: var(--space-1);
   }
 
   .hero-heatmap {
-    max-width: min(100%, 360px);
+    max-width: 100%;
   }
 
   .entry-head {
