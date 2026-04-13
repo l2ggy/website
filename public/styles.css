@@ -238,6 +238,17 @@ button {
   font-size: 0.9em;
 }
 
+
+.stats-subsection {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.stats-subsection h3 {
+  font-size: 1.02rem;
+  font-weight: 520;
+}
+
 .leetcode-stats {
   display: grid;
   gap: 0.35rem;
