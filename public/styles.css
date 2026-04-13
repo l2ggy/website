@@ -368,12 +368,12 @@ button {
   gap: 0.22rem;
   justify-items: end;
   color: var(--muted);
-  min-width: 7.8rem;
+  min-width: 8.3rem;
 }
 
 .percentile-viz svg {
-  width: 7.8rem;
-  height: 3.2rem;
+  width: 8.3rem;
+  height: 3.35rem;
 }
 
 .percentile-viz p {
@@ -385,6 +385,15 @@ button {
   stroke: var(--line);
   stroke-width: 1.2;
   fill: none;
+}
+
+.percentile-axis {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.percentile-fill {
+  fill: rgba(127, 127, 127, 0.18);
 }
 
 .percentile-marker {

@@ -85,6 +85,39 @@ const setStatMarkup = (selector, markup) => {
   }
 };
 
+const erf = (value) => {
+  const sign = value < 0 ? -1 : 1;
+  const x = Math.abs(value);
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+  const t = 1 / (1 + p * x);
+  const y = 1 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x));
+  return sign * y;
+};
+
+const normalCdf = (x) => 0.5 * (1 + erf(x / Math.SQRT2));
+const normalPdf = (x) => Math.exp(-(x * x) / 2) / Math.sqrt(2 * Math.PI);
+
+const inverseStandardNormal = (p) => {
+  let low = -6;
+  let high = 6;
+
+  for (let i = 0; i < 64; i += 1) {
+    const mid = (low + high) / 2;
+    if (normalCdf(mid) < p) {
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+
+  return (low + high) / 2;
+};
+
 const renderPercentile = (selector, percentile) => {
   const element = document.querySelector(selector);
   if (!element) {
@@ -97,29 +130,44 @@ const renderPercentile = (selector, percentile) => {
     return;
   }
 
-  const chartWidth = 124;
-  const chartHeight = 50;
-  const baseline = 42;
-  const left = 4;
-  const right = chartWidth - 4;
-  const center = (left + right) / 2;
-  const sigma = 20;
-  const amplitude = 20;
-  const points = [];
+  const chartWidth = 132;
+  const chartHeight = 54;
+  const left = 6;
+  const right = chartWidth - 6;
+  const top = 6;
+  const baseline = chartHeight - 8;
+  const xMin = -3.5;
+  const xMax = 3.5;
+  const yMax = normalPdf(0);
+  const mapX = (x) => left + ((x - xMin) / (xMax - xMin)) * (right - left);
+  const mapY = (y) => baseline - (y / yMax) * (baseline - top);
+  const pointCount = 90;
+  const curvePoints = [];
 
-  for (let x = left; x <= right; x += 4) {
-    const curve = Math.exp(-Math.pow(x - center, 2) / (2 * Math.pow(sigma, 2)));
-    points.push(`${x},${baseline - curve * amplitude}`);
+  for (let i = 0; i <= pointCount; i += 1) {
+    const x = xMin + (i / pointCount) * (xMax - xMin);
+    curvePoints.push(`${mapX(x)},${mapY(normalPdf(x))}`);
   }
 
-  const markerX = left + ((right - left) * (100 - percentile)) / 100;
-  const markerCurve = Math.exp(-Math.pow(markerX - center, 2) / (2 * Math.pow(sigma, 2)));
-  const markerY = baseline - markerCurve * amplitude;
+  const tailProbability = percentile / 100;
+  const thresholdZ = inverseStandardNormal(1 - tailProbability);
+  const clampedThreshold = Math.max(xMin, Math.min(xMax, thresholdZ));
+  const markerX = mapX(clampedThreshold);
+  const markerY = mapY(normalPdf(clampedThreshold));
+
+  const shadePoints = [`${mapX(clampedThreshold)},${baseline}`];
+  for (let i = 0; i <= pointCount; i += 1) {
+    const x = clampedThreshold + (i / pointCount) * (xMax - clampedThreshold);
+    shadePoints.push(`${mapX(x)},${mapY(normalPdf(x))}`);
+  }
+  shadePoints.push(`${right},${baseline}`);
 
   element.hidden = false;
   element.innerHTML = `
-    <svg viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-label="Percentile distribution">
-      <polyline class="percentile-curve" points="${points.join(" ")}" />
+    <svg viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-label="Standard normal curve with top ${formatNumber(percentile, 2)} percent tail highlighted">
+      <line class="percentile-axis" x1="${left}" y1="${baseline}" x2="${right}" y2="${baseline}" />
+      <polygon class="percentile-fill" points="${shadePoints.join(" ")}" />
+      <polyline class="percentile-curve" points="${curvePoints.join(" ")}" />
       <line class="percentile-marker" x1="${markerX}" y1="${baseline}" x2="${markerX}" y2="${markerY}" />
       <circle class="percentile-dot" cx="${markerX}" cy="${markerY}" r="2" />
     </svg>
