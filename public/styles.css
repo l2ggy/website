@@ -9,6 +9,9 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --cursor-spotlight-size: clamp(260px, 38vw, 520px);
+  --cursor-spotlight-opacity: 0.34;
+  --cursor-spotlight-blend: normal;
 }
 
 :root[data-theme="light"] {
@@ -17,6 +20,7 @@
   --muted: #505050;
   --line: #d5d5d5;
 }
+
 
 * {
   box-sizing: border-box;
@@ -264,6 +268,33 @@ button {
   padding-block: calc(var(--header-h) + var(--space-3)) calc(var(--footer-h) + var(--space-3));
   display: grid;
   gap: var(--space-3);
+  position: relative;
+  z-index: 2;
+}
+
+.has-cursor-spotlight {
+  position: relative;
+}
+
+.cursor-spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--cursor-spotlight-size);
+  height: var(--cursor-spotlight-size);
+  margin-top: calc(var(--cursor-spotlight-size) * -0.5);
+  margin-left: calc(var(--cursor-spotlight-size) * -0.5);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  mix-blend-mode: var(--cursor-spotlight-blend);
+  background: radial-gradient(circle, rgba(127, 127, 127, 0.24) 0%, rgba(127, 127, 127, 0.16) 28%, rgba(127, 127, 127, 0.06) 52%, transparent 72%);
+  transition: opacity 220ms ease;
+  will-change: transform, opacity;
+}
+
+.cursor-spotlight.is-active {
+  opacity: var(--cursor-spotlight-opacity);
 }
 
 .section {
@@ -569,6 +600,14 @@ button {
 
   .theme-toggle:active::before {
     animation: none;
+  }
+
+  .cursor-spotlight {
+    display: none;
+  }
+
+  .has-cursor-spotlight {
+    background: radial-gradient(circle at 50% 30%, rgba(127, 127, 127, 0.08) 0%, rgba(127, 127, 127, 0.04) 42%, transparent 74%);
   }
 }
 
