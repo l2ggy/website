@@ -99,6 +99,12 @@ button {
   gap: 0.85rem;
 }
 
+.footer-navs {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
 .logo-slot,
 .text-btn {
   color: var(--muted);
@@ -631,6 +637,12 @@ button {
     flex-direction: column;
     gap: 0.2rem;
     padding-block: 0.2rem;
+  }
+
+  .footer-navs {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
   }
 
   .hero h1 {
