@@ -30,7 +30,7 @@ const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
   const user = section?.dataset.githubUser?.trim();
-  const chartColor = "7d8fa6";
+  const chartColor = "c06a2b";
 
   if (!section || !heatmapImage || !user) {
     return;
