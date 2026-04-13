@@ -175,9 +175,11 @@ button {
 }
 
 .hero-heatmap {
-  width: auto;
-  height: clamp(92px, 12vw, 138px);
-  max-width: min(48vw, 520px);
+  width: min(48vw, 520px);
+  max-width: 100%;
+  max-height: 138px;
+  height: auto;
+  object-fit: contain;
   display: block;
 }
 
@@ -359,7 +361,7 @@ button {
   }
 
   .hero-heatmap {
-    max-width: 100%;
+    width: 100%;
   }
 
   .entry-head {
