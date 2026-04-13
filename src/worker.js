@@ -25,15 +25,28 @@ const jsonResponse = (data, init = {}) =>
     status: init.status || 200,
   });
 
-const getLeetCodeStats = async (username) => {
-  const response = await fetch("https://leetcode.com/graphql", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      query: LEETCODE_QUERY,
-      variables: { username },
-    }),
+const withTimeout = async (promise, timeoutMs = 10000) => {
+  const timeout = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error("Request timed out")), timeoutMs);
   });
+
+  return Promise.race([promise, timeout]);
+};
+
+const getLeetCodeStats = async (username) => {
+  const response = await withTimeout(
+    fetch("https://leetcode.com/graphql", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "user-agent": "Mozilla/5.0",
+      },
+      body: JSON.stringify({
+        query: LEETCODE_QUERY,
+        variables: { username },
+      }),
+    })
+  );
 
   if (!response.ok) {
     throw new Error("LeetCode request failed");
@@ -59,7 +72,7 @@ const getLeetCodeStats = async (username) => {
 };
 
 const getMonkeytypeStats = async (username) => {
-  const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`);
+  const response = await withTimeout(fetch(`https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`));
   if (!response.ok) {
     throw new Error("Monkeytype request failed");
   }
@@ -86,14 +99,24 @@ const getStats = async (requestUrl) => {
   const leetcode = requestUrl.searchParams.get("leetcode") || "lagsterino";
   const monkeytype = requestUrl.searchParams.get("monkeytype") || "laggy";
 
-  const [leetcodeStats, monkeytypeStats] = await Promise.all([getLeetCodeStats(leetcode), getMonkeytypeStats(monkeytype)]);
+  const [leetcodeStats, monkeytypeStats] = await Promise.allSettled([getLeetCodeStats(leetcode), getMonkeytypeStats(monkeytype)]);
+  const failedSources = [];
+
+  if (leetcodeStats.status === "rejected") {
+    failedSources.push("leetcode");
+  }
+
+  if (monkeytypeStats.status === "rejected") {
+    failedSources.push("monkeytype");
+  }
 
   return {
     fetchedAt: new Date().toISOString(),
     leetcodeUser: leetcode,
     monkeytypeUser: monkeytype,
-    leetcode: leetcodeStats,
-    monkeytype: monkeytypeStats,
+    leetcode: leetcodeStats.status === "fulfilled" ? leetcodeStats.value : null,
+    monkeytype: monkeytypeStats.status === "fulfilled" ? monkeytypeStats.value : null,
+    failedSources,
   };
 };
 
@@ -104,7 +127,8 @@ export default {
     if (requestUrl.pathname === "/api/stats") {
       try {
         const stats = await getStats(requestUrl);
-        return jsonResponse(stats);
+        const status = stats.failedSources.length === 2 ? 502 : 200;
+        return jsonResponse(stats, { status });
       } catch {
         return jsonResponse({ error: "Unable to load stats right now." }, { status: 502 });
       }
