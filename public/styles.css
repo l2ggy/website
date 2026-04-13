@@ -259,8 +259,7 @@ button {
 
 
 .project-title-link {
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
+  text-decoration: none;
 }
 
 .project-title-link:hover,
