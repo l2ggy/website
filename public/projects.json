@@ -1,12 +1,12 @@
 [
   {
-    "title": "APA Site Choice Transformer",
-    "summary": "Co-led a 5-person team at the Toronto Bioinformatics Hackathon 2025 (2nd place). Built and trained a DNABERT-2 model with PyTorch + Hugging Face on ~800k labeled sequence windows using A100 GPUs.",
-    "tools": "Python · PyTorch · Hugging Face · GCP · AWS · Git LFS"
+    "title": "APA Transformer",
+    "summary": "DNABERT-2 training pipeline for APA prediction (Hackathon 2025, 2nd place).",
+    "tools": "Python · PyTorch · Hugging Face · GCP"
   },
   {
-    "title": "CreditCombo — Credit Card Rewards Optimization Engine",
-    "summary": "Built a polished static web app with a cap-aware optimization engine that models card setups under real constraints, including guided onboarding, deep-link state transfer, and responsive computation via Web Worker.",
-    "tools": "JavaScript · HTML/CSS · JSON · Web Workers · Cloudflare Workers"
+    "title": "CreditCombo",
+    "summary": "Client-side credit-card rewards optimizer with fast combo search.",
+    "tools": "JavaScript · HTML/CSS · Web Workers · Cloudflare"
   }
 ]
