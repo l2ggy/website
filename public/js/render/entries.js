@@ -29,9 +29,23 @@ export const renderProject = ({ title, summary, tools, link }) => `
   </article>
 `;
 
+export const renderLeadership = ({ title, role }) => `
+  <article class="leadership-item">
+    <h3>${title}</h3>
+    <p>${role}</p>
+  </article>
+`;
+
+export const renderContact = ({ location, emails = [] }) => `
+  <p>${location || ""}</p>
+  <p>${emails.map(({ address }) => `<a href="mailto:${address}">${address}</a>`).join(" · ")}</p>
+`;
+
 const renderByKind = {
   entry: renderEntry,
   project: renderProject,
+  leadership: renderLeadership,
+  contact: renderContact,
 };
 
 export const loadEntries = async (element) => {
