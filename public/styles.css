@@ -99,6 +99,15 @@ button {
   gap: 0.85rem;
 }
 
+.topbar-webring {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-left: 0.3rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--line);
+}
+
 .logo-slot,
 .text-btn {
   color: var(--muted);
