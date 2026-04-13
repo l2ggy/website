@@ -48,6 +48,35 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const moodStates = [
+  { max: 0.2, state: "calm" },
+  { max: 0.4, state: "blink" },
+  { max: 0.6, state: "focus" },
+  { max: 0.8, state: "bounce" },
+  { max: 1, state: "wave" },
+];
+
+const setupScrollMood = () => {
+  const mood = document.querySelector(".scroll-mood");
+  if (!mood) return;
+
+  let activeState = "";
+  const updateMood = () => {
+    const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    const progress = window.scrollY / maxScroll;
+    const nextState = moodStates.find(({ max }) => progress <= max)?.state || "wave";
+
+    if (nextState !== activeState) {
+      mood.dataset.state = nextState;
+      activeState = nextState;
+    }
+  };
+
+  updateMood();
+  window.addEventListener("scroll", updateMood, { passive: true });
+  window.addEventListener("resize", updateMood);
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -220,3 +249,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+setupScrollMood();

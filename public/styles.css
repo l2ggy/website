@@ -334,6 +334,84 @@ button {
   font-size: 0.8rem;
 }
 
+.scroll-mood {
+  position: fixed;
+  right: max(1rem, calc((100vw - 840px) / 2));
+  bottom: calc(var(--footer-h) + 0.9rem);
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  pointer-events: none;
+  user-select: none;
+  z-index: 5;
+}
+
+.scroll-mood-face {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.scroll-mood[data-state="calm"] .scroll-mood-face::before {
+  content: "·ᴗ·";
+}
+
+.scroll-mood[data-state="blink"] .scroll-mood-face::before {
+  content: "-ᴗ-";
+  animation: mood-blink 260ms ease 1;
+}
+
+.scroll-mood[data-state="bounce"] .scroll-mood-face::before {
+  content: "^ᴗ^";
+  animation: mood-bounce 300ms ease 1;
+}
+
+.scroll-mood[data-state="wave"] .scroll-mood-face::before {
+  content: "•ᴗ•ﾉ";
+  animation: mood-wave 360ms ease 1;
+}
+
+.scroll-mood[data-state="focus"] .scroll-mood-face::before {
+  content: "•_•";
+}
+
+@keyframes mood-blink {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  40% {
+    transform: scaleY(0.25);
+  }
+}
+
+@keyframes mood-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes mood-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(-7deg);
+  }
+  70% {
+    transform: rotate(7deg);
+  }
+}
+
 @media (max-width: 700px) {
   :root {
     --footer-h: 64px;
@@ -378,5 +456,9 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+
+  .scroll-mood {
+    display: none;
   }
 }
