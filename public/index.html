@@ -17,8 +17,13 @@
           <span>laggy</span>
         </a>
         <div class="topbar-actions">
-          <button class="text-btn" id="theme-toggle" type="button" aria-label="Toggle color mode" title="Toggle color mode">
-            Toggle theme
+          <button class="text-btn theme-toggle" id="theme-toggle" type="button" aria-label="Toggle color mode" title="Toggle color mode">
+            <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <circle class="theme-icon__sun" cx="12" cy="12" r="4.2" />
+              <path class="theme-icon__rays" d="M12 2.25v2.45M12 19.3v2.45M4.93 4.93l1.73 1.73M17.34 17.34l1.73 1.73M2.25 12h2.45M19.3 12h2.45M4.93 19.07l1.73-1.73M17.34 6.66l1.73-1.73" />
+              <path class="theme-icon__moon" d="M14.4 3.6A8.4 8.4 0 1 0 20.4 16 7.05 7.05 0 1 1 14.4 3.6Z" />
+            </svg>
+            <span class="visually-hidden">Toggle color mode</span>
           </button>
           <a class="text-btn" href="resume.pdf" target="_blank" rel="noreferrer" aria-label="Resume" title="Resume">Resume</a>
         </div>
