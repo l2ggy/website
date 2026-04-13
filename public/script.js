@@ -74,26 +74,45 @@ const renderStats = ({ leetcode, monkeytype }) => {
   const monkeytypeSummary = document.querySelector("#monkeytype-summary");
   const monkeytypePb = document.querySelector("#monkeytype-pb");
 
-  if (leetcodeSolved && solved) {
-    leetcodeSolved.textContent = `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`;
+  if (leetcodeSolved) {
+    leetcodeSolved.textContent = solved
+      ? `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(
+          solved.medium
+        )} medium · ${formatNumber(solved.hard)} hard)`
+      : "Unavailable right now.";
   }
 
-  if (leetcodeContest && contest?.rating && contest?.topPercentage) {
-    leetcodeContest.textContent = `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`;
+  if (leetcodeContest) {
+    leetcodeContest.textContent =
+      contest?.rating && contest?.topPercentage
+        ? `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`
+        : "Unavailable right now.";
   }
 
   if (monkeytypeSummary) {
-    const typingHours = (monkeytype?.timeTypingSeconds || 0) / 3600;
-    monkeytypeSummary.textContent = `${formatNumber(monkeytype?.completedTests || 0)} tests completed · ${formatNumber(typingHours, 1)}h total typing`;
+    if (!monkeytype) {
+      monkeytypeSummary.textContent = "Unavailable right now.";
+    } else {
+      const typingHours = monkeytype.timeTypingSeconds / 3600;
+      monkeytypeSummary.textContent = `${formatNumber(monkeytype.completedTests)} tests completed · ${formatNumber(
+        typingHours,
+        1
+      )}h total typing`;
+    }
   }
 
   if (monkeytypePb) {
+    if (!monkeytype) {
+      monkeytypePb.textContent = "Unavailable right now.";
+      return;
+    }
+
     const topPercent =
       leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
     monkeytypePb.textContent = topPercent
-      ? `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM`;
+      ? `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
+      : `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM`;
   }
 };
 
