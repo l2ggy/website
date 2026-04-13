@@ -295,8 +295,10 @@ const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
 const applyTheme = (theme) => {
   document.documentElement.dataset.theme = theme;
   if (themeToggle) {
-    themeToggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
-    themeToggle.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} mode`);
+    const isDark = theme === "dark";
+    themeToggle.classList.toggle("is-dark", isDark);
+    themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+    themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
   }
 };
 
