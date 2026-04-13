@@ -40,31 +40,31 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
-const renderLeetCodeStats = ({ username, solved, contestRating }) => `
-  <p class="stat-subtitle">@${username}</p>
-  <div class="stat-grid">
-    <article class="stat-card">
-      <p class="stat-label">Solved</p>
-      <p class="stat-value">${solved.total}</p>
-    </article>
-    <article class="stat-card">
-      <p class="stat-label">Easy</p>
-      <p class="stat-value">${solved.easy}</p>
-    </article>
-    <article class="stat-card">
-      <p class="stat-label">Medium</p>
-      <p class="stat-value">${solved.medium}</p>
-    </article>
-    <article class="stat-card">
-      <p class="stat-label">Hard</p>
-      <p class="stat-value">${solved.hard}</p>
-    </article>
-    <article class="stat-card">
-      <p class="stat-label">Contest rating</p>
-      <p class="stat-value">${contestRating || "N/A"}</p>
-    </article>
-  </div>
-`;
+const renderLeetCodeStats = ({ username, solved, contestRating }) => {
+  const metrics = [
+    ["Solved", solved.total],
+    ["Easy", solved.easy],
+    ["Medium", solved.medium],
+    ["Hard", solved.hard],
+    ["Rating", contestRating || "N/A"],
+  ];
+
+  return `
+    <p class="stat-subtitle">@${username}</p>
+    <div class="stat-row" role="list">
+      ${metrics
+        .map(
+          ([label, value]) => `
+            <p class="stat-item" role="listitem">
+              <span class="stat-label">${label}</span>
+              <span class="stat-value">${value}</span>
+            </p>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+};
 
 const loadLeetCodeStats = async () => {
   const section = document.querySelector("#leetcode");

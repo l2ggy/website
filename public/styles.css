@@ -240,36 +240,35 @@ button {
 
 .leetcode-stats {
   display: grid;
-  gap: var(--space-1);
+  gap: 0.35rem;
 }
 
 .stat-subtitle,
 .stat-loading {
   color: var(--muted);
+  font-size: 0.9rem;
 }
 
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.75rem;
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
 }
 
-.stat-card {
-  border: 1px solid var(--line);
-  padding: 0.65rem 0.75rem;
-  border-radius: 0.35rem;
-  display: grid;
-  gap: 0.15rem;
+.stat-item {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: baseline;
 }
 
 .stat-label {
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.83rem;
 }
 
 .stat-value {
   color: var(--text);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
 }
 
 .footer-content {
