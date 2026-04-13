@@ -26,6 +26,16 @@ const renderByKind = {
   project: renderProject,
 };
 
+const renderLeetCodeStats = (stats) => `
+  <article class="entry project-entry">
+    <div class="entry-main">
+      <h3>${stats.username}</h3>
+      <p class="project-tools">Solved: ${stats.solved.total} total · ${stats.solved.easy} easy · ${stats.solved.medium} medium · ${stats.solved.hard} hard</p>
+      <p>Contest rating: ${stats.contestRating} (${stats.contestsAttended} contests)</p>
+    </div>
+  </article>
+`;
+
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
@@ -48,6 +58,24 @@ const loadEntries = async (element) => {
   const response = await fetch(source);
   const items = await response.json();
   element.innerHTML = items.map(renderByKind[kind]).join("");
+};
+
+const loadLeetCodeStats = async () => {
+  const section = document.querySelector("#leetcode");
+  const container = document.querySelector("#leetcode-stats");
+  const username = section?.dataset.leetcodeUser?.trim();
+
+  if (!section || !container || !username) {
+    return;
+  }
+
+  const response = await fetch(`/api/leetcode/${encodeURIComponent(username)}`);
+  if (!response.ok) {
+    throw new Error("Unable to load LeetCode stats.");
+  }
+
+  const stats = await response.json();
+  container.innerHTML = renderLeetCodeStats(stats);
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -96,3 +124,9 @@ document.querySelectorAll(".entries").forEach((element) => {
 });
 
 renderGitHubHeatmap();
+loadLeetCodeStats().catch(() => {
+  const container = document.querySelector("#leetcode-stats");
+  if (container) {
+    container.innerHTML = "<p>Unable to load LeetCode stats.</p>";
+  }
+});
