@@ -34,6 +34,61 @@ const renderByKind = {
   project: renderProject,
 };
 
+const enableCustomCursor = window.__DISABLE_CUSTOM_CURSOR__ !== true;
+const pointerPrecisionQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+const customCursorLayer = document.querySelector("#cursor-layer");
+const interactiveCursorSelector = "a, button, input, textarea, select, [contenteditable='true'], label";
+
+const setupCustomCursor = () => {
+  if (!enableCustomCursor || !customCursorLayer || !pointerPrecisionQuery.matches) {
+    return;
+  }
+
+  document.documentElement.classList.add("custom-cursor-enabled");
+
+  const position = { x: 0, y: 0 };
+  const target = { x: 0, y: 0 };
+  let isActive = false;
+
+  const setVariant = (eventTarget) => {
+    const section = eventTarget?.closest?.("[data-cursor-variant]");
+    customCursorLayer.dataset.variant = section?.dataset.cursorVariant || "default";
+  };
+
+  const setVisibility = (eventTarget) => {
+    const isInteractive = eventTarget?.closest?.(interactiveCursorSelector);
+    customCursorLayer.classList.toggle("is-visible", !isInteractive);
+  };
+
+  const move = ({ clientX, clientY, target: eventTarget }) => {
+    target.x = clientX;
+    target.y = clientY;
+    setVariant(eventTarget);
+    setVisibility(eventTarget);
+
+    if (!isActive) {
+      position.x = clientX;
+      position.y = clientY;
+      isActive = true;
+      customCursorLayer.classList.add("is-visible");
+    }
+  };
+
+  const tick = () => {
+    position.x += (target.x - position.x) * 0.22;
+    position.y += (target.y - position.y) * 0.22;
+    customCursorLayer.style.setProperty("--cursor-x", `${position.x}px`);
+    customCursorLayer.style.setProperty("--cursor-y", `${position.y}px`);
+    requestAnimationFrame(tick);
+  };
+
+  document.addEventListener("pointermove", move, { passive: true });
+  document.addEventListener("pointerleave", () => customCursorLayer.classList.remove("is-visible"));
+  document.addEventListener("pointerdown", () => customCursorLayer.classList.remove("is-visible"));
+  document.addEventListener("pointerup", () => customCursorLayer.classList.add("is-visible"));
+  requestAnimationFrame(tick);
+};
+
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
@@ -220,3 +275,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+setupCustomCursor();

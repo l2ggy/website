@@ -28,6 +28,10 @@ body {
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
 }
 
+html.custom-cursor-enabled body {
+  cursor: none;
+}
+
 h1,
 h2,
 h3,
@@ -48,6 +52,52 @@ button {
   font: inherit;
   cursor: pointer;
 }
+
+html.custom-cursor-enabled button,
+html.custom-cursor-enabled a,
+html.custom-cursor-enabled input,
+html.custom-cursor-enabled textarea,
+html.custom-cursor-enabled select,
+html.custom-cursor-enabled [contenteditable="true"] {
+  cursor: auto;
+}
+
+.cursor-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 50%, transparent);
+  pointer-events: none;
+  opacity: 0;
+  --cursor-x: -100px;
+  --cursor-y: -100px;
+  --cursor-scale: 0.96;
+  transform: translate3d(var(--cursor-x), var(--cursor-y), 0) scale(var(--cursor-scale));
+  transition: opacity 120ms ease, transform 120ms ease, border-color 120ms ease, background-color 120ms ease;
+  z-index: 60;
+}
+
+html.custom-cursor-enabled .cursor-layer.is-visible {
+  opacity: 1;
+}
+
+.cursor-layer[data-variant="hero"] { --cursor-scale: 1.12; }
+
+.cursor-layer[data-variant="projects"] {
+  border-color: var(--text);
+}
+
+.cursor-layer[data-variant="stats"] {
+  background: color-mix(in srgb, var(--text) 20%, transparent);
+}
+
+.cursor-layer[data-variant="contact"] { --cursor-scale: 0.86; }
 
 .container {
   width: min(840px, calc(100% - 2rem));
@@ -378,5 +428,15 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-layer {
+    display: none;
+  }
+
+  html.custom-cursor-enabled body {
+    cursor: auto;
   }
 }
