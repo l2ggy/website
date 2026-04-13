@@ -48,6 +48,186 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const initHeroConstellation = () => {
+  const hero = document.querySelector(".hero");
+  const canvas = document.querySelector("#hero-constellation");
+  if (!hero || !canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    return;
+  }
+
+  const particleCount = 26;
+  const maxDistance = 92;
+  const particles = [];
+  const pointer = { x: 0, y: 0, active: false };
+  const colorCache = { text: "", muted: "", line: "" };
+  let heroBounds = hero.getBoundingClientRect();
+  let heroVisible = true;
+  let pageVisible = !document.hidden;
+  let frame = null;
+
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const alphaColor = (color, alpha) => `color-mix(in srgb, ${color} ${Math.round(alpha * 100)}%, transparent)`;
+
+  const resizeCanvas = () => {
+    heroBounds = hero.getBoundingClientRect();
+    const width = Math.max(1, Math.round(heroBounds.width));
+    const height = Math.max(1, Math.round(heroBounds.height));
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+  };
+
+  const refreshColors = () => {
+    const style = getComputedStyle(document.documentElement);
+    colorCache.text = style.getPropertyValue("--text").trim() || "#d7d7d7";
+    colorCache.muted = style.getPropertyValue("--muted").trim() || "#a1a1a1";
+    colorCache.line = style.getPropertyValue("--line").trim() || "#2a2a2a";
+  };
+
+  const seedParticles = () => {
+    particles.length = 0;
+    for (let i = 0; i < particleCount; i += 1) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
+        radius: 1 + Math.random() * 1.1,
+      });
+    }
+  };
+
+  const updateParticle = (particle) => {
+    const followStrength = pointer.active ? 0.00075 : 0;
+    if (followStrength) {
+      const dx = pointer.x - particle.x;
+      const dy = pointer.y - particle.y;
+      particle.vx += dx * followStrength;
+      particle.vy += dy * followStrength;
+    }
+
+    particle.vx = clamp(particle.vx, -0.38, 0.38);
+    particle.vy = clamp(particle.vy, -0.38, 0.38);
+    particle.x += particle.vx;
+    particle.y += particle.vy;
+    particle.vx *= 0.985;
+    particle.vy *= 0.985;
+
+    if (particle.x <= 0 || particle.x >= canvas.width) {
+      particle.vx *= -1;
+      particle.x = clamp(particle.x, 0, canvas.width);
+    }
+    if (particle.y <= 0 || particle.y >= canvas.height) {
+      particle.vy *= -1;
+      particle.y = clamp(particle.y, 0, canvas.height);
+    }
+  };
+
+  const draw = () => {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i += 1) {
+      const first = particles[i];
+      for (let j = i + 1; j < particles.length; j += 1) {
+        const second = particles[j];
+        const dx = first.x - second.x;
+        const dy = first.y - second.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance > maxDistance) {
+          continue;
+        }
+        const alpha = (1 - distance / maxDistance) * 0.24;
+        context.strokeStyle = alphaColor(colorCache.line, alpha);
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(first.x, first.y);
+        context.lineTo(second.x, second.y);
+        context.stroke();
+      }
+    }
+
+    particles.forEach((particle) => {
+      context.fillStyle = alphaColor(pointer.active ? colorCache.text : colorCache.muted, 0.38);
+      context.beginPath();
+      context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+      context.fill();
+    });
+  };
+
+  const animate = () => {
+    frame = null;
+    if (!heroVisible || !pageVisible) {
+      return;
+    }
+    particles.forEach(updateParticle);
+    draw();
+    frame = requestAnimationFrame(animate);
+  };
+
+  const ensureAnimation = () => {
+    if (!frame && heroVisible && pageVisible) {
+      frame = requestAnimationFrame(animate);
+    }
+  };
+
+  const stopAnimation = () => {
+    if (frame) {
+      cancelAnimationFrame(frame);
+      frame = null;
+    }
+  };
+
+  const onPointerMove = (event) => {
+    pointer.active = true;
+    pointer.x = event.clientX - heroBounds.left;
+    pointer.y = event.clientY - heroBounds.top;
+  };
+
+  const onPointerLeave = () => {
+    pointer.active = false;
+  };
+
+  const observer = new IntersectionObserver(([entry]) => {
+    heroVisible = Boolean(entry?.isIntersecting);
+    if (heroVisible) {
+      ensureAnimation();
+    } else {
+      stopAnimation();
+    }
+  }, { threshold: 0.1 });
+
+  observer.observe(hero);
+  hero.addEventListener("pointerenter", onPointerMove);
+  hero.addEventListener("pointermove", onPointerMove);
+  hero.addEventListener("pointerleave", onPointerLeave);
+  window.addEventListener("resize", () => {
+    resizeCanvas();
+    seedParticles();
+  });
+  document.addEventListener("visibilitychange", () => {
+    pageVisible = !document.hidden;
+    if (pageVisible) {
+      ensureAnimation();
+    } else {
+      stopAnimation();
+    }
+  });
+  new MutationObserver(() => refreshColors()).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+
+  refreshColors();
+  resizeCanvas();
+  seedParticles();
+  ensureAnimation();
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -332,3 +512,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+initHeroConstellation();
