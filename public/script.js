@@ -220,3 +220,108 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+
+
+const initializeHeroPoints = () => {
+  const hero = document.querySelector("#hero");
+  const svg = document.querySelector("#hero-points");
+  const isTouch = window.matchMedia("(hover: none), (pointer: coarse)").matches || navigator.maxTouchPoints > 0;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!hero || !svg || isTouch || reducedMotion) {
+    if (svg) svg.remove();
+    return;
+  }
+
+  const pointCount = 12;
+  const points = [];
+  const circles = [];
+  const cursorLines = [];
+  const seeds = Array.from({ length: pointCount }, (_, index) => ({
+    x: ((index * 37 + 11) % 100) / 100,
+    y: ((index * 53 + 17) % 100) / 100,
+  }));
+
+  const makeSvg = (tag, attrs) => {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, String(value)));
+    svg.append(node);
+    return node;
+  };
+
+  seeds.forEach((seed) => {
+    const point = { x: 0, y: 0, seed };
+    points.push(point);
+    circles.push(makeSvg("circle", { r: 2.2, class: "hero-point" }));
+    cursorLines.push(makeSvg("line", { class: "hero-cursor-line" }));
+  });
+
+  let width = 0;
+  let height = 0;
+  let raf = 0;
+  let cursor = null;
+
+  const layoutPoints = () => {
+    width = hero.clientWidth;
+    height = hero.clientHeight;
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+    points.forEach((point, index) => {
+      point.x = width * (0.08 + point.seed.x * 0.84);
+      point.y = height * (0.15 + point.seed.y * 0.7);
+      circles[index].setAttribute("cx", point.x);
+      circles[index].setAttribute("cy", point.y);
+    });
+  };
+
+  const render = () => {
+    raf = 0;
+
+    if (!cursor) {
+      circles.forEach((circle) => circle.classList.remove("is-active"));
+      cursorLines.forEach((line) => line.classList.remove("is-active"));
+      return;
+    }
+
+    const nearest = [...points]
+      .sort((a, b) => (a.x - cursor.x) ** 2 + (a.y - cursor.y) ** 2 - ((b.x - cursor.x) ** 2 + (b.y - cursor.y) ** 2))
+      .slice(0, 3);
+
+    points.forEach((point, index) => {
+      const active = nearest.includes(point);
+      circles[index].classList.toggle("is-active", active);
+      const line = cursorLines[index];
+      line.classList.toggle("is-active", active);
+      if (active) {
+        line.setAttribute("x1", point.x);
+        line.setAttribute("y1", point.y);
+        line.setAttribute("x2", cursor.x);
+        line.setAttribute("y2", cursor.y);
+      }
+    });
+  };
+
+  const queueRender = () => {
+    if (!raf) raf = requestAnimationFrame(render);
+  };
+
+  layoutPoints();
+  const resizeObserver = new ResizeObserver(() => {
+    layoutPoints();
+    queueRender();
+  });
+  resizeObserver.observe(hero);
+
+  hero.addEventListener("pointermove", (event) => {
+    const bounds = hero.getBoundingClientRect();
+    cursor = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+    queueRender();
+  });
+
+  hero.addEventListener("pointerleave", () => {
+    cursor = null;
+    queueRender();
+  });
+};
+
+initializeHeroPoints();
