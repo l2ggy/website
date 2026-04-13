@@ -27,6 +27,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
+  transition: background-color 280ms ease, color 280ms ease;
 }
 
 h1,
@@ -40,6 +41,7 @@ a,
 button {
   color: inherit;
   text-decoration: none;
+  transition: color 280ms ease;
 }
 
 button {
@@ -61,18 +63,21 @@ button {
   right: 0;
   background: var(--bg);
   z-index: 20;
+  transition: background-color 280ms ease, border-color 280ms ease;
 }
 
 .topbar {
   top: 0;
   height: var(--header-h);
   border-bottom: 1px solid var(--line);
+  transition: border-color 280ms ease;
 }
 
 .bottombar {
   bottom: 0;
   height: var(--footer-h);
   border-top: 1px solid var(--line);
+  transition: border-color 280ms ease;
 }
 
 .bar-content,
@@ -334,6 +339,7 @@ button {
 .hero p,
 .section p {
   color: var(--muted);
+  transition: color 280ms ease;
 }
 
 .section h2 {
@@ -367,6 +373,7 @@ button {
   border-radius: 8px;
   object-fit: cover;
   border: 1px solid var(--line);
+  transition: border-color 280ms ease;
 }
 
 #education .entry-thumb {
@@ -387,6 +394,7 @@ button {
   text-align: right;
   white-space: nowrap;
   color: var(--muted);
+  transition: color 280ms ease;
 }
 
 .project-entry {
@@ -505,6 +513,7 @@ button {
   align-items: center;
   color: var(--muted);
   width: 14.4rem;
+  transition: color 280ms ease;
 }
 
 .percentile-viz svg {
@@ -518,11 +527,13 @@ button {
   stroke: var(--line);
   stroke-width: 1.2;
   fill: none;
+  transition: stroke 280ms ease;
 }
 
 .percentile-axis {
   stroke: var(--line);
   stroke-width: 1;
+  transition: stroke 280ms ease;
 }
 
 .percentile-fill {
@@ -533,10 +544,12 @@ button {
   stroke: var(--text);
   stroke-width: 1.15;
   stroke-linecap: round;
+  transition: stroke 280ms ease;
 }
 
 .percentile-dot {
   fill: var(--text);
+  transition: fill 280ms ease;
 }
 
 .footer-content {
@@ -544,6 +557,13 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
   .theme-icon,
   .theme-icon__sun,
   .theme-icon__moon,
