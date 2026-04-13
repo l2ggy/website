@@ -15,6 +15,18 @@ const LEETCODE_QUERY = `
   }
 `;
 
+const defaultLeetCodeStats = () => ({
+  solved: { all: 0, easy: 0, medium: 0, hard: 0 },
+  contest: { rating: null, topPercentage: null },
+});
+
+const defaultMonkeytypeStats = () => ({
+  completedTests: 0,
+  timeTypingSeconds: 0,
+  pb60: 0,
+  leaderboard: { rank: null, count: null },
+});
+
 const jsonResponse = (data, init = {}) =>
   new Response(JSON.stringify(data), {
     headers: {
@@ -28,7 +40,11 @@ const jsonResponse = (data, init = {}) =>
 const getLeetCodeStats = async (username) => {
   const response = await fetch("https://leetcode.com/graphql", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      accept: "application/json",
+      "user-agent": "portfolio-stats-worker/1.0",
+    },
     body: JSON.stringify({
       query: LEETCODE_QUERY,
       variables: { username },
@@ -40,6 +56,10 @@ const getLeetCodeStats = async (username) => {
   }
 
   const payload = await response.json();
+  if (payload?.errors?.length) {
+    throw new Error("LeetCode GraphQL error");
+  }
+
   const counts = payload?.data?.matchedUser?.submitStatsGlobal?.acSubmissionNum || [];
   const contest = payload?.data?.userContestRanking || {};
   const byDifficulty = Object.fromEntries(counts.map(({ difficulty, count }) => [difficulty, count]));
@@ -59,7 +79,12 @@ const getLeetCodeStats = async (username) => {
 };
 
 const getMonkeytypeStats = async (username) => {
-  const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`);
+  const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`, {
+    headers: {
+      accept: "application/json",
+      "user-agent": "portfolio-stats-worker/1.0",
+    },
+  });
   if (!response.ok) {
     throw new Error("Monkeytype request failed");
   }
@@ -86,14 +111,23 @@ const getStats = async (requestUrl) => {
   const leetcode = requestUrl.searchParams.get("leetcode") || "lagsterino";
   const monkeytype = requestUrl.searchParams.get("monkeytype") || "laggy";
 
-  const [leetcodeStats, monkeytypeStats] = await Promise.all([getLeetCodeStats(leetcode), getMonkeytypeStats(monkeytype)]);
+  const [leetcodeResult, monkeytypeResult] = await Promise.allSettled([
+    getLeetCodeStats(leetcode),
+    getMonkeytypeStats(monkeytype),
+  ]);
+  const leetcodeAvailable = leetcodeResult.status === "fulfilled";
+  const monkeytypeAvailable = monkeytypeResult.status === "fulfilled";
 
   return {
     fetchedAt: new Date().toISOString(),
     leetcodeUser: leetcode,
     monkeytypeUser: monkeytype,
-    leetcode: leetcodeStats,
-    monkeytype: monkeytypeStats,
+    leetcode: leetcodeAvailable ? leetcodeResult.value : defaultLeetCodeStats(),
+    monkeytype: monkeytypeAvailable ? monkeytypeResult.value : defaultMonkeytypeStats(),
+    availability: {
+      leetcode: leetcodeAvailable,
+      monkeytype: monkeytypeAvailable,
+    },
   };
 };
 
@@ -102,12 +136,8 @@ export default {
     const requestUrl = new URL(request.url);
 
     if (requestUrl.pathname === "/api/stats") {
-      try {
-        const stats = await getStats(requestUrl);
-        return jsonResponse(stats);
-      } catch {
-        return jsonResponse({ error: "Unable to load stats right now." }, { status: 502 });
-      }
+      const stats = await getStats(requestUrl);
+      return jsonResponse(stats);
     }
 
     return env.ASSETS.fetch(request);

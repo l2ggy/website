@@ -64,36 +64,56 @@ const formatNumber = (value, digits = 0) =>
     maximumFractionDigits: digits,
   }).format(value);
 
-const renderStats = ({ leetcode, monkeytype }) => {
+const unavailableMessage = "Unavailable right now.";
+
+const renderStats = ({ leetcode, monkeytype, availability }) => {
   const solved = leetcode?.solved;
   const contest = leetcode?.contest;
   const leaderboard = monkeytype?.leaderboard;
+  const leetcodeAvailable = availability?.leetcode !== false;
+  const monkeytypeAvailable = availability?.monkeytype !== false;
 
   const leetcodeSolved = document.querySelector("#leetcode-solved");
   const leetcodeContest = document.querySelector("#leetcode-contest");
   const monkeytypeSummary = document.querySelector("#monkeytype-summary");
   const monkeytypePb = document.querySelector("#monkeytype-pb");
 
-  if (leetcodeSolved && solved) {
-    leetcodeSolved.textContent = `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`;
+  if (leetcodeSolved) {
+    if (!leetcodeAvailable) {
+      leetcodeSolved.textContent = unavailableMessage;
+    } else if (solved) {
+      leetcodeSolved.textContent = `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`;
+    }
   }
 
-  if (leetcodeContest && contest?.rating && contest?.topPercentage) {
-    leetcodeContest.textContent = `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`;
+  if (leetcodeContest) {
+    if (!leetcodeAvailable) {
+      leetcodeContest.textContent = unavailableMessage;
+    } else if (contest?.rating && contest?.topPercentage) {
+      leetcodeContest.textContent = `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`;
+    }
   }
 
   if (monkeytypeSummary) {
-    const typingHours = (monkeytype?.timeTypingSeconds || 0) / 3600;
-    monkeytypeSummary.textContent = `${formatNumber(monkeytype?.completedTests || 0)} tests completed · ${formatNumber(typingHours, 1)}h total typing`;
+    if (!monkeytypeAvailable) {
+      monkeytypeSummary.textContent = unavailableMessage;
+    } else {
+      const typingHours = (monkeytype?.timeTypingSeconds || 0) / 3600;
+      monkeytypeSummary.textContent = `${formatNumber(monkeytype?.completedTests || 0)} tests completed · ${formatNumber(typingHours, 1)}h total typing`;
+    }
   }
 
   if (monkeytypePb) {
-    const topPercent =
-      leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
+    if (!monkeytypeAvailable) {
+      monkeytypePb.textContent = unavailableMessage;
+    } else {
+      const topPercent =
+        leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
-    monkeytypePb.textContent = topPercent
-      ? `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM`;
+      monkeytypePb.textContent = topPercent
+        ? `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
+        : `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM`;
+    }
   }
 };
 
@@ -118,7 +138,7 @@ const setStatsFallback = () => {
   ["#leetcode-solved", "#leetcode-contest", "#monkeytype-summary", "#monkeytype-pb"].forEach((selector) => {
     const element = document.querySelector(selector);
     if (element) {
-      element.textContent = "Unavailable right now.";
+      element.textContent = unavailableMessage;
     }
   });
 };
