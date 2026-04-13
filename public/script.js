@@ -22,7 +22,7 @@ const renderEntry = ({ icon, title, subtitle, dates }) => `
 const renderProject = ({ title, summary, tools, link }) => `
   <article class="entry project-entry">
     <div class="entry-main">
-      <h3>${link ? `<a class="project-title-link" href="${link}" target="_blank" rel="noreferrer">${title}</a>` : title}</h3>
+      <h3>${link ? `<a class="project-title-link fluid-fill" href="${link}" target="_blank" rel="noreferrer">${title}</a>` : title}</h3>
       <p>${summary}</p>
       <p class="project-tools">${tools}</p>
     </div>
@@ -285,6 +285,43 @@ const setStatsFallback = () => {
   renderPercentile("#monkeytype-percentile", null);
 };
 
+const directionalVector = (event, element) => {
+  const rect = element.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  const left = x;
+  const right = rect.width - x;
+  const top = y;
+  const bottom = rect.height - y;
+  const minSide = Math.min(left, right, top, bottom);
+
+  if (minSide === left) return { x: "-34%", y: "0%", ox: "0%", oy: "50%" };
+  if (minSide === right) return { x: "34%", y: "0%", ox: "100%", oy: "50%" };
+  if (minSide === top) return { x: "0%", y: "-34%", ox: "50%", oy: "0%" };
+  return { x: "0%", y: "34%", ox: "50%", oy: "100%" };
+};
+
+const applyFluidDirection = (element, vector) => {
+  element.style.setProperty("--fluid-shift-x", vector.x);
+  element.style.setProperty("--fluid-shift-y", vector.y);
+  element.style.setProperty("--fluid-origin-x", vector.ox);
+  element.style.setProperty("--fluid-origin-y", vector.oy);
+};
+
+const setupDirectionalFluidFill = () => {
+  document.querySelectorAll(".fluid-fill").forEach((element) => {
+    element.addEventListener("pointerenter", (event) => {
+      element.classList.remove("is-leaving");
+      applyFluidDirection(element, directionalVector(event, element));
+    });
+
+    element.addEventListener("pointerleave", (event) => {
+      applyFluidDirection(element, directionalVector(event, element));
+      element.classList.add("is-leaving");
+    });
+  });
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -332,3 +369,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+setupDirectionalFluidFill();

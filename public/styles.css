@@ -113,20 +113,7 @@ button {
 
 .text-btn {
   position: relative;
-  transition: color 180ms ease, transform 180ms ease;
-}
-
-.text-btn::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.1em;
-  height: 1px;
-  background: var(--text);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 180ms ease;
+  transition: color 160ms ease, transform 160ms ease;
 }
 
 .text-btn:hover,
@@ -134,13 +121,45 @@ button {
   color: var(--text);
 }
 
-.text-btn:hover::after,
-.text-btn:focus-visible::after {
-  transform: scaleX(1);
-}
-
 .text-btn:active {
   transform: translateY(1px);
+}
+
+.fluid-fill {
+  --fluid-shift-x: 0;
+  --fluid-shift-y: 0;
+  --fluid-origin-x: 50%;
+  --fluid-origin-y: 50%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 999px;
+  padding-inline: 0.36rem;
+  margin-inline: -0.36rem;
+}
+
+.fluid-fill::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  border-radius: inherit;
+  z-index: -1;
+  background: rgba(127, 127, 127, 0.22);
+  transform-origin: var(--fluid-origin-x) var(--fluid-origin-y);
+  transform: translate(var(--fluid-shift-x), var(--fluid-shift-y)) scale(0.2);
+  opacity: 0;
+  transition: transform 180ms ease-out, opacity 140ms ease-out;
+}
+
+.fluid-fill:hover::before,
+.fluid-fill:focus-visible::before {
+  transform: translate(0, 0) scale(1);
+  opacity: 1;
+}
+
+.fluid-fill.is-leaving::before {
+  transform: translate(var(--fluid-shift-x), var(--fluid-shift-y)) scale(0.2);
+  opacity: 0;
 }
 
 .layout {
@@ -265,30 +284,12 @@ button {
 .project-title-link {
   position: relative;
   text-decoration: none;
-  transition: color 180ms ease, transform 180ms ease;
-}
-
-.project-title-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.1em;
-  height: 1px;
-  background: var(--text);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 180ms ease;
+  transition: color 160ms ease, transform 160ms ease;
 }
 
 .project-title-link:hover,
 .project-title-link:focus-visible {
   color: var(--text);
-}
-
-.project-title-link:hover::after,
-.project-title-link:focus-visible::after {
-  transform: scaleX(1);
 }
 
 .project-title-link:active {
