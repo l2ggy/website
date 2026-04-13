@@ -352,6 +352,8 @@ button {
   grid-template-columns: var(--entry-icon-size) minmax(0, 1fr);
   gap: var(--space-2);
   align-items: center;
+  transform: translateX(0);
+  transition: transform 180ms ease;
 }
 
 .entry-icon {
@@ -440,6 +442,8 @@ button {
 .leadership-item {
   display: grid;
   gap: 0.12rem;
+  transform: translateX(0);
+  transition: transform 180ms ease;
 }
 
 .leadership-item h3 {
@@ -462,6 +466,19 @@ button {
   gap: 0.15rem;
   position: relative;
   padding-right: 15.1rem;
+  transform: translateX(0);
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .entry:hover,
+  .entry:focus-within,
+  .leadership-item:hover,
+  .leadership-item:focus-within,
+  .stats-item:hover,
+  .stats-item:focus-within {
+    transform: translateX(0.35rem);
+  }
 }
 
 .stats-copy {
