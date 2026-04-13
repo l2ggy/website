@@ -173,6 +173,105 @@ const setStatsFallback = () => {
   });
 };
 
+const shouldDisableSectionPoints = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+  window.matchMedia("(pointer: coarse)").matches ||
+  navigator.maxTouchPoints > 0;
+
+const backgroundPointRatios = [
+  [0.08, 0.18],
+  [0.24, 0.12],
+  [0.42, 0.22],
+  [0.62, 0.14],
+  [0.81, 0.2],
+  [0.14, 0.45],
+  [0.33, 0.52],
+  [0.56, 0.44],
+  [0.75, 0.5],
+  [0.19, 0.78],
+  [0.46, 0.74],
+  [0.72, 0.82],
+];
+
+const initSectionPointEffects = () => {
+  if (shouldDisableSectionPoints()) return;
+
+  document.querySelectorAll(".section").forEach((section) => {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("section-points");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("preserveAspectRatio", "none");
+    section.prepend(svg);
+
+    const lines = Array.from({ length: 3 }, () => {
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.classList.add("section-line");
+      line.style.opacity = "0";
+      svg.append(line);
+      return line;
+    });
+
+    const circles = backgroundPointRatios.map(([x, y]) => {
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.classList.add("section-point");
+      circle.setAttribute("cx", `${x * 100}`);
+      circle.setAttribute("cy", `${y * 100}`);
+      circle.setAttribute("r", "0.8");
+      svg.append(circle);
+      return { x, y, node: circle };
+    });
+
+    let frameId = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+
+    const clearHighlight = () => {
+      circles.forEach(({ node }) => {
+        node.classList.remove("is-active");
+        node.setAttribute("r", "0.8");
+      });
+      lines.forEach((line) => {
+        line.style.opacity = "0";
+      });
+    };
+
+    const renderFrame = () => {
+      frameId = 0;
+      const nearest = [...circles]
+        .sort((a, b) => (a.x - pointerX) ** 2 + (a.y - pointerY) ** 2 - ((b.x - pointerX) ** 2 + (b.y - pointerY) ** 2))
+        .slice(0, lines.length);
+
+      clearHighlight();
+      nearest.forEach((point, index) => {
+        point.node.classList.add("is-active");
+        point.node.setAttribute("r", "1.05");
+
+        const line = lines[index];
+        line.setAttribute("x1", `${point.x * 100}`);
+        line.setAttribute("y1", `${point.y * 100}`);
+        line.setAttribute("x2", `${pointerX * 100}`);
+        line.setAttribute("y2", `${pointerY * 100}`);
+        line.style.opacity = "1";
+      });
+    };
+
+    section.addEventListener("pointermove", (event) => {
+      const bounds = section.getBoundingClientRect();
+      pointerX = (event.clientX - bounds.left) / bounds.width;
+      pointerY = (event.clientY - bounds.top) / bounds.height;
+      if (!frameId) frameId = requestAnimationFrame(renderFrame);
+    });
+
+    section.addEventListener("pointerleave", () => {
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+        frameId = 0;
+      }
+      clearHighlight();
+    });
+  });
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -220,3 +319,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+initSectionPointEffects();
