@@ -173,6 +173,53 @@ const setStatsFallback = () => {
   });
 };
 
+const scrollMoodStates = [
+  { key: "idle", max: 0.18, face: "•‿•" },
+  { key: "blink", max: 0.4, face: "•◡•" },
+  { key: "wave", max: 0.62, face: "ᵔᴗᵔ" },
+  { key: "bounce", max: 0.84, face: "•̀ᴗ•́" },
+  { key: "sleepy", max: 1, face: "˘◡˘" },
+];
+
+const setupScrollMood = () => {
+  const mood = document.querySelector("[data-scroll-mood]");
+  if (!mood) return;
+
+  let activeKey = mood.dataset.state || "idle";
+  let ticking = false;
+
+  const applyMood = () => {
+    ticking = false;
+    const scrollRange = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = scrollRange > 0 ? window.scrollY / scrollRange : 0;
+    const nextMood = scrollMoodStates.find(({ max }) => progress <= max) || scrollMoodStates[scrollMoodStates.length - 1];
+
+    if (nextMood.key === activeKey) {
+      return;
+    }
+
+    activeKey = nextMood.key;
+    mood.dataset.state = nextMood.key;
+    mood.textContent = nextMood.face;
+    mood.classList.remove("mood-animate");
+    void mood.offsetWidth;
+    mood.classList.add("mood-animate");
+  };
+
+  const queueMoodUpdate = () => {
+    if (ticking) {
+      return;
+    }
+
+    ticking = true;
+    window.requestAnimationFrame(applyMood);
+  };
+
+  window.addEventListener("scroll", queueMoodUpdate, { passive: true });
+  window.addEventListener("resize", queueMoodUpdate);
+  queueMoodUpdate();
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -220,3 +267,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+setupScrollMood();

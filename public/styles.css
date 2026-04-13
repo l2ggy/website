@@ -334,6 +334,83 @@ button {
   font-size: 0.8rem;
 }
 
+.scroll-mood {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(var(--footer-h) + var(--space-2));
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  pointer-events: none;
+  user-select: none;
+  z-index: 5;
+}
+
+.scroll-mood-face {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.scroll-mood-face[data-state="blink"].mood-animate {
+  animation: mood-blink 360ms steps(1, end);
+}
+
+.scroll-mood-face[data-state="wave"].mood-animate {
+  animation: mood-wave 380ms ease-in-out;
+}
+
+.scroll-mood-face[data-state="bounce"].mood-animate {
+  animation: mood-bounce 320ms ease-in-out;
+}
+
+.scroll-mood-face[data-state="sleepy"].mood-animate {
+  animation: mood-nod 420ms ease-in-out;
+}
+
+@keyframes mood-blink {
+  50% {
+    transform: scaleY(0.4);
+  }
+}
+
+@keyframes mood-wave {
+  35% {
+    transform: rotate(-12deg);
+  }
+  70% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes mood-bounce {
+  40% {
+    transform: translateY(-3px);
+  }
+  70% {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes mood-nod {
+  40% {
+    transform: translateY(1px);
+  }
+  70% {
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 820px) {
+  .scroll-mood {
+    display: none;
+  }
+}
+
 @media (max-width: 700px) {
   :root {
     --footer-h: 64px;
