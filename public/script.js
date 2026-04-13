@@ -173,6 +173,50 @@ const setStatsFallback = () => {
   });
 };
 
+
+const blobPresets = [
+  {
+    radius: "52% 48% 62% 38% / 43% 61% 39% 57%",
+    path: "polygon(20% 8%, 80% 12%, 94% 48%, 78% 90%, 24% 88%, 8% 52%)",
+    hue: "0deg",
+  },
+  {
+    radius: "62% 38% 44% 56% / 58% 45% 55% 42%",
+    path: "polygon(26% 10%, 76% 6%, 92% 38%, 88% 78%, 48% 94%, 14% 74%, 8% 34%)",
+    hue: "10deg",
+  },
+  {
+    radius: "42% 58% 55% 45% / 35% 55% 45% 65%",
+    path: "polygon(16% 22%, 52% 4%, 86% 18%, 96% 56%, 72% 90%, 34% 94%, 6% 62%)",
+    hue: "-9deg",
+  },
+  {
+    radius: "58% 42% 40% 60% / 52% 38% 62% 48%",
+    path: "polygon(12% 20%, 42% 6%, 84% 12%, 94% 44%, 84% 84%, 44% 96%, 10% 66%)",
+    hue: "16deg",
+  },
+];
+
+const applyBlobPreset = (blob, preset) => {
+  blob.style.setProperty("--blob-radius", preset.radius);
+  blob.style.setProperty("--blob-path", preset.path);
+  blob.style.setProperty("--blob-hue", preset.hue);
+};
+
+const initBlobMorph = () => {
+  const blob = document.querySelector("#hero-blob");
+  if (!blob) return;
+
+  let blobIndex = Math.floor(Math.random() * blobPresets.length);
+  applyBlobPreset(blob, blobPresets[blobIndex]);
+
+  blob.addEventListener("click", () => {
+    const randomStep = Math.floor(Math.random() * (blobPresets.length - 1)) + 1;
+    blobIndex = (blobIndex + randomStep) % blobPresets.length;
+    applyBlobPreset(blob, blobPresets[blobIndex]);
+  });
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -220,3 +264,5 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+
+initBlobMorph();

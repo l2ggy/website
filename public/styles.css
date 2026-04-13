@@ -164,6 +164,32 @@ button {
   gap: 0.2rem;
 }
 
+
+.hero-blob {
+  --blob-radius: 52% 48% 62% 38% / 43% 61% 39% 57%;
+  --blob-path: polygon(20% 8%, 80% 12%, 94% 48%, 78% 90%, 24% 88%, 8% 52%);
+  --blob-hue: 0deg;
+  position: absolute;
+  top: -0.4rem;
+  right: min(50vw, 560px);
+  width: 62px;
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--blob-radius);
+  clip-path: var(--blob-path);
+  background: color-mix(in oklab, var(--text) 20%, transparent);
+  filter: hue-rotate(var(--blob-hue));
+  opacity: 0.7;
+  transition: border-radius 360ms ease, clip-path 360ms ease, filter 360ms ease, opacity 220ms ease;
+  will-change: border-radius, clip-path, filter;
+  z-index: 1;
+}
+
+.hero-blob:hover,
+.hero-blob:focus-visible {
+  opacity: 0.95;
+}
+
 .hero-heatmap-wrap {
   position: absolute;
   top: 50%;
@@ -349,6 +375,12 @@ button {
 
   .hero {
     padding-right: 0;
+  }
+
+  .hero-blob {
+    top: 0.1rem;
+    right: 0.6rem;
+    width: 48px;
   }
 
   .hero-heatmap-wrap {
