@@ -48,6 +48,198 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const parseColor = (value) => {
+  if (!value) return [215, 215, 215];
+  const color = value.trim();
+
+  if (color.startsWith("#")) {
+    const hex = color.slice(1);
+    if (hex.length === 3) {
+      return hex.split("").map((char) => parseInt(char + char, 16));
+    }
+    if (hex.length === 6) {
+      return [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((part) => parseInt(part, 16));
+    }
+  }
+
+  const match = color.match(/\d+(\.\d+)?/g);
+  if (match && match.length >= 3) {
+    return match.slice(0, 3).map((part) => Math.round(Number(part)));
+  }
+
+  return [215, 215, 215];
+};
+
+const withAlpha = (rgb, alpha) => `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+
+const initHeroConstellation = () => {
+  const hero = document.querySelector(".hero");
+  const canvas = document.querySelector("#hero-constellation");
+
+  if (!hero || !canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (canvas) canvas.hidden = true;
+    return;
+  }
+
+  const context = canvas.getContext("2d");
+  if (!context) return;
+
+  let particleColor = [161, 161, 161];
+  let lineColor = [42, 42, 42];
+  let pointerColor = [215, 215, 215];
+  const particles = [];
+  const pointer = { active: false, x: 0, y: 0 };
+  const linkDistance = 90;
+  const count = 26;
+  let width = 0;
+  let height = 0;
+  let frameId = 0;
+  let inView = true;
+  let tabVisible = !document.hidden;
+
+  const resize = () => {
+    const bounds = hero.getBoundingClientRect();
+    width = Math.max(1, Math.floor(bounds.width));
+    height = Math.max(1, Math.floor(bounds.height));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+
+  const syncPalette = () => {
+    const styles = getComputedStyle(document.documentElement);
+    particleColor = parseColor(styles.getPropertyValue("--muted"));
+    lineColor = parseColor(styles.getPropertyValue("--line"));
+    pointerColor = parseColor(styles.getPropertyValue("--text"));
+  };
+
+  const seedParticles = () => {
+    particles.length = 0;
+    for (let i = 0; i < count; i += 1) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.24,
+        vy: (Math.random() - 0.5) * 0.24,
+      });
+    }
+  };
+
+  const updateParticles = () => {
+    particles.forEach((particle) => {
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      if (particle.x <= 0 || particle.x >= width) particle.vx *= -1;
+      if (particle.y <= 0 || particle.y >= height) particle.vy *= -1;
+      particle.x = Math.max(0, Math.min(width, particle.x));
+      particle.y = Math.max(0, Math.min(height, particle.y));
+    });
+  };
+
+  const draw = () => {
+    context.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i += 1) {
+      const first = particles[i];
+      for (let j = i + 1; j < particles.length; j += 1) {
+        const second = particles[j];
+        const dx = first.x - second.x;
+        const dy = first.y - second.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance > linkDistance) continue;
+
+        const alpha = 0.22 * (1 - distance / linkDistance);
+        context.strokeStyle = withAlpha(lineColor, alpha);
+        context.lineWidth = 1;
+        context.beginPath();
+        context.moveTo(first.x, first.y);
+        context.lineTo(second.x, second.y);
+        context.stroke();
+      }
+    }
+
+    particles.forEach((particle) => {
+      const pointerDistance = pointer.active ? Math.hypot(pointer.x - particle.x, pointer.y - particle.y) : linkDistance;
+      const boost = pointerDistance < linkDistance ? 0.2 * (1 - pointerDistance / linkDistance) : 0;
+      context.fillStyle = withAlpha(pointer.active ? pointerColor : particleColor, 0.18 + boost);
+      context.beginPath();
+      context.arc(particle.x, particle.y, 1.5, 0, Math.PI * 2);
+      context.fill();
+    });
+  };
+
+  const shouldRun = () => inView && tabVisible;
+
+  const tick = () => {
+    if (!shouldRun()) {
+      frameId = 0;
+      return;
+    }
+    updateParticles();
+    draw();
+    frameId = window.requestAnimationFrame(tick);
+  };
+
+  const schedule = () => {
+    if (!frameId && shouldRun()) {
+      frameId = window.requestAnimationFrame(tick);
+    }
+  };
+
+  const updatePointer = (event) => {
+    const bounds = hero.getBoundingClientRect();
+    pointer.x = event.clientX - bounds.left;
+    pointer.y = event.clientY - bounds.top;
+  };
+
+  hero.addEventListener("pointerenter", (event) => {
+    pointer.active = true;
+    updatePointer(event);
+  });
+  hero.addEventListener("pointermove", (event) => {
+    if (!pointer.active) return;
+    updatePointer(event);
+  });
+  hero.addEventListener("pointerleave", () => {
+    pointer.active = false;
+  });
+
+  const visibilityWatcher = new IntersectionObserver(
+    ([entry]) => {
+      inView = Boolean(entry?.isIntersecting);
+      schedule();
+    },
+    { threshold: 0.1 }
+  );
+  visibilityWatcher.observe(hero);
+
+  document.addEventListener("visibilitychange", () => {
+    tabVisible = !document.hidden;
+    schedule();
+  });
+
+  window.addEventListener("resize", () => {
+    resize();
+    seedParticles();
+    draw();
+    schedule();
+  });
+
+  new MutationObserver(syncPalette).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+
+  syncPalette();
+  resize();
+  seedParticles();
+  draw();
+  schedule();
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -332,3 +524,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+initHeroConstellation();

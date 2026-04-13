@@ -160,7 +160,18 @@ button {
   padding-right: min(48vw, 540px);
 }
 
+#hero-constellation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .hero-copy {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 0.2rem;
 }
@@ -173,6 +184,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  z-index: 1;
 }
 
 .hero-heatmap {
@@ -180,6 +192,12 @@ button {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #hero-constellation {
+    display: none;
+  }
 }
 
 .entry-head {
