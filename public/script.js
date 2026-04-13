@@ -74,27 +74,94 @@ const renderStats = ({ leetcode, monkeytype }) => {
   const monkeytypeSummary = document.querySelector("#monkeytype-summary");
   const monkeytypePb = document.querySelector("#monkeytype-pb");
 
-  if (leetcodeSolved && solved) {
-    leetcodeSolved.textContent = `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`;
+  if (leetcodeSolved) {
+    leetcodeSolved.textContent = solved
+      ? `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(
+          solved.medium
+        )} medium · ${formatNumber(solved.hard)} hard)`
+      : "Unavailable right now.";
   }
 
-  if (leetcodeContest && contest?.rating && contest?.topPercentage) {
-    leetcodeContest.textContent = `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`;
+  if (leetcodeContest) {
+    leetcodeContest.textContent =
+      contest?.rating && contest?.topPercentage
+        ? `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`
+        : "Unavailable right now.";
   }
 
   if (monkeytypeSummary) {
-    const typingHours = (monkeytype?.timeTypingSeconds || 0) / 3600;
-    monkeytypeSummary.textContent = `${formatNumber(monkeytype?.completedTests || 0)} tests completed · ${formatNumber(typingHours, 1)}h total typing`;
+    if (!monkeytype) {
+      monkeytypeSummary.textContent = "Unavailable right now.";
+    } else {
+      const typingHours = monkeytype.timeTypingSeconds / 3600;
+      monkeytypeSummary.textContent = `${formatNumber(monkeytype.completedTests)} tests completed · ${formatNumber(
+        typingHours,
+        1
+      )}h total typing`;
+    }
   }
 
   if (monkeytypePb) {
+    if (!monkeytype) {
+      monkeytypePb.textContent = "Unavailable right now.";
+      return;
+    }
+
     const topPercent =
       leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
     monkeytypePb.textContent = topPercent
-      ? `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM`;
+      ? `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
+      : `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM`;
   }
+};
+
+const parseMonkeytypeStats = (payload) => {
+  const data = payload?.data || {};
+  const typingStats = data.typingStats || {};
+  const personalBest60 = data?.personalBests?.time?.["60"] || [];
+  const pb60 = personalBest60.reduce((best, run) => Math.max(best, run?.wpm || 0), 0);
+  const leaderboard = data?.allTimeLbs?.time?.["60"]?.english || {};
+
+  return {
+    completedTests: typingStats.completedTests ?? typingStats.testsCompleted ?? 0,
+    timeTypingSeconds: typingStats.timeTyping ?? 0,
+    pb60,
+    leaderboard: {
+      rank: leaderboard.rank || null,
+      count: leaderboard.count || null,
+    },
+  };
+};
+
+const loadLeetCodeStats = async (leetcode, monkeytype) => {
+  const query = new URLSearchParams({ leetcode, monkeytype, includeMonkeytype: "0" });
+  const response = await fetch(`/api/stats?${query.toString()}`);
+  if (!response.ok) {
+    throw new Error("Unable to load stats");
+  }
+
+  const payload = await response.json();
+  return payload.leetcode || null;
+};
+
+const loadMonkeytypeStats = async (username) => {
+  const endpoints = [
+    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`,
+    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile?isUid=false`,
+  ];
+
+  for (const endpoint of endpoints) {
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      continue;
+    }
+
+    const payload = await response.json();
+    return parseMonkeytypeStats(payload);
+  }
+
+  return null;
 };
 
 const loadStats = async () => {
@@ -103,15 +170,19 @@ const loadStats = async () => {
 
   const leetcode = section.dataset.leetcodeUser || "lagsterino";
   const monkeytype = section.dataset.monkeytypeUser || "laggy";
-  const query = new URLSearchParams({ leetcode, monkeytype });
+  const [leetcodeResult, monkeytypeResult] = await Promise.allSettled([
+    loadLeetCodeStats(leetcode, monkeytype),
+    loadMonkeytypeStats(monkeytype),
+  ]);
 
-  const response = await fetch(`/api/stats?${query.toString()}`);
-  if (!response.ok) {
+  if (leetcodeResult.status === "rejected" && monkeytypeResult.status === "rejected") {
     throw new Error("Unable to load stats");
   }
 
-  const payload = await response.json();
-  renderStats(payload);
+  renderStats({
+    leetcode: leetcodeResult.status === "fulfilled" ? leetcodeResult.value : null,
+    monkeytype: monkeytypeResult.status === "fulfilled" ? monkeytypeResult.value : null,
+  });
 };
 
 const setStatsFallback = () => {
