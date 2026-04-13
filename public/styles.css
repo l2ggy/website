@@ -5,6 +5,8 @@
   --space-1: 0.55rem;
   --space-2: 1rem;
   --space-3: 1.6rem;
+  --theme-fade-dur: 320ms;
+  --theme-fade-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --bg: #121212;
   --text: #d7d7d7;
   --muted: #a1a1a1;
@@ -27,6 +29,30 @@ body {
   background: var(--bg);
   color: var(--text);
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
+}
+
+.theme-ready body,
+.theme-ready .bar,
+.theme-ready .hero p,
+.theme-ready .section p,
+.theme-ready .logo-slot,
+.theme-ready .entry-icon,
+.theme-ready .entry-thumb,
+.theme-ready .entry-dates,
+.theme-ready .project-tools,
+.theme-ready .leadership-item p,
+.theme-ready .stat-value,
+.theme-ready .percentile-viz,
+.theme-ready .percentile-curve,
+.theme-ready .percentile-axis,
+.theme-ready .percentile-marker,
+.theme-ready .percentile-dot {
+  transition:
+    background-color var(--theme-fade-dur) var(--theme-fade-ease),
+    color var(--theme-fade-dur) var(--theme-fade-ease),
+    border-color var(--theme-fade-dur) var(--theme-fade-ease),
+    stroke var(--theme-fade-dur) var(--theme-fade-ease),
+    fill var(--theme-fade-dur) var(--theme-fade-ease);
 }
 
 h1,
@@ -544,6 +570,25 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .theme-ready body,
+  .theme-ready .bar,
+  .theme-ready .hero p,
+  .theme-ready .section p,
+  .theme-ready .logo-slot,
+  .theme-ready .entry-icon,
+  .theme-ready .entry-thumb,
+  .theme-ready .entry-dates,
+  .theme-ready .project-tools,
+  .theme-ready .leadership-item p,
+  .theme-ready .stat-value,
+  .theme-ready .percentile-viz,
+  .theme-ready .percentile-curve,
+  .theme-ready .percentile-axis,
+  .theme-ready .percentile-marker,
+  .theme-ready .percentile-dot {
+    transition: none;
+  }
+
   .theme-icon,
   .theme-icon__sun,
   .theme-icon__moon,
