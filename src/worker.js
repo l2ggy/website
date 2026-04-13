@@ -58,22 +58,42 @@ const getLeetCodeStats = async (username) => {
   };
 };
 
+const fetchFirstOkJson = async (urls) => {
+  for (const url of urls) {
+    const response = await fetch(url);
+    if (response.ok) {
+      return response.json();
+    }
+  }
+
+  return null;
+};
+
 const getMonkeytypeStats = async (username) => {
-  const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`);
-  if (!response.ok) {
+  const encodedName = encodeURIComponent(username);
+  const [profilePayload, statsPayload] = await Promise.all([
+    fetchFirstOkJson([
+      `https://api.monkeytype.com/users/${encodedName}/profile?isUid=false`,
+      `https://api.monkeytype.com/users/${encodedName}/profile`,
+    ]),
+    fetchFirstOkJson([
+      `https://api.monkeytype.com/users/stats?uidOrName=${encodedName}&isUid=false`,
+      `https://api.monkeytype.com/users/${encodedName}/stats`,
+    ]),
+  ]);
+  const profile = profilePayload?.data || {};
+  const typingStats = profile.typingStats || statsPayload?.data || {};
+  const personalBest60 = profile?.personalBests?.time?.["60"] || [];
+  const pb60 = personalBest60.reduce((best, run) => Math.max(best, run?.wpm || 0), 0);
+  const leaderboard = profile?.allTimeLbs?.time?.["60"]?.english || {};
+
+  if (!typingStats.completedTests && !typingStats.testsCompleted && !pb60) {
     throw new Error("Monkeytype request failed");
   }
 
-  const payload = await response.json();
-  const data = payload?.data || {};
-  const typingStats = data.typingStats || {};
-  const personalBest60 = data?.personalBests?.time?.["60"] || [];
-  const pb60 = personalBest60.reduce((best, run) => Math.max(best, run?.wpm || 0), 0);
-  const leaderboard = data?.allTimeLbs?.time?.["60"]?.english || {};
-
   return {
-    completedTests: typingStats.completedTests || 0,
-    timeTypingSeconds: typingStats.timeTyping || 0,
+    completedTests: typingStats.completedTests ?? typingStats.testsCompleted ?? 0,
+    timeTypingSeconds: typingStats.timeTyping ?? 0,
     pb60,
     leaderboard: {
       rank: leaderboard.rank || null,
@@ -85,8 +105,12 @@ const getMonkeytypeStats = async (username) => {
 const getStats = async (requestUrl) => {
   const leetcode = requestUrl.searchParams.get("leetcode") || "lagsterino";
   const monkeytype = requestUrl.searchParams.get("monkeytype") || "laggy";
-
-  const [leetcodeStats, monkeytypeStats] = await Promise.all([getLeetCodeStats(leetcode), getMonkeytypeStats(monkeytype)]);
+  const [leetcodeResult, monkeytypeResult] = await Promise.allSettled([
+    getLeetCodeStats(leetcode),
+    getMonkeytypeStats(monkeytype),
+  ]);
+  const leetcodeStats = leetcodeResult.status === "fulfilled" ? leetcodeResult.value : null;
+  const monkeytypeStats = monkeytypeResult.status === "fulfilled" ? monkeytypeResult.value : null;
 
   return {
     fetchedAt: new Date().toISOString(),
@@ -102,12 +126,8 @@ export default {
     const requestUrl = new URL(request.url);
 
     if (requestUrl.pathname === "/api/stats") {
-      try {
-        const stats = await getStats(requestUrl);
-        return jsonResponse(stats);
-      } catch {
-        return jsonResponse({ error: "Unable to load stats right now." }, { status: 502 });
-      }
+      const stats = await getStats(requestUrl);
+      return jsonResponse(stats);
     }
 
     return env.ASSETS.fetch(request);
