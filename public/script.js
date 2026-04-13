@@ -299,16 +299,29 @@ const splitHeroNameLetters = () => {
   heroName.setAttribute("aria-label", originalText);
   heroName.textContent = "";
 
-  Array.from(originalText).forEach((letter, index) => {
+  const letterSpans = Array.from(originalText).map((letter, index) => {
     const span = document.createElement("span");
     span.className = "hero-letter";
     span.style.setProperty("--hero-letter-i", index);
-    span.style.setProperty("--hero-letter-seed", (Math.random() * 2 - 1).toFixed(3));
-    span.style.setProperty("--hero-letter-stagger", `${Math.floor(Math.random() * 180)}ms`);
     span.textContent = letter === " " ? "\u00A0" : letter;
     span.setAttribute("aria-hidden", "true");
+    return span;
+  });
+
+  const randomizeHeroLetters = () => {
+    letterSpans.forEach((span) => {
+      span.style.setProperty("--hero-letter-seed", (Math.random() * 2 - 1).toFixed(3));
+      span.style.setProperty("--hero-letter-stagger", Math.floor(Math.random() * letterSpans.length).toString());
+    });
+  };
+
+  randomizeHeroLetters();
+  letterSpans.forEach((span) => {
     heroName.append(span);
   });
+
+  heroName.addEventListener("pointerenter", randomizeHeroLetters);
+  heroName.addEventListener("focusin", randomizeHeroLetters);
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
