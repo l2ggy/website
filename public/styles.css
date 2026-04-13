@@ -111,35 +111,45 @@ button {
   display: block;
 }
 
-.text-btn {
+.directional-fill {
+  --fill-origin-x: 50%;
+  --fill-origin-y: 50%;
+  --fill-shift-x: 0;
+  --fill-shift-y: 0;
   position: relative;
-  transition: color 180ms ease, transform 180ms ease;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  padding-inline: 0.28rem;
+  margin-inline: -0.28rem;
+  transition: color 140ms ease, transform 140ms ease;
 }
 
-.text-btn::after {
+.directional-fill::before {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.1em;
-  height: 1px;
-  background: var(--text);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 180ms ease;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--text) 18%, transparent);
+  transform: translate(var(--fill-shift-x), var(--fill-shift-y)) scale(0.45);
+  transform-origin: var(--fill-origin-x) var(--fill-origin-y);
+  opacity: 0;
+  transition: transform 150ms ease-out, opacity 120ms ease-out;
+  z-index: -1;
 }
 
-.text-btn:hover,
-.text-btn:focus-visible {
+.directional-fill:hover,
+.directional-fill:focus-visible {
   color: var(--text);
 }
 
-.text-btn:hover::after,
-.text-btn:focus-visible::after {
-  transform: scaleX(1);
+.directional-fill:hover::before,
+.directional-fill:focus-visible::before {
+  transform: translate(0, 0) scale(1);
+  opacity: 1;
 }
 
-.text-btn:active {
+.directional-fill:active {
   transform: translateY(1px);
 }
 
@@ -259,40 +269,6 @@ button {
 .project-tools {
   color: var(--text);
   font-size: 0.9em;
-}
-
-
-.project-title-link {
-  position: relative;
-  text-decoration: none;
-  transition: color 180ms ease, transform 180ms ease;
-}
-
-.project-title-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.1em;
-  height: 1px;
-  background: var(--text);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 180ms ease;
-}
-
-.project-title-link:hover,
-.project-title-link:focus-visible {
-  color: var(--text);
-}
-
-.project-title-link:hover::after,
-.project-title-link:focus-visible::after {
-  transform: scaleX(1);
-}
-
-.project-title-link:active {
-  transform: translateY(1px);
 }
 
 .leadership-list {

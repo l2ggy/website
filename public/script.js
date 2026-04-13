@@ -22,7 +22,7 @@ const renderEntry = ({ icon, title, subtitle, dates }) => `
 const renderProject = ({ title, summary, tools, link }) => `
   <article class="entry project-entry">
     <div class="entry-main">
-      <h3>${link ? `<a class="project-title-link" href="${link}" target="_blank" rel="noreferrer">${title}</a>` : title}</h3>
+      <h3>${link ? `<a class="project-title-link directional-fill" href="${link}" target="_blank" rel="noreferrer">${title}</a>` : title}</h3>
       <p>${summary}</p>
       <p class="project-tools">${tools}</p>
     </div>
@@ -56,6 +56,48 @@ const loadEntries = async (element) => {
   const response = await fetch(source);
   const items = await response.json();
   element.innerHTML = items.map(renderByKind[kind]).join("");
+  initDirectionalFill(element);
+};
+
+const setDirectionalFillOrigin = (event) => {
+  const target = event.currentTarget;
+  const bounds = target.getBoundingClientRect();
+  const x = event.clientX - bounds.left;
+  const y = event.clientY - bounds.top;
+  const offsetX = x - bounds.width / 2;
+  const offsetY = y - bounds.height / 2;
+  const horizontal = Math.abs(offsetX / bounds.width);
+  const vertical = Math.abs(offsetY / bounds.height);
+  const fromHorizontal = horizontal > vertical;
+  const shift = "20%";
+
+  if (fromHorizontal) {
+    const side = offsetX < 0 ? "0%" : "100%";
+    const xShift = offsetX < 0 ? `-${shift}` : shift;
+    target.style.setProperty("--fill-origin-x", side);
+    target.style.setProperty("--fill-origin-y", "50%");
+    target.style.setProperty("--fill-shift-x", xShift);
+    target.style.setProperty("--fill-shift-y", "0");
+    return;
+  }
+
+  const side = offsetY < 0 ? "0%" : "100%";
+  const yShift = offsetY < 0 ? `-${shift}` : shift;
+  target.style.setProperty("--fill-origin-x", "50%");
+  target.style.setProperty("--fill-origin-y", side);
+  target.style.setProperty("--fill-shift-x", "0");
+  target.style.setProperty("--fill-shift-y", yShift);
+};
+
+const initDirectionalFill = (scope = document) => {
+  scope.querySelectorAll(".directional-fill").forEach((element) => {
+    if (element.dataset.directionalFillReady) {
+      return;
+    }
+
+    element.dataset.directionalFillReady = "true";
+    element.addEventListener("pointerenter", setDirectionalFillOrigin);
+  });
 };
 
 const formatNumber = (value, digits = 0) =>
@@ -330,5 +372,6 @@ document.querySelectorAll(".entries").forEach((element) => {
   });
 });
 
+initDirectionalFill();
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
