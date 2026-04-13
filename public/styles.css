@@ -135,10 +135,53 @@ button {
   gap: var(--space-3);
 }
 
-.hero,
 .section {
   display: grid;
   gap: var(--space-1);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hero-copy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.hero-heatmap-wrap {
+  background: var(--line);
+  background: color-mix(in srgb, var(--line) 65%, transparent);
+  border-radius: 0.7rem;
+  padding: 0.55rem 0.65rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.hero-heatmap-label {
+  width: 100%;
+  color: var(--muted);
+  font-size: 0.73rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.hero-heatmap {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: saturate(0.9) contrast(1.04);
+}
+
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .hero h1 {
@@ -184,13 +227,6 @@ button {
   gap: 0.18rem;
 }
 
-.entry-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .entry h3 {
   font-size: 1.02rem;
   font-weight: 520;
@@ -224,14 +260,28 @@ button {
     width: calc(100% - 1.2rem);
   }
 
+  .entry-dates {
+    text-align: left;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .hero-heatmap-wrap {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .hero-heatmap {
+    width: 100%;
+  }
+
   .entry-head {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.08rem;
-  }
-
-  .entry-dates {
-    text-align: left;
   }
 
   .footer-content {
