@@ -40,6 +40,44 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const renderMonkeytypeStats = (container, stats) => {
+  container.innerHTML = stats
+    .map(({ label, value }) => `<span class="hero-stat-chip">${label}: ${value}</span>`)
+    .join("");
+};
+
+const loadMonkeytypeStats = async () => {
+  const section = document.querySelector(".hero-monkeytype");
+  const statsContainer = document.querySelector("#monkeytype-stats");
+  const user = section?.dataset.monkeytypeUser?.trim();
+
+  if (!section || !statsContainer || !user) {
+    return;
+  }
+
+  const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(user)}/profile?isUid=false`);
+  if (!response.ok) {
+    throw new Error("Unable to load Monkeytype profile");
+  }
+
+  const payload = await response.json();
+  const profile = payload?.data;
+  const best60s = (profile?.personalBests?.time?.["60"] || []).reduce(
+    (best, entry) => (!best || entry.wpm > best.wpm ? entry : best),
+    null,
+  );
+  const typedHours = profile?.typingStats?.timeTyping
+    ? `${(profile.typingStats.timeTyping / 3600).toFixed(1)}h`
+    : "—";
+
+  renderMonkeytypeStats(statsContainer, [
+    { label: "Best 60s WPM", value: best60s ? best60s.wpm.toFixed(1) : "—" },
+    { label: "Best 60s Acc", value: best60s ? `${best60s.acc.toFixed(1)}%` : "—" },
+    { label: "Tests Completed", value: profile?.typingStats?.completedTests ?? "—" },
+    { label: "Time Typed", value: typedHours },
+  ]);
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -96,3 +134,9 @@ document.querySelectorAll(".entries").forEach((element) => {
 });
 
 renderGitHubHeatmap();
+loadMonkeytypeStats().catch(() => {
+  const statsContainer = document.querySelector("#monkeytype-stats");
+  if (statsContainer) {
+    statsContainer.innerHTML = "<p>Unable to load Monkeytype stats.</p>";
+  }
+});
