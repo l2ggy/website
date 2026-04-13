@@ -113,7 +113,34 @@ button {
 
 .text-btn {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   transition: color 180ms ease, transform 180ms ease;
+}
+
+.fluid-fill::before {
+  content: "";
+  position: absolute;
+  width: 170%;
+  aspect-ratio: 1;
+  left: var(--entry-x, 50%);
+  top: var(--entry-y, 50%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+  pointer-events: none;
+  z-index: -1;
+  transform: translate(var(--fill-shift-x, -50%), var(--fill-shift-y, -50%)) scale(0.05);
+  transform-origin: var(--fill-origin, center);
+  transition: transform 220ms ease;
+}
+
+.fluid-fill:hover::before,
+.fluid-fill:focus-visible::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.fluid-fill:not(:hover):not(:focus-visible)::before {
+  transform: translate(calc(var(--fill-shift-x, -50%) * 1.12), calc(var(--fill-shift-y, -50%) * 1.12)) scale(0.05);
 }
 
 .text-btn::after {

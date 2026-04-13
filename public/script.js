@@ -285,6 +285,46 @@ const setStatsFallback = () => {
   renderPercentile("#monkeytype-percentile", null);
 };
 
+const attachFluidFill = (selector = ".fluid-fill") => {
+  const sideMap = {
+    left: { origin: "0% 50%", shiftX: "-58%", shiftY: "-50%" },
+    right: { origin: "100% 50%", shiftX: "-42%", shiftY: "-50%" },
+    top: { origin: "50% 0%", shiftX: "-50%", shiftY: "-58%" },
+    bottom: { origin: "50% 100%", shiftX: "-50%", shiftY: "-42%" },
+  };
+  const updateFillDirection = (event) => {
+    const target = event.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const distances = {
+      left: x,
+      right: rect.width - x,
+      top: y,
+      bottom: rect.height - y,
+    };
+    const side = Object.entries(distances).sort((a, b) => a[1] - b[1])[0][0];
+    const settings = sideMap[side];
+
+    target.style.setProperty("--entry-x", `${x}px`);
+    target.style.setProperty("--entry-y", `${y}px`);
+    target.style.setProperty("--fill-origin", settings.origin);
+    target.style.setProperty("--fill-shift-x", settings.shiftX);
+    target.style.setProperty("--fill-shift-y", settings.shiftY);
+  };
+
+  document.querySelectorAll(selector).forEach((element) => {
+    element.addEventListener("pointerenter", updateFillDirection);
+    element.addEventListener("focus", () => {
+      element.style.setProperty("--entry-x", "50%");
+      element.style.setProperty("--entry-y", "50%");
+      element.style.setProperty("--fill-origin", "50% 50%");
+      element.style.setProperty("--fill-shift-x", "-50%");
+      element.style.setProperty("--fill-shift-y", "-50%");
+    });
+  });
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -332,3 +372,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+attachFluidFill();
