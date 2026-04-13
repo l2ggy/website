@@ -285,6 +285,81 @@ const setStatsFallback = () => {
   renderPercentile("#monkeytype-percentile", null);
 };
 
+
+const presetToggle = document.querySelector("#preset-toggle");
+const particleLayer = document.querySelector("#ambient-particles");
+const storedPresetKey = "portfolio-preset-override";
+let overridePreset = localStorage.getItem(storedPresetKey);
+
+const getHourPreset = (date = new Date()) => {
+  const hour = date.getHours();
+  return hour >= 6 && hour < 18 ? "day" : "night";
+};
+
+const presetLabel = (preset) => (preset ? `Preset: ${preset[0].toUpperCase()}${preset.slice(1)}` : "Preset: Auto");
+
+const renderParticles = (preset) => {
+  if (!particleLayer) return;
+
+  const iconSets = {
+    day: ["☀", "✦", "✧"],
+    night: ["☾", "✦", "✧"],
+  };
+
+  const icons = iconSets[preset] || iconSets.night;
+  const particles = Array.from({ length: 9 }, (_, index) => {
+    const x = 8 + (index % 3) * 42 + Math.random() * 8;
+    const y = 12 + Math.floor(index / 3) * 28 + Math.random() * 6;
+    const icon = icons[index % icons.length];
+    return `<span class="ambient-particle" style="left:${x}%;top:${y}%">${icon}</span>`;
+  });
+
+  particleLayer.innerHTML = particles.join("");
+};
+
+const applyPreset = (preset) => {
+  document.documentElement.dataset.preset = preset;
+  renderParticles(preset);
+
+  if (presetToggle) {
+    presetToggle.textContent = presetLabel(overridePreset);
+    presetToggle.setAttribute("aria-label", `Decorative preset ${overridePreset || "auto"}`);
+  }
+};
+
+const syncPreset = () => applyPreset(overridePreset || getHourPreset());
+
+if (presetToggle) {
+  const cycle = [null, "day", "night"];
+  presetToggle.addEventListener("click", () => {
+    const currentIndex = cycle.indexOf(overridePreset);
+    overridePreset = cycle[(currentIndex + 1) % cycle.length];
+
+    if (overridePreset) {
+      localStorage.setItem(storedPresetKey, overridePreset);
+    } else {
+      localStorage.removeItem(storedPresetKey);
+    }
+
+    syncPreset();
+  });
+}
+
+const msUntilNextHour = () => {
+  const now = new Date();
+  const nextHour = new Date(now);
+  nextHour.setHours(now.getHours() + 1, 0, 0, 0);
+  return nextHour.getTime() - now.getTime();
+};
+
+syncPreset();
+setTimeout(() => {
+  syncPreset();
+  setInterval(() => {
+    if (!overridePreset) syncPreset();
+  }, 60 * 60 * 1000);
+}, msUntilNextHour());
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");

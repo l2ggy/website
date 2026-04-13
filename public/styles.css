@@ -8,7 +8,11 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --ambient-glow: rgba(82, 113, 178, 0.1);
+  --ambient-dot: rgba(173, 193, 236, 0.28);
+  --ambient-icon: #9bb0dd;
 }
+
 
 :root[data-theme="light"] {
   --bg: #f4f4f4;
@@ -17,15 +21,43 @@
   --line: #d5d5d5;
 }
 
+:root[data-preset="day"] {
+  --ambient-glow: rgba(237, 200, 118, 0.11);
+  --ambient-dot: rgba(212, 159, 58, 0.22);
+  --ambient-icon: #c88928;
+}
+
+:root[data-preset="night"] {
+  --ambient-glow: rgba(82, 113, 178, 0.1);
+  --ambient-dot: rgba(173, 193, 236, 0.28);
+  --ambient-icon: #9bb0dd;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: radial-gradient(circle at 10% -10%, var(--ambient-glow), transparent 46%), var(--bg);
   color: var(--text);
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
+}
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.ambient-particle {
+  position: absolute;
+  color: var(--ambient-icon);
+  opacity: 0.38;
+  font-size: clamp(0.75rem, 1.6vw, 1rem);
+  filter: drop-shadow(0 0 6px var(--ambient-dot));
 }
 
 h1,
@@ -144,6 +176,8 @@ button {
 }
 
 .layout {
+  position: relative;
+  z-index: 2;
   padding-block: calc(var(--header-h) + var(--space-3)) calc(var(--footer-h) + var(--space-3));
   display: grid;
   gap: var(--space-3);
