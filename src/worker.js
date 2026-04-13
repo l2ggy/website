@@ -85,8 +85,12 @@ const getMonkeytypeStats = async (username) => {
 const getStats = async (requestUrl) => {
   const leetcode = requestUrl.searchParams.get("leetcode") || "lagsterino";
   const monkeytype = requestUrl.searchParams.get("monkeytype") || "laggy";
-
-  const [leetcodeStats, monkeytypeStats] = await Promise.all([getLeetCodeStats(leetcode), getMonkeytypeStats(monkeytype)]);
+  const [leetcodeResult, monkeytypeResult] = await Promise.allSettled([
+    getLeetCodeStats(leetcode),
+    getMonkeytypeStats(monkeytype),
+  ]);
+  const leetcodeStats = leetcodeResult.status === "fulfilled" ? leetcodeResult.value : null;
+  const monkeytypeStats = monkeytypeResult.status === "fulfilled" ? monkeytypeResult.value : null;
 
   return {
     fetchedAt: new Date().toISOString(),
@@ -102,12 +106,8 @@ export default {
     const requestUrl = new URL(request.url);
 
     if (requestUrl.pathname === "/api/stats") {
-      try {
-        const stats = await getStats(requestUrl);
-        return jsonResponse(stats);
-      } catch {
-        return jsonResponse({ error: "Unable to load stats right now." }, { status: 502 });
-      }
+      const stats = await getStats(requestUrl);
+      return jsonResponse(stats);
     }
 
     return env.ASSETS.fetch(request);
