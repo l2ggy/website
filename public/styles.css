@@ -29,6 +29,35 @@ body {
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
 }
 
+.has-cursor-spotlight {
+  position: relative;
+  isolation: isolate;
+  background-image: radial-gradient(circle at 50% 50%, rgba(127, 127, 127, 0.06) 0%, transparent 72%);
+}
+
+.cursor-spotlight-overlay {
+  --spotlight-x: 50vw;
+  --spotlight-y: 50vh;
+  --spotlight-size: min(42rem, 68vw);
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+  background: radial-gradient(
+    circle var(--spotlight-size) at var(--spotlight-x) var(--spotlight-y),
+    rgba(125, 125, 125, 0.12) 0%,
+    rgba(125, 125, 125, 0.065) 28%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+}
+
+body.is-cursor-spotlight-active .cursor-spotlight-overlay {
+  opacity: 1;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 280ms;
@@ -565,6 +594,14 @@ button {
   .theme-icon__moon,
   .theme-icon__rays {
     transition: none;
+  }
+
+  .cursor-spotlight-overlay {
+    display: none;
+  }
+
+  .has-cursor-spotlight {
+    background-image: radial-gradient(circle at 50% 50%, rgba(127, 127, 127, 0.045) 0%, transparent 74%);
   }
 
   .theme-toggle:active::before {
