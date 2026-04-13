@@ -1,4 +1,5 @@
 import { splitHeroNameLetters } from "./hero-name.js";
+import { setupInteractiveGlobe } from "./interactive-globe.js";
 import { loadEntries } from "./render/entries.js";
 import { renderStats, setStatsFallback } from "./render/stats.js";
 import { loadStats } from "./services/stats-client.js";
@@ -41,4 +42,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initEntries();
   initStats();
   renderGitHubHeatmap();
+  setupInteractiveGlobe();
 });
