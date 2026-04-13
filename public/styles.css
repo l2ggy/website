@@ -352,6 +352,12 @@ button {
   grid-template-columns: var(--entry-icon-size) minmax(0, 1fr);
   gap: var(--space-2);
   align-items: center;
+  transition: transform 180ms ease;
+}
+
+.entry:hover,
+.entry:focus-within {
+  transform: translateX(0.4rem);
 }
 
 .entry-icon {
@@ -440,6 +446,12 @@ button {
 .leadership-item {
   display: grid;
   gap: 0.12rem;
+  transition: transform 180ms ease;
+}
+
+.leadership-item:hover,
+.leadership-item:focus-within {
+  transform: translateX(0.4rem);
 }
 
 .leadership-item h3 {
@@ -462,6 +474,12 @@ button {
   gap: 0.15rem;
   position: relative;
   padding-right: 15.1rem;
+  transition: transform 180ms ease;
+}
+
+.stats-item:hover,
+.stats-item:focus-within {
+  transform: translateX(0.4rem);
 }
 
 .stats-copy {
@@ -547,7 +565,10 @@ button {
   .theme-icon,
   .theme-icon__sun,
   .theme-icon__moon,
-  .theme-icon__rays {
+  .theme-icon__rays,
+  .entry,
+  .leadership-item,
+  .stats-item {
     transition: none;
   }
 
