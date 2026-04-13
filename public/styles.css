@@ -380,12 +380,33 @@ button {
 
 .entry-thumb {
   border-radius: 8px;
-  object-fit: cover;
-  border: 1px solid var(--line);
+  object-fit: contain;
+  border: 0;
+  filter: drop-shadow(0 0 0 transparent);
+  transition: filter 280ms ease, transform 280ms ease;
 }
 
-#education .entry-thumb {
-  border: 0;
+.subsection-item:hover .entry-thumb,
+.subsection-item:focus-within .entry-thumb {
+  animation: entry-logo-glow 1.8s ease-in-out infinite;
+  transform: translateZ(0) scale(1.03);
+}
+
+@keyframes entry-logo-glow {
+  0%,
+  100% {
+    filter:
+      drop-shadow(0 0 3px rgba(120, 180, 255, 0.32))
+      drop-shadow(0 0 8px rgba(120, 180, 255, 0.24))
+      drop-shadow(0 0 14px rgba(196, 142, 255, 0.16));
+  }
+
+  50% {
+    filter:
+      drop-shadow(0 0 6px rgba(142, 201, 255, 0.58))
+      drop-shadow(0 0 14px rgba(142, 201, 255, 0.38))
+      drop-shadow(0 0 24px rgba(210, 162, 255, 0.24));
+  }
 }
 
 .entry-main {
