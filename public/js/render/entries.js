@@ -7,7 +7,7 @@ const renderIcon = (icon, title) => {
 };
 
 export const renderEntry = ({ icon, title, subtitle, dates }) => `
-  <article class="entry">
+  <article class="entry subsection-item">
     ${renderIcon(icon, title)}
     <div class="entry-main">
       <div class="entry-head">
@@ -20,7 +20,7 @@ export const renderEntry = ({ icon, title, subtitle, dates }) => `
 `;
 
 export const renderProject = ({ title, summary, tools, link }) => `
-  <article class="entry project-entry">
+  <article class="entry project-entry subsection-item">
     <div class="entry-main">
       <h3>${link ? `<a class="project-title-link" href="${link}" target="_blank" rel="noreferrer">${title}</a>` : title}</h3>
       <p>${summary}</p>
@@ -30,7 +30,7 @@ export const renderProject = ({ title, summary, tools, link }) => `
 `;
 
 export const renderLeadership = ({ title, role }) => `
-  <article class="leadership-item">
+  <article class="leadership-item subsection-item">
     <h3>${title}</h3>
     <p>${role}</p>
   </article>

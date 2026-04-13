@@ -346,22 +346,21 @@ button {
   gap: var(--space-2);
 }
 
+.subsection-item {
+  transition: transform 180ms ease;
+}
+
+.subsection-item:hover,
+.subsection-item:focus-within {
+  transform: translateX(0.35rem);
+}
+
 .entry {
   width: 100%;
   display: grid;
   grid-template-columns: var(--entry-icon-size) minmax(0, 1fr);
   gap: var(--space-2);
   align-items: center;
-  transition: transform 180ms ease;
-}
-
-.entry:hover,
-.entry:focus-within,
-.leadership-item:hover,
-.leadership-item:focus-within,
-.stats-item:hover,
-.stats-item:focus-within {
-  transform: translateX(0.35rem);
 }
 
 .entry-icon {
@@ -450,7 +449,6 @@ button {
 .leadership-item {
   display: grid;
   gap: 0.12rem;
-  transition: transform 180ms ease;
 }
 
 .leadership-item h3 {
@@ -473,7 +471,6 @@ button {
   gap: 0.15rem;
   position: relative;
   padding-right: 15.1rem;
-  transition: transform 180ms ease;
 }
 
 .stats-copy {
@@ -556,9 +553,7 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .entry,
-  .leadership-item,
-  .stats-item,
+  .subsection-item,
   .theme-icon,
   .theme-icon__sun,
   .theme-icon__moon,
