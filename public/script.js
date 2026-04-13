@@ -34,6 +34,31 @@ const renderByKind = {
   project: renderProject,
 };
 
+const initHeroNameLetters = () => {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  const heading = document.querySelector("#hero-name");
+  if (!heading) {
+    return;
+  }
+
+  const nameText = heading.textContent || "";
+  heading.setAttribute("aria-label", nameText);
+  heading.textContent = "";
+
+  [...nameText].forEach((character, index) => {
+    const letter = document.createElement("span");
+    letter.className = "hero-letter";
+    letter.setAttribute("aria-hidden", "true");
+    letter.textContent = character === " " ? "\u00A0" : character;
+    letter.style.setProperty("--letter-index", index);
+    letter.style.setProperty("--letter-seed", (Math.random() * 2 - 1).toFixed(3));
+    heading.append(letter);
+  });
+};
+
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
@@ -301,6 +326,7 @@ const applyTheme = (theme) => {
 };
 
 applyTheme(overrideTheme || getSystemTheme());
+initHeroNameLetters();
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
