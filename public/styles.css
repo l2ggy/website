@@ -135,10 +135,51 @@ button {
   gap: var(--space-3);
 }
 
-.hero,
 .section {
   display: grid;
   gap: var(--space-1);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hero-copy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.hero-heatmap-wrap {
+  position: relative;
+  justify-self: end;
+  width: min(100%, 320px);
+  padding: 0.35rem;
+}
+
+.hero-heatmap-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0.45rem;
+  background: radial-gradient(circle at 80% 50%, rgba(125, 143, 166, 0.33), transparent 68%);
+  pointer-events: none;
+}
+
+.hero-heatmap {
+  width: 100%;
+  height: auto;
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .hero h1 {
@@ -184,13 +225,6 @@ button {
   gap: 0.18rem;
 }
 
-.entry-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-}
-
 .entry h3 {
   font-size: 1.02rem;
   font-weight: 520;
@@ -224,14 +258,29 @@ button {
     width: calc(100% - 1.2rem);
   }
 
+  .entry-dates {
+    text-align: left;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+
+  .hero-heatmap-wrap {
+    justify-self: start;
+    width: min(100%, 300px);
+    padding: 0;
+  }
+
+  .hero-heatmap-wrap::before {
+    inset: 0.1rem;
+  }
+
   .entry-head {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.08rem;
-  }
-
-  .entry-dates {
-    text-align: left;
   }
 
   .footer-content {
