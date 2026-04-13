@@ -1,5 +1,6 @@
 const TAU = Math.PI * 2;
-const CELL_STEP = 2;
+const MASK_WIDTH = 360;
+const MASK_HEIGHT = 180;
 
 const normalizeLongitude = (lon) => {
   const wrapped = ((lon + 180) % 360 + 360) % 360;
@@ -16,35 +17,6 @@ const rotateX = ([x, y, z], angle) => {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
   return [x, y * cos - z * sin, y * sin + z * cos];
-};
-
-const project = ([x, y, z], radius, centerX, centerY) => ({
-  x: centerX + x * radius,
-  y: centerY + y * radius,
-  z
-});
-
-const createPoint = (lat, lon) => {
-  const latRad = (lat * Math.PI) / 180;
-  const lonRad = (normalizeLongitude(lon) * Math.PI) / 180;
-  const cosLat = Math.cos(latRad);
-  return [cosLat * Math.cos(lonRad), Math.sin(latRad), cosLat * Math.sin(lonRad)];
-};
-
-const ringBounds = (ring) => {
-  let minLon = Infinity;
-  let maxLon = -Infinity;
-  let minLat = Infinity;
-  let maxLat = -Infinity;
-
-  ring.forEach(([lon, lat]) => {
-    minLon = Math.min(minLon, lon);
-    maxLon = Math.max(maxLon, lon);
-    minLat = Math.min(minLat, lat);
-    maxLat = Math.max(maxLat, lat);
-  });
-
-  return { minLon, maxLon, minLat, maxLat };
 };
 
 const pointInRing = (lon, lat, ring) => {
@@ -65,89 +37,81 @@ const extractPolygons = (geojson) => {
     return [];
   }
 
-  const polygons = [];
-  geojson.features.forEach((feature) => {
+  return geojson.features.flatMap((feature) => {
     const geometry = feature?.geometry;
     if (!geometry) {
-      return;
+      return [];
     }
 
     if (geometry.type === "Polygon") {
-      polygons.push(geometry.coordinates);
-      return;
+      return [geometry.coordinates];
     }
 
     if (geometry.type === "MultiPolygon") {
-      geometry.coordinates.forEach((polygon) => polygons.push(polygon));
+      return geometry.coordinates;
     }
-  });
 
-  return polygons
-    .map((polygon) => {
-      const outer = polygon[0]?.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
-      if (!outer || outer.length < 3) {
-        return null;
-      }
-      return {
-        outer,
-        holes: polygon.slice(1).map((ring) => ring.map(([lon, lat]) => [normalizeLongitude(lon), lat])),
-        bounds: ringBounds(outer)
-      };
-    })
-    .filter(Boolean);
+    return [];
+  }).map((polygon) => ({
+    outer: polygon[0].map(([lon, lat]) => [normalizeLongitude(lon), lat]),
+    holes: polygon.slice(1).map((ring) => ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]))
+  }));
 };
 
 const pointInPolygon = (lon, lat, polygon) => {
-  const { minLon, maxLon, minLat, maxLat } = polygon.bounds;
-  if (lat < minLat || lat > maxLat || lon < minLon || lon > maxLon) {
-    return false;
-  }
-
   if (!pointInRing(lon, lat, polygon.outer)) {
     return false;
   }
-
   return !polygon.holes.some((hole) => pointInRing(lon, lat, hole));
 };
 
-const buildLandCells = (polygons) => {
-  const cells = [];
+const buildLandMask = (polygons) => {
+  const mask = new Uint8Array(MASK_WIDTH * MASK_HEIGHT);
 
-  for (let lat = -88; lat < 88; lat += CELL_STEP) {
-    for (let lon = -180; lon < 180; lon += CELL_STEP) {
-      const sampleLon = lon + CELL_STEP * 0.5;
-      const sampleLat = lat + CELL_STEP * 0.5;
-      const isLand = polygons.some((polygon) => pointInPolygon(sampleLon, sampleLat, polygon));
-
-      if (!isLand) {
-        continue;
-      }
-
-      cells.push([
-        createPoint(lat, lon),
-        createPoint(lat, lon + CELL_STEP),
-        createPoint(lat + CELL_STEP, lon + CELL_STEP),
-        createPoint(lat + CELL_STEP, lon)
-      ]);
+  for (let y = 0; y < MASK_HEIGHT; y += 1) {
+    const lat = 90 - ((y + 0.5) / MASK_HEIGHT) * 180;
+    for (let x = 0; x < MASK_WIDTH; x += 1) {
+      const lon = ((x + 0.5) / MASK_WIDTH) * 360 - 180;
+      const isLand = polygons.some((polygon) => pointInPolygon(lon, lat, polygon));
+      mask[y * MASK_WIDTH + x] = isLand ? 1 : 0;
     }
   }
 
-  return cells;
+  return mask;
 };
 
-let landCellsPromise;
-const loadLandCells = () => {
-  if (landCellsPromise) {
-    return landCellsPromise;
+let landMaskPromise;
+const loadLandMask = () => {
+  if (landMaskPromise) {
+    return landMaskPromise;
   }
 
-  landCellsPromise = fetch("/data/ne_110m_land.geojson")
+  landMaskPromise = fetch("/data/ne_110m_land.geojson")
     .then((response) => (response.ok ? response.json() : { features: [] }))
-    .then((geojson) => buildLandCells(extractPolygons(geojson)))
-    .catch(() => []);
+    .then((geojson) => buildLandMask(extractPolygons(geojson)))
+    .catch(() => new Uint8Array(MASK_WIDTH * MASK_HEIGHT));
 
-  return landCellsPromise;
+  return landMaskPromise;
 };
+
+const colorFromHex = (hex) => {
+  const value = hex.trim().replace("#", "");
+  if (value.length !== 6) {
+    return { r: 127, g: 127, b: 127 };
+  }
+
+  return {
+    r: Number.parseInt(value.slice(0, 2), 16),
+    g: Number.parseInt(value.slice(2, 4), 16),
+    b: Number.parseInt(value.slice(4, 6), 16)
+  };
+};
+
+const shade = (color, factor) => ({
+  r: Math.round(color.r * factor),
+  g: Math.round(color.g * factor),
+  b: Math.round(color.b * factor)
+});
 
 export const setupInteractiveGlobe = () => {
   const globe = document.querySelector("#hero-globe");
@@ -155,82 +119,98 @@ export const setupInteractiveGlobe = () => {
     return;
   }
 
-  const ctx = globe.getContext("2d");
+  const ctx = globe.getContext("2d", { alpha: true });
   if (!ctx) {
     return;
   }
 
-  let yaw = 0.35;
-  let pitch = -0.22;
+  let yaw = -1.42;
+  let pitch = 0.08;
   let velocity = 0.006;
   let dragId = null;
   let dragX = 0;
   let dragY = 0;
-  let rafId = 0;
-  let landCells = [];
+  let landMask = new Uint8Array(MASK_WIDTH * MASK_HEIGHT);
+  let buffer = null;
+  let bufferData = null;
+  let cssSize = 188;
 
   const updateSize = () => {
     const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const size = globe.clientWidth || 188;
-    globe.width = Math.round(size * dpr);
-    globe.height = Math.round(size * dpr);
+    cssSize = Math.round(globe.clientWidth || 188);
+    globe.width = Math.round(cssSize * dpr);
+    globe.height = Math.round(cssSize * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buffer = ctx.createImageData(cssSize, cssSize);
+    bufferData = buffer.data;
   };
 
   const draw = () => {
-    const styles = getComputedStyle(document.documentElement);
-    const text = styles.getPropertyValue("--text").trim();
-    const line = styles.getPropertyValue("--line").trim();
-    const size = globe.clientWidth || 188;
-    const radius = size * 0.44;
-    const center = size * 0.5;
+    if (!buffer || !bufferData) {
+      return;
+    }
 
-    ctx.clearRect(0, 0, size, size);
+    const styles = getComputedStyle(document.documentElement);
+    const textColor = colorFromHex(styles.getPropertyValue("--text"));
+    const lineColor = colorFromHex(styles.getPropertyValue("--line"));
+    const oceanBase = shade(lineColor, 1.12);
+    const landBase = shade(textColor, 0.95);
+
+    bufferData.fill(0);
+
+    const center = cssSize * 0.5;
+    const radius = cssSize * 0.44;
+    const light = [-0.35, -0.15, 0.92];
+
+    for (let py = 0; py < cssSize; py += 1) {
+      for (let px = 0; px < cssSize; px += 1) {
+        const nx = (px + 0.5 - center) / radius;
+        const ny = (py + 0.5 - center) / radius;
+        const distanceSquared = nx * nx + ny * ny;
+        if (distanceSquared > 1) {
+          continue;
+        }
+
+        const nz = Math.sqrt(1 - distanceSquared);
+        let globePoint = [nx, ny, nz];
+        globePoint = rotateX(globePoint, -pitch);
+        globePoint = rotateY(globePoint, -yaw);
+
+        const lat = (Math.asin(globePoint[1]) * 180) / Math.PI;
+        const lon = (Math.atan2(globePoint[2], globePoint[0]) * 180) / Math.PI;
+        const maskX = Math.max(0, Math.min(MASK_WIDTH - 1, Math.floor(((lon + 180) / 360) * MASK_WIDTH)));
+        const maskY = Math.max(0, Math.min(MASK_HEIGHT - 1, Math.floor(((90 - lat) / 180) * MASK_HEIGHT)));
+        const isLand = landMask[maskY * MASK_WIDTH + maskX] === 1;
+
+        const lightStrength = Math.max(0.58, Math.min(1.12, nx * light[0] + ny * light[1] + nz * light[2] + 0.16));
+        const base = isLand ? landBase : oceanBase;
+
+        const index = (py * cssSize + px) * 4;
+        bufferData[index] = Math.min(255, Math.round(base.r * lightStrength));
+        bufferData[index + 1] = Math.min(255, Math.round(base.g * lightStrength));
+        bufferData[index + 2] = Math.min(255, Math.round(base.b * lightStrength));
+        bufferData[index + 3] = 255;
+      }
+    }
+
+    ctx.clearRect(0, 0, cssSize, cssSize);
+    ctx.putImageData(buffer, 0, 0);
 
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, TAU);
-    ctx.fillStyle = `${line}5a`;
-    ctx.fill();
-    ctx.strokeStyle = `${line}d0`;
+    ctx.strokeStyle = `${styles.getPropertyValue("--line").trim()}cc`;
     ctx.lineWidth = 1;
-    ctx.stroke();
-
-    landCells.forEach((cell) => {
-      const projected = cell.map((point) => {
-        let rotated = rotateY(point, yaw);
-        rotated = rotateX(rotated, pitch);
-        return project(rotated, radius, center, center);
-      });
-
-      const visibleCount = projected.filter((point) => point.z >= 0).length;
-      if (visibleCount < 4) {
-        return;
-      }
-
-      ctx.beginPath();
-      ctx.moveTo(projected[0].x, projected[0].y);
-      for (let i = 1; i < projected.length; i += 1) {
-        ctx.lineTo(projected[i].x, projected[i].y);
-      }
-      ctx.closePath();
-      ctx.fillStyle = `${text}d4`;
-      ctx.fill();
-    });
-
-    ctx.beginPath();
-    ctx.arc(center, center, radius * 0.98, 0, TAU);
-    ctx.strokeStyle = `${text}3d`;
     ctx.stroke();
   };
 
   const tick = () => {
     yaw += velocity;
-    velocity *= 0.985;
-    if (Math.abs(velocity) < 0.0004) {
-      velocity = 0.0004;
+    velocity *= 0.986;
+    if (Math.abs(velocity) < 0.0003) {
+      velocity = 0.0003;
     }
     draw();
-    rafId = window.requestAnimationFrame(tick);
+    window.requestAnimationFrame(tick);
   };
 
   const onPointerDown = (event) => {
@@ -245,13 +225,15 @@ export const setupInteractiveGlobe = () => {
     if (dragId !== event.pointerId) {
       return;
     }
+
     const deltaX = event.clientX - dragX;
     const deltaY = event.clientY - dragY;
     dragX = event.clientX;
     dragY = event.clientY;
-    yaw += deltaX * 0.015;
-    pitch = Math.max(-1.15, Math.min(1.15, pitch - deltaY * 0.009));
-    velocity = deltaX * 0.0008;
+
+    yaw += deltaX * 0.01;
+    pitch = Math.max(-1.25, Math.min(1.25, pitch - deltaY * 0.008));
+    velocity = deltaX * 0.0007;
     draw();
   };
 
@@ -259,6 +241,7 @@ export const setupInteractiveGlobe = () => {
     if (dragId !== event.pointerId) {
       return;
     }
+
     dragId = null;
     globe.releasePointerCapture(event.pointerId);
   };
@@ -268,16 +251,19 @@ export const setupInteractiveGlobe = () => {
     updateSize();
     draw();
     if (!media.matches) {
-      rafId = window.requestAnimationFrame(tick);
+      window.requestAnimationFrame(tick);
     }
   };
 
-  loadLandCells().then((cells) => {
-    landCells = cells;
+  loadLandMask().then((mask) => {
+    landMask = mask;
     start();
   });
 
-  window.addEventListener("resize", updateSize);
+  window.addEventListener("resize", () => {
+    updateSize();
+    draw();
+  });
   globe.addEventListener("pointerdown", onPointerDown);
   globe.addEventListener("pointermove", onPointerMove);
   globe.addEventListener("pointerup", onPointerUp);

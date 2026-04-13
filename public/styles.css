@@ -290,24 +290,6 @@ button {
   gap: 0.2rem;
 }
 
-.hero-globe-wrap {
-  margin-top: 0.5rem;
-  width: min(34vw, 190px);
-  min-width: 130px;
-}
-
-.hero-globe {
-  width: 100%;
-  height: auto;
-  display: block;
-  touch-action: none;
-  cursor: grab;
-}
-
-.hero-globe:active {
-  cursor: grabbing;
-}
-
 .hero-heatmap-wrap {
   position: absolute;
   top: 50%;
@@ -585,6 +567,23 @@ button {
   font-size: 0.8rem;
 }
 
+.globe-section {
+  justify-items: end;
+}
+
+.site-globe {
+  width: min(32vw, 190px);
+  min-width: 144px;
+  height: auto;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+}
+
+.site-globe:active {
+  cursor: grabbing;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .subsection-item,
   .theme-icon,
@@ -628,8 +627,12 @@ button {
     max-width: 100%;
   }
 
-  .hero-globe-wrap {
-    width: min(52vw, 184px);
+  .globe-section {
+    justify-items: start;
+  }
+
+  .site-globe {
+    width: min(56vw, 184px);
   }
 
   .entry-head {
