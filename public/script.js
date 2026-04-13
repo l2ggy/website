@@ -58,6 +58,58 @@ const loadEntries = async (element) => {
   element.innerHTML = items.map(renderByKind[kind]).join("");
 };
 
+const formatInteger = (value) => new Intl.NumberFormat("en-US").format(value);
+
+const loadStats = async () => {
+  const statsSection = document.querySelector("#stats");
+  if (!statsSection) return;
+
+  const leetcodeUser = statsSection.dataset.leetcodeUser || "lagsterino";
+  const monkeytypeUser = statsSection.dataset.monkeytypeUser || "laggy";
+  const response = await fetch(`/api/stats?leetcode=${encodeURIComponent(leetcodeUser)}&monkeytype=${encodeURIComponent(monkeytypeUser)}`);
+
+  if (!response.ok) {
+    throw new Error("Unable to load stats");
+  }
+
+  const stats = await response.json();
+  const leetcodeSolved = document.querySelector("#leetcode-solved");
+  const leetcodeContest = document.querySelector("#leetcode-contest");
+  const monkeytypeVolume = document.querySelector("#monkeytype-volume");
+  const monkeytypePb = document.querySelector("#monkeytype-pb");
+
+  if (leetcodeSolved) {
+    const solved = stats.leetcode?.solved;
+    leetcodeSolved.textContent = solved
+      ? `${formatInteger(solved.all)} solved (${formatInteger(solved.easy)} easy · ${formatInteger(solved.medium)} medium · ${formatInteger(solved.hard)} hard)`
+      : "Solved stats unavailable.";
+  }
+
+  if (leetcodeContest) {
+    const rating = stats.leetcode?.contest?.rating;
+    const top = stats.leetcode?.contest?.topPercentage;
+    leetcodeContest.textContent = rating && top !== null
+      ? `Contest rating: ${formatInteger(rating)} · top ${top.toFixed(2)}%`
+      : "Contest stats unavailable.";
+  }
+
+  if (monkeytypeVolume) {
+    const completedTests = stats.monkeytype?.completedTests;
+    const totalTypingHours = stats.monkeytype?.totalTypingHours;
+    monkeytypeVolume.textContent = completedTests !== undefined && totalTypingHours !== undefined
+      ? `${formatInteger(completedTests)} tests completed · ${totalTypingHours}h total typing`
+      : "Typing volume unavailable.";
+  }
+
+  if (monkeytypePb) {
+    const pb = stats.monkeytype?.pb60;
+    const top = stats.monkeytype?.pb60TopPercentage;
+    monkeytypePb.textContent = pb && top !== null
+      ? `PB (60s): ${pb.toFixed(2)} WPM · top ${top.toFixed(2)}%`
+      : "PB (60s) unavailable.";
+  }
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -100,6 +152,21 @@ systemThemeQuery.addEventListener("change", () => {
 document.querySelectorAll(".entries").forEach((element) => {
   loadEntries(element).catch(() => {
     element.innerHTML = "<p>Unable to load entries.</p>";
+  });
+});
+
+loadStats().catch(() => {
+  const statsLines = [
+    document.querySelector("#leetcode-solved"),
+    document.querySelector("#leetcode-contest"),
+    document.querySelector("#monkeytype-volume"),
+    document.querySelector("#monkeytype-pb"),
+  ];
+
+  statsLines.forEach((line) => {
+    if (line) {
+      line.textContent = "Stats unavailable right now.";
+    }
   });
 });
 
