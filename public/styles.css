@@ -257,6 +257,36 @@ button {
   font-size: 0.9em;
 }
 
+
+.project-title-link {
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.project-title-link:hover,
+.project-title-link:focus-visible {
+  color: var(--muted);
+}
+
+.leadership-list {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.leadership-item {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.leadership-item h3 {
+  font-size: 1.02rem;
+  font-weight: 520;
+}
+
+.leadership-item p {
+  color: var(--muted);
+}
+
 .footer-content {
   font-size: 0.8rem;
 }
