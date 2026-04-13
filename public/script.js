@@ -291,22 +291,15 @@ const splitHeroNameLetters = () => {
     return;
   }
 
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const originalText = heroName.textContent || "";
+  heroName.setAttribute("aria-label", originalText);
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !originalText) {
     return;
   }
 
-  const originalText = heroName.textContent || "";
-  heroName.setAttribute("aria-label", originalText);
-  heroName.textContent = "";
-
-  const letterSpans = Array.from(originalText).map((letter, index) => {
-    const span = document.createElement("span");
-    span.className = "hero-letter";
-    span.style.setProperty("--hero-letter-i", index);
-    span.textContent = letter === " " ? "\u00A0" : letter;
-    span.setAttribute("aria-hidden", "true");
-    return span;
-  });
+  let letterSpans = [];
+  let isSplit = false;
 
   const randomizeHeroLetters = () => {
     letterSpans.forEach((span) => {
@@ -315,13 +308,45 @@ const splitHeroNameLetters = () => {
     });
   };
 
-  randomizeHeroLetters();
-  letterSpans.forEach((span) => {
-    heroName.append(span);
-  });
+  const splitText = () => {
+    if (isSplit) {
+      randomizeHeroLetters();
+      return;
+    }
 
-  heroName.addEventListener("pointerenter", randomizeHeroLetters);
-  heroName.addEventListener("focusin", randomizeHeroLetters);
+    heroName.classList.add("hero-name-animated");
+    heroName.textContent = "";
+    letterSpans = Array.from(originalText).map((letter, index) => {
+      const span = document.createElement("span");
+      span.className = "hero-letter";
+      span.style.setProperty("--hero-letter-i", index);
+      span.textContent = letter === " " ? "\u00A0" : letter;
+      span.setAttribute("aria-hidden", "true");
+      return span;
+    });
+    randomizeHeroLetters();
+    letterSpans.forEach((span) => {
+      heroName.append(span);
+    });
+    isSplit = true;
+  };
+
+  const restoreText = () => {
+    if (!isSplit || heroName.matches(":hover, :focus-visible")) {
+      return;
+    }
+
+    heroName.classList.remove("hero-name-animated");
+    heroName.textContent = originalText;
+    isSplit = false;
+  };
+
+  heroName.addEventListener("pointerenter", splitText);
+  heroName.addEventListener("focusin", splitText);
+  heroName.addEventListener("pointerleave", restoreText);
+  heroName.addEventListener("focusout", () => {
+    requestAnimationFrame(restoreText);
+  });
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");

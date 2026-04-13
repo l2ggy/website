@@ -306,9 +306,7 @@ button {
 }
 
 #hero-name {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.01em;
+  display: inline-block;
 }
 
 #hero-name:focus-visible {
@@ -322,6 +320,12 @@ button {
   transform: translateY(0) rotate(0deg);
   transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
   transition-delay: calc(var(--hero-letter-stagger, var(--hero-letter-i)) * 18ms);
+}
+
+#hero-name.hero-name-animated {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.01em;
 }
 
 #hero-name:hover .hero-letter,
