@@ -9,6 +9,7 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --logo-glow-color: color-mix(in oklab, #8bd3ff 60%, #b794ff 40%);
 }
 
 :root[data-theme="light"] {
@@ -382,10 +383,33 @@ button {
   border-radius: 8px;
   object-fit: cover;
   border: 1px solid var(--line);
+  transform: translateZ(0);
+  transition: filter 260ms ease, transform 260ms ease;
+  filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
 }
 
 #education .entry-thumb {
   border: 0;
+}
+
+.subsection-item:hover .entry-thumb,
+.subsection-item:focus-within .entry-thumb {
+  animation: entry-thumb-glow 1.8s ease-in-out infinite;
+  transform: scale(1.035);
+}
+
+@keyframes entry-thumb-glow {
+  0%,
+  100% {
+    filter:
+      drop-shadow(0 0 3px color-mix(in oklab, var(--logo-glow-color) 45%, transparent))
+      drop-shadow(0 0 8px color-mix(in oklab, var(--logo-glow-color) 32%, transparent));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 8px color-mix(in oklab, var(--logo-glow-color) 68%, transparent))
+      drop-shadow(0 0 16px color-mix(in oklab, var(--logo-glow-color) 50%, transparent));
+  }
 }
 
 .entry-main {
