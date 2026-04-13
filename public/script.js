@@ -173,6 +173,37 @@ const setStatsFallback = () => {
   });
 };
 
+const attachPointerShift = (selector, maxShiftPx = 6) => {
+  if (window.matchMedia("(pointer: coarse)").matches) {
+    return;
+  }
+
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+  const targets = document.querySelectorAll(selector);
+
+  targets.forEach((target) => {
+    target.classList.add("pointer-shift-target");
+
+    target.addEventListener("pointermove", (event) => {
+      const rect = target.getBoundingClientRect();
+      const localX = event.clientX - rect.left;
+      const localY = event.clientY - rect.top;
+      const offsetX = ((localX / rect.width) * 2 - 1) * maxShiftPx;
+      const offsetY = ((localY / rect.height) * 2 - 1) * maxShiftPx;
+      const x = clamp(offsetX, -maxShiftPx, maxShiftPx);
+      const y = clamp(offsetY, -maxShiftPx, maxShiftPx);
+
+      target.classList.add("is-pointer-shifting");
+      target.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    });
+
+    target.addEventListener("pointerleave", () => {
+      target.classList.remove("is-pointer-shifting");
+      target.style.transform = "translate3d(0, 0, 0)";
+    });
+  });
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -220,3 +251,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+attachPointerShift(".btn-primary, .btn-icon");
