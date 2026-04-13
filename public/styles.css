@@ -238,6 +238,39 @@ button {
   font-size: 0.9em;
 }
 
+.leetcode-stats {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.stat-subtitle,
+.stat-loading {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.stat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.9rem;
+}
+
+.stat-card {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.32rem;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.stat-value {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
 .footer-content {
   font-size: 0.8rem;
 }
@@ -257,34 +290,5 @@ button {
 
   .hero {
     padding-right: 0;
-  }
-
-  .hero-heatmap-wrap {
-    position: static;
-    transform: none;
-    justify-content: flex-start;
-    margin-top: var(--space-1);
-  }
-
-  .hero-heatmap {
-    max-width: 100%;
-  }
-
-  .entry-head {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.08rem;
-  }
-
-  .footer-content {
-    align-items: flex-start;
-    justify-content: center;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding-block: 0.2rem;
-  }
-
-  .hero h1 {
-    font-size: 2.3rem;
   }
 }
