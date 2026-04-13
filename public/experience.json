@@ -1,8 +1,14 @@
 [
   {
-    "icon": "Icon",
-    "title": "Company Placeholder",
-    "subtitle": "Role Placeholder",
-    "dates": "Start Date – End Date"
+    "icon": "images/experience/wheeler-lab.png",
+    "title": "Wheeler Lab, University of Toronto",
+    "subtitle": "Software Engineer (Work Study)",
+    "dates": "2025 – Present"
+  },
+  {
+    "icon": "images/experience/helmholtz-munich.png",
+    "title": "Helmholtz Munich",
+    "subtitle": "Research Intern",
+    "dates": "2023"
   }
 ]

@@ -1,12 +1,14 @@
 [
   {
-    "title": "Project Placeholder One",
-    "summary": "Brief placeholder summary of purpose and outcome.",
-    "tools": "Framework · Language · API · Data Store · Hosting"
+    "title": "APA Transformer",
+    "link": "https://devpost.com/software/predicting-apa-site-choice-from-mrna-sequences",
+    "summary": "DNABERT-2 training pipeline for APA prediction (TBH 2025, 2nd place).",
+    "tools": "Python · PyTorch · Hugging Face · GCP"
   },
   {
-    "title": "Project Placeholder Two",
-    "summary": "Brief placeholder summary of purpose and outcome.",
-    "tools": "Library · Runtime · Styling · Testing · Deployment"
+    "title": "CreditCombo",
+    "link": "https://github.com/l2ggy/creditcombo",
+    "summary": "Client-side credit-card rewards optimizer with fast combo search.",
+    "tools": "JavaScript · HTML/CSS · Web Workers · Cloudflare"
   }
 ]

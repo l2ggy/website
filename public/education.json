@@ -1,8 +1,8 @@
 [
   {
-    "icon": "Icon",
-    "title": "University Placeholder",
-    "subtitle": "Degree Placeholder",
-    "dates": "Start Year – End Year"
+    "icon": "images/education/university-of-toronto.png",
+    "title": "University of Toronto",
+    "subtitle": "HBSc · Computer Science + Mathematics",
+    "dates": "2024 – 2028"
   }
 ]

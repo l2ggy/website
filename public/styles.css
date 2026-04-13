@@ -98,6 +98,19 @@ button {
   font-size: 0.84rem;
 }
 
+.logo-slot {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.site-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: block;
+}
+
 .text-btn {
   position: relative;
   transition: color 180ms ease, transform 180ms ease;
@@ -213,6 +226,12 @@ button {
   font-size: 0.8rem;
 }
 
+.entry-thumb {
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
 .entry-main {
   display: grid;
   gap: 0.18rem;
@@ -236,6 +255,59 @@ button {
 .project-tools {
   color: var(--text);
   font-size: 0.9em;
+}
+
+
+.project-title-link {
+  position: relative;
+  text-decoration: none;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.project-title-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.1em;
+  height: 1px;
+  background: var(--text);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 180ms ease;
+}
+
+.project-title-link:hover,
+.project-title-link:focus-visible {
+  color: var(--text);
+}
+
+.project-title-link:hover::after,
+.project-title-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.project-title-link:active {
+  transform: translateY(1px);
+}
+
+.leadership-list {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.leadership-item {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.leadership-item h3 {
+  font-size: 1.02rem;
+  font-weight: 520;
+}
+
+.leadership-item p {
+  color: var(--muted);
 }
 
 .footer-content {
