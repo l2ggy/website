@@ -112,35 +112,7 @@ button {
 }
 
 .text-btn {
-  position: relative;
-  transition: color 180ms ease, transform 180ms ease;
-}
-
-.text-btn::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.1em;
-  height: 1px;
-  background: var(--text);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 180ms ease;
-}
-
-.text-btn:hover,
-.text-btn:focus-visible {
-  color: var(--text);
-}
-
-.text-btn:hover::after,
-.text-btn:focus-visible::after {
-  transform: scaleX(1);
-}
-
-.text-btn:active {
-  transform: translateY(1px);
+  color: var(--muted);
 }
 
 .layout {
@@ -263,35 +235,47 @@ button {
 
 
 .project-title-link {
+  color: var(--muted);
+}
+
+.fluid-fill {
   position: relative;
   text-decoration: none;
-  transition: color 180ms ease, transform 180ms ease;
+  isolation: isolate;
+  transition: color 150ms ease, transform 150ms ease;
 }
 
-.project-title-link::after {
+.fluid-fill::before {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.1em;
-  height: 1px;
-  background: var(--text);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 180ms ease;
+  inset: -0.14em -0.42em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 16%, transparent);
+  opacity: 0;
+  transform-origin: var(--fill-origin, 50% 50%);
+  transform: translate(var(--fill-shift-x, 0), var(--fill-shift-y, 0)) scale(0.34);
+  transition: transform 190ms ease, opacity 130ms ease;
+  z-index: -1;
+  pointer-events: none;
 }
 
-.project-title-link:hover,
-.project-title-link:focus-visible {
+.fluid-fill:is(:hover, :focus-visible),
+.fluid-fill[data-flow="in"] {
   color: var(--text);
 }
 
-.project-title-link:hover::after,
-.project-title-link:focus-visible::after {
-  transform: scaleX(1);
+.fluid-fill:is(:hover, :focus-visible)::before,
+.fluid-fill[data-flow="in"]::before {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
 }
 
-.project-title-link:active {
+.fluid-fill[data-flow="out"]::before {
+  opacity: 0;
+  transform: translate(var(--fill-shift-x, 0), var(--fill-shift-y, 0)) scale(0.34);
+}
+
+.fluid-fill:active {
   transform: translateY(1px);
 }
 

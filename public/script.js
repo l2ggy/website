@@ -22,7 +22,7 @@ const renderEntry = ({ icon, title, subtitle, dates }) => `
 const renderProject = ({ title, summary, tools, link }) => `
   <article class="entry project-entry">
     <div class="entry-main">
-      <h3>${link ? `<a class="project-title-link" href="${link}" target="_blank" rel="noreferrer">${title}</a>` : title}</h3>
+      <h3>${link ? `<a class="project-title-link fluid-fill" href="${link}" target="_blank" rel="noreferrer">${title}</a>` : title}</h3>
       <p>${summary}</p>
       <p class="project-tools">${tools}</p>
     </div>
@@ -285,6 +285,60 @@ const setStatsFallback = () => {
   renderPercentile("#monkeytype-percentile", null);
 };
 
+const fluidFillSide = (event, element) => {
+  const rect = element.getBoundingClientRect();
+  const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+  const y = Math.max(0, Math.min(rect.height, event.clientY - rect.top));
+  const distances = {
+    left: x,
+    right: rect.width - x,
+    top: y,
+    bottom: rect.height - y,
+  };
+
+  return Object.entries(distances).reduce((closest, [side, value]) => (value < closest.value ? { side, value } : closest), { side: "top", value: Infinity }).side;
+};
+
+const fluidFillMotion = {
+  left: { origin: "0% 50%", x: "-26%", y: "0%" },
+  right: { origin: "100% 50%", x: "26%", y: "0%" },
+  top: { origin: "50% 0%", x: "0%", y: "-26%" },
+  bottom: { origin: "50% 100%", x: "0%", y: "26%" },
+};
+
+const setFluidFillState = (element, state, side) => {
+  const motion = fluidFillMotion[side] || fluidFillMotion.top;
+  element.style.setProperty("--fill-origin", motion.origin);
+  element.style.setProperty("--fill-shift-x", motion.x);
+  element.style.setProperty("--fill-shift-y", motion.y);
+  element.dataset.flow = state;
+};
+
+const bindFluidFill = () => {
+  document.addEventListener("pointerover", (event) => {
+    const element = event.target.closest(".fluid-fill");
+    if (!element || element.contains(event.relatedTarget)) {
+      return;
+    }
+
+    clearTimeout(element._flowTimer);
+    setFluidFillState(element, "in", fluidFillSide(event, element));
+  });
+
+  document.addEventListener("pointerout", (event) => {
+    const element = event.target.closest(".fluid-fill");
+    if (!element || element.contains(event.relatedTarget)) {
+      return;
+    }
+
+    setFluidFillState(element, "out", fluidFillSide(event, element));
+    clearTimeout(element._flowTimer);
+    element._flowTimer = setTimeout(() => {
+      delete element.dataset.flow;
+    }, 190);
+  });
+};
+
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
@@ -332,3 +386,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+bindFluidFill();
