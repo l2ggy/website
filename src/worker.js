@@ -59,8 +59,26 @@ const getLeetCodeStats = async (username) => {
 };
 
 const getMonkeytypeStats = async (username) => {
-  const response = await fetch(`https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`);
-  if (!response.ok) {
+  const endpoints = [
+    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile?isUid=false`,
+    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`,
+  ];
+  const requestHeaders = {
+    accept: "application/json",
+    origin: "https://monkeytype.com",
+    referer: `https://monkeytype.com/profile/${encodeURIComponent(username)}`,
+    "user-agent": "Mozilla/5.0",
+  };
+
+  let response = null;
+  for (const endpoint of endpoints) {
+    response = await fetch(endpoint, { headers: requestHeaders });
+    if (response.ok) {
+      break;
+    }
+  }
+
+  if (!response?.ok) {
     throw new Error("Monkeytype request failed");
   }
 
@@ -72,8 +90,8 @@ const getMonkeytypeStats = async (username) => {
   const leaderboard = data?.allTimeLbs?.time?.["60"]?.english || {};
 
   return {
-    completedTests: typingStats.completedTests || 0,
-    timeTypingSeconds: typingStats.timeTyping || 0,
+    completedTests: typingStats.completedTests ?? typingStats.testsCompleted ?? 0,
+    timeTypingSeconds: typingStats.timeTyping ?? 0,
     pb60,
     leaderboard: {
       rank: leaderboard.rank || null,
