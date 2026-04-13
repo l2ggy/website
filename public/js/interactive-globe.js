@@ -1,31 +1,9 @@
 const TAU = Math.PI * 2;
-const LAT_STEPS = [-60, -30, 0, 30, 60];
-const LON_STEP = 20;
-const LAND_CENTERS = [
-  { lat: 50, lon: -105, rx: 26, ry: 18, weight: 1.1 },  // North America
-  { lat: 15, lon: -92, rx: 12, ry: 18, weight: 0.7 },   // Central America
-  { lat: -14, lon: -60, rx: 17, ry: 24, weight: 1.05 }, // South America
-  { lat: 54, lon: 20, rx: 34, ry: 16, weight: 1.15 },   // Europe + North Asia
-  { lat: 33, lon: 68, rx: 28, ry: 18, weight: 1.1 },    // South + Central Asia
-  { lat: 7, lon: 22, rx: 20, ry: 25, weight: 1.15 },    // Africa
-  { lat: -25, lon: 133, rx: 12, ry: 10, weight: 0.85 }, // Australia
-  { lat: 73, lon: -40, rx: 16, ry: 9, weight: 0.7 },    // Greenland
-  { lat: -78, lon: 18, rx: 60, ry: 9, weight: 0.5 }     // Antarctica
-];
+const CELL_STEP = 2;
 
-const wrapLongitudeDelta = (a, b) => {
-  const raw = Math.abs(a - b) % 360;
-  return raw > 180 ? 360 - raw : raw;
-};
-
-const landStrength = (lat, lon) => {
-  let strength = 0;
-  LAND_CENTERS.forEach((center) => {
-    const lonDelta = wrapLongitudeDelta(lon, center.lon) / center.rx;
-    const latDelta = (lat - center.lat) / center.ry;
-    strength += center.weight * Math.exp(-(lonDelta * lonDelta + latDelta * latDelta));
-  });
-  return strength;
+const normalizeLongitude = (lon) => {
+  const wrapped = ((lon + 180) % 360 + 360) % 360;
+  return wrapped - 180;
 };
 
 const rotateY = ([x, y, z], angle) => {
@@ -43,54 +21,132 @@ const rotateX = ([x, y, z], angle) => {
 const project = ([x, y, z], radius, centerX, centerY) => ({
   x: centerX + x * radius,
   y: centerY + y * radius,
-  visible: z >= 0
+  z
 });
 
 const createPoint = (lat, lon) => {
   const latRad = (lat * Math.PI) / 180;
-  const lonRad = (lon * Math.PI) / 180;
+  const lonRad = (normalizeLongitude(lon) * Math.PI) / 180;
   const cosLat = Math.cos(latRad);
   return [cosLat * Math.cos(lonRad), Math.sin(latRad), cosLat * Math.sin(lonRad)];
 };
 
-const LAND_POINTS = (() => {
-  const points = [];
-  for (let lat = -78; lat <= 82; lat += 4) {
-    for (let lon = -180; lon < 180; lon += 4) {
-      const strength = landStrength(lat, lon);
-      if (strength < 0.58) {
-        continue;
-      }
-      points.push({
-        point: createPoint(lat, lon),
-        strength
-      });
+const ringBounds = (ring) => {
+  let minLon = Infinity;
+  let maxLon = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+
+  ring.forEach(([lon, lat]) => {
+    minLon = Math.min(minLon, lon);
+    maxLon = Math.max(maxLon, lon);
+    minLat = Math.min(minLat, lat);
+    maxLat = Math.max(maxLat, lat);
+  });
+
+  return { minLon, maxLon, minLat, maxLat };
+};
+
+const pointInRing = (lon, lat, ring) => {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    const intersects = yi > lat !== yj > lat && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi;
+    if (intersects) {
+      inside = !inside;
     }
   }
-  return points;
-})();
+  return inside;
+};
 
-const drawGridLine = (ctx, points, radius, centerX, centerY, front, back) => {
-  let activeStyle = null;
-  ctx.beginPath();
-  points.forEach((point, index) => {
-    const projected = project(point, radius, centerX, centerY);
-    const nextStyle = projected.visible ? front : back;
+const extractPolygons = (geojson) => {
+  if (!geojson || !Array.isArray(geojson.features)) {
+    return [];
+  }
 
-    if (nextStyle !== activeStyle) {
-      if (index !== 0) {
-        ctx.stroke();
-      }
-      ctx.beginPath();
-      ctx.strokeStyle = nextStyle;
-      activeStyle = nextStyle;
-      ctx.moveTo(projected.x, projected.y);
+  const polygons = [];
+  geojson.features.forEach((feature) => {
+    const geometry = feature?.geometry;
+    if (!geometry) {
       return;
     }
 
-    ctx.lineTo(projected.x, projected.y);
+    if (geometry.type === "Polygon") {
+      polygons.push(geometry.coordinates);
+      return;
+    }
+
+    if (geometry.type === "MultiPolygon") {
+      geometry.coordinates.forEach((polygon) => polygons.push(polygon));
+    }
   });
-  ctx.stroke();
+
+  return polygons
+    .map((polygon) => {
+      const outer = polygon[0]?.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
+      if (!outer || outer.length < 3) {
+        return null;
+      }
+      return {
+        outer,
+        holes: polygon.slice(1).map((ring) => ring.map(([lon, lat]) => [normalizeLongitude(lon), lat])),
+        bounds: ringBounds(outer)
+      };
+    })
+    .filter(Boolean);
+};
+
+const pointInPolygon = (lon, lat, polygon) => {
+  const { minLon, maxLon, minLat, maxLat } = polygon.bounds;
+  if (lat < minLat || lat > maxLat || lon < minLon || lon > maxLon) {
+    return false;
+  }
+
+  if (!pointInRing(lon, lat, polygon.outer)) {
+    return false;
+  }
+
+  return !polygon.holes.some((hole) => pointInRing(lon, lat, hole));
+};
+
+const buildLandCells = (polygons) => {
+  const cells = [];
+
+  for (let lat = -88; lat < 88; lat += CELL_STEP) {
+    for (let lon = -180; lon < 180; lon += CELL_STEP) {
+      const sampleLon = lon + CELL_STEP * 0.5;
+      const sampleLat = lat + CELL_STEP * 0.5;
+      const isLand = polygons.some((polygon) => pointInPolygon(sampleLon, sampleLat, polygon));
+
+      if (!isLand) {
+        continue;
+      }
+
+      cells.push([
+        createPoint(lat, lon),
+        createPoint(lat, lon + CELL_STEP),
+        createPoint(lat + CELL_STEP, lon + CELL_STEP),
+        createPoint(lat + CELL_STEP, lon)
+      ]);
+    }
+  }
+
+  return cells;
+};
+
+let landCellsPromise;
+const loadLandCells = () => {
+  if (landCellsPromise) {
+    return landCellsPromise;
+  }
+
+  landCellsPromise = fetch("/data/ne_110m_land.geojson")
+    .then((response) => (response.ok ? response.json() : { features: [] }))
+    .then((geojson) => buildLandCells(extractPolygons(geojson)))
+    .catch(() => []);
+
+  return landCellsPromise;
 };
 
 export const setupInteractiveGlobe = () => {
@@ -105,12 +161,13 @@ export const setupInteractiveGlobe = () => {
   }
 
   let yaw = 0.35;
-  let pitch = -0.28;
+  let pitch = -0.22;
   let velocity = 0.006;
   let dragId = null;
   let dragX = 0;
   let dragY = 0;
   let rafId = 0;
+  let landCells = [];
 
   const updateSize = () => {
     const dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -123,61 +180,46 @@ export const setupInteractiveGlobe = () => {
   const draw = () => {
     const styles = getComputedStyle(document.documentElement);
     const text = styles.getPropertyValue("--text").trim();
-    const muted = styles.getPropertyValue("--muted").trim();
     const line = styles.getPropertyValue("--line").trim();
     const size = globe.clientWidth || 188;
     const radius = size * 0.44;
     const center = size * 0.5;
 
     ctx.clearRect(0, 0, size, size);
-    ctx.lineWidth = 1;
 
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, TAU);
-    ctx.fillStyle = `${line}66`;
+    ctx.fillStyle = `${line}5a`;
     ctx.fill();
-    ctx.strokeStyle = `${line}cc`;
+    ctx.strokeStyle = `${line}d0`;
+    ctx.lineWidth = 1;
     ctx.stroke();
 
-    LAT_STEPS.forEach((lat) => {
-      const points = [];
-      for (let lon = -180; lon <= 180; lon += LON_STEP) {
-        let point = createPoint(lat, lon);
-        point = rotateY(point, yaw);
-        point = rotateX(point, pitch);
-        points.push(point);
-      }
-      drawGridLine(ctx, points, radius, center, center, `${text}c2`, `${muted}4d`);
-    });
+    landCells.forEach((cell) => {
+      const projected = cell.map((point) => {
+        let rotated = rotateY(point, yaw);
+        rotated = rotateX(rotated, pitch);
+        return project(rotated, radius, center, center);
+      });
 
-    for (let lon = 0; lon < 180; lon += 30) {
-      const points = [];
-      for (let lat = -90; lat <= 90; lat += 6) {
-        let point = createPoint(lat, lon);
-        point = rotateY(point, yaw);
-        point = rotateX(point, pitch);
-        points.push(point);
-      }
-      drawGridLine(ctx, points, radius, center, center, `${text}aa`, `${muted}40`);
-    }
-
-    LAND_POINTS.forEach(({ point, strength }) => {
-      let rotated = rotateY(point, yaw);
-      rotated = rotateX(rotated, pitch);
-      const projected = project(rotated, radius, center, center);
-      if (!projected.visible) {
+      const visibleCount = projected.filter((point) => point.z >= 0).length;
+      if (visibleCount < 4) {
         return;
       }
-      const dotSize = radius * 0.014 * Math.min(1.6, strength);
+
       ctx.beginPath();
-      ctx.arc(projected.x, projected.y, dotSize, 0, TAU);
-      ctx.fillStyle = `${text}d0`;
+      ctx.moveTo(projected[0].x, projected[0].y);
+      for (let i = 1; i < projected.length; i += 1) {
+        ctx.lineTo(projected[i].x, projected[i].y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = `${text}d4`;
       ctx.fill();
     });
 
     ctx.beginPath();
-    ctx.arc(center, center, radius * 0.97, 0, TAU);
-    ctx.strokeStyle = `${text}55`;
+    ctx.arc(center, center, radius * 0.98, 0, TAU);
+    ctx.strokeStyle = `${text}3d`;
     ctx.stroke();
   };
 
@@ -210,6 +252,7 @@ export const setupInteractiveGlobe = () => {
     yaw += deltaX * 0.015;
     pitch = Math.max(-1.15, Math.min(1.15, pitch - deltaY * 0.009));
     velocity = deltaX * 0.0008;
+    draw();
   };
 
   const onPointerUp = (event) => {
@@ -220,15 +263,19 @@ export const setupInteractiveGlobe = () => {
     globe.releasePointerCapture(event.pointerId);
   };
 
-  updateSize();
-  draw();
-  rafId = window.requestAnimationFrame(tick);
-
   const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (media.matches) {
-    window.cancelAnimationFrame(rafId);
-    rafId = 0;
-  }
+  const start = () => {
+    updateSize();
+    draw();
+    if (!media.matches) {
+      rafId = window.requestAnimationFrame(tick);
+    }
+  };
+
+  loadLandCells().then((cells) => {
+    landCells = cells;
+    start();
+  });
 
   window.addEventListener("resize", updateSize);
   globe.addEventListener("pointerdown", onPointerDown);
