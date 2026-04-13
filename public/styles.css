@@ -150,8 +150,61 @@ button {
 }
 
 .section {
+  position: relative;
   display: grid;
   gap: var(--space-1);
+  isolation: isolate;
+}
+
+.section > * {
+  position: relative;
+  z-index: 1;
+}
+
+.section::before,
+.section::after {
+  content: "";
+  position: absolute;
+  width: clamp(220px, 32vw, 360px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  opacity: 0.14;
+  filter: blur(84px);
+  pointer-events: none;
+  z-index: 0;
+  transform-origin: center;
+}
+
+.section::before {
+  top: -72px;
+  left: -130px;
+  background: radial-gradient(circle at 35% 35%, #6f84ff, #9b60ff 56%, transparent 100%);
+  animation: blob-drift-a 40s ease-in-out infinite alternate;
+}
+
+.section::after {
+  right: -130px;
+  bottom: -92px;
+  background: radial-gradient(circle at 60% 60%, #55c8ff, #4f77ff 58%, transparent 100%);
+  animation: blob-drift-b 52s ease-in-out infinite alternate;
+}
+
+.section:nth-of-type(odd)::before {
+  background: radial-gradient(circle at 40% 35%, #9580ff, #5d72ff 52%, transparent 100%);
+}
+
+.section:nth-of-type(odd)::after {
+  background: radial-gradient(circle at 60% 62%, #4fb6ff, #7f55ff 56%, transparent 100%);
+}
+
+.section:nth-of-type(3n)::before {
+  left: -100px;
+  top: -56px;
+}
+
+.section:nth-of-type(3n)::after {
+  right: -110px;
+  bottom: -80px;
 }
 
 .hero {
@@ -332,6 +385,33 @@ button {
 
 .footer-content {
   font-size: 0.8rem;
+}
+
+
+@keyframes blob-drift-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(18px, -12px, 0) scale(1.08);
+  }
+}
+
+@keyframes blob-drift-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(-20px, 16px, 0) scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section::before,
+  .section::after {
+    animation: none;
+    transform: none;
+  }
 }
 
 @media (max-width: 700px) {
