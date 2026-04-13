@@ -160,7 +160,18 @@ button {
   padding-right: min(48vw, 540px);
 }
 
+#hero-constellation {
+  position: absolute;
+  inset: -0.35rem 0;
+  width: 100%;
+  height: calc(100% + 0.7rem);
+  z-index: 0;
+  pointer-events: none;
+}
+
 .hero-copy {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 0.2rem;
 }
@@ -173,6 +184,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  z-index: 1;
 }
 
 .hero-heatmap {
@@ -431,6 +443,11 @@ button {
     margin-top: var(--space-1);
   }
 
+  #hero-constellation {
+    inset: 0;
+    height: 100%;
+  }
+
   .hero-heatmap {
     width: 100%;
     max-width: 100%;
@@ -470,5 +487,11 @@ button {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #hero-constellation {
+    display: none;
   }
 }
