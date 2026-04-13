@@ -286,8 +286,10 @@ const setStatsFallback = () => {
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
+const themeToggleLabel = themeToggle?.querySelector(".theme-toggle-label");
 let overrideTheme = localStorage.getItem(storedThemeKey);
 
 const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
@@ -295,7 +297,10 @@ const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
 const applyTheme = (theme) => {
   document.documentElement.dataset.theme = theme;
   if (themeToggle) {
-    themeToggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+    themeToggle.classList.toggle("is-dark", theme === "dark");
+    if (themeToggleLabel) {
+      themeToggleLabel.textContent = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
+    }
     themeToggle.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} mode`);
   }
 };
@@ -304,10 +309,21 @@ applyTheme(overrideTheme || getSystemTheme());
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
+    if (!reducedMotionQuery.matches) {
+      themeToggle.classList.remove("is-rippling");
+      void themeToggle.offsetWidth;
+      themeToggle.classList.add("is-rippling");
+    }
     const currentTheme = document.documentElement.dataset.theme || getSystemTheme();
     overrideTheme = currentTheme === "dark" ? "light" : "dark";
     localStorage.setItem(storedThemeKey, overrideTheme);
     applyTheme(overrideTheme);
+  });
+
+  themeToggle.addEventListener("animationend", (event) => {
+    if (event.animationName === "theme-toggle-ripple") {
+      themeToggle.classList.remove("is-rippling");
+    }
   });
 }
 

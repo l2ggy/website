@@ -117,6 +117,90 @@ button {
   transition: color 180ms ease, transform 180ms ease;
 }
 
+#theme-toggle {
+  overflow: hidden;
+  border-radius: 999px;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#theme-toggle::before {
+  content: "";
+  position: absolute;
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--text) 20%, transparent);
+  opacity: 0;
+}
+
+#theme-toggle.is-rippling::before {
+  animation: theme-toggle-ripple 220ms ease-out;
+}
+
+#theme-toggle:focus-visible {
+  color: var(--text);
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.theme-toggle-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  transform: rotate(0deg);
+  transition: transform 220ms ease;
+}
+
+.theme-toggle-sun,
+.theme-toggle-moon {
+  transform-origin: center;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.theme-toggle-sun {
+  fill: currentColor;
+  opacity: 0;
+  transform: scale(0.65);
+}
+
+.theme-toggle-moon {
+  fill: currentColor;
+  opacity: 1;
+  transform: scale(1);
+}
+
+#theme-toggle.is-dark .theme-toggle-icon {
+  transform: rotate(28deg);
+}
+
+#theme-toggle.is-dark .theme-toggle-sun {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#theme-toggle.is-dark .theme-toggle-moon {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .text-btn::after {
   content: "";
   position: absolute;
@@ -405,6 +489,31 @@ button {
 
 .footer-content {
   font-size: 0.8rem;
+}
+
+@keyframes theme-toggle-ripple {
+  from {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(26);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #theme-toggle::before {
+    display: none;
+  }
+
+  #theme-toggle,
+  .theme-toggle-icon,
+  .theme-toggle-sun,
+  .theme-toggle-moon {
+    transition: none;
+    animation: none;
+  }
 }
 
 @media (max-width: 700px) {
