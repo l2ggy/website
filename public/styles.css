@@ -324,7 +324,7 @@ button {
   display: grid;
   gap: 0.15rem;
   position: relative;
-  padding-right: 10.4rem;
+  padding-right: 14.9rem;
 }
 
 .stats-copy {
@@ -368,7 +368,7 @@ button {
   justify-content: center;
   align-items: flex-end;
   color: var(--muted);
-  width: 9.6rem;
+  width: 14.4rem;
   padding-block: 0.12rem;
 }
 
@@ -456,9 +456,10 @@ button {
 
   .percentile-viz {
     position: static;
-    width: min(100%, 10.4rem);
+    width: min(100%, 11.6rem);
     min-height: 4.9rem;
     align-items: flex-start;
+    align-self: center;
   }
 
   .footer-content {
