@@ -306,9 +306,12 @@ button {
 }
 
 #hero-name {
+  display: inline-block;
+}
+
+#hero-name.hero-name-split {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.01em;
 }
 
 #hero-name:focus-visible {
