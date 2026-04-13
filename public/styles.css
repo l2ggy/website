@@ -4,17 +4,27 @@
   --space-1: 0.55rem;
   --space-2: 1rem;
   --space-3: 1.6rem;
-  --bg: #121212;
-  --text: #d7d7d7;
-  --muted: #a1a1a1;
-  --line: #2a2a2a;
-}
-
-:root[data-theme="light"] {
   --bg: #f4f4f4;
   --text: #161616;
   --muted: #505050;
   --line: #d5d5d5;
+  --particle-1: "☀";
+  --particle-2: "✦";
+  --particle-3: "❀";
+  --particle-4: "◌";
+  --particle-glow: rgba(255, 175, 74, 0.45);
+}
+
+:root[data-theme="night"] {
+  --bg: #121212;
+  --text: #d7d7d7;
+  --muted: #a1a1a1;
+  --line: #2a2a2a;
+  --particle-1: "☾";
+  --particle-2: "✧";
+  --particle-3: "✦";
+  --particle-4: "·";
+  --particle-glow: rgba(135, 173, 255, 0.45);
 }
 
 * {
@@ -162,6 +172,79 @@ button {
 .hero-copy {
   display: grid;
   gap: 0.2rem;
+}
+
+.preset-particles {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: min(17rem, 60vw);
+  height: 4.2rem;
+  pointer-events: none;
+  opacity: 0.82;
+}
+
+.particle {
+  position: absolute;
+  color: var(--text);
+  text-shadow: 0 0 16px var(--particle-glow);
+  animation: drift 6s ease-in-out infinite;
+}
+
+.particle::before {
+  content: var(--particle-1);
+}
+
+.particle:nth-child(1) {
+  top: 0.2rem;
+  left: 0.15rem;
+  font-size: 1rem;
+  animation-delay: -0.5s;
+}
+
+.particle:nth-child(2)::before {
+  content: var(--particle-2);
+}
+
+.particle:nth-child(2) {
+  top: 1.8rem;
+  left: 3.7rem;
+  font-size: 0.78rem;
+  animation-delay: -2.1s;
+}
+
+.particle:nth-child(3)::before {
+  content: var(--particle-3);
+}
+
+.particle:nth-child(3) {
+  top: 0.75rem;
+  left: 7.2rem;
+  font-size: 0.72rem;
+  animation-delay: -3.3s;
+}
+
+.particle:nth-child(4)::before {
+  content: var(--particle-4);
+}
+
+.particle:nth-child(4) {
+  top: 2.3rem;
+  left: 10.1rem;
+  font-size: 0.85rem;
+  animation-delay: -4.2s;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.66;
+  }
+
+  50% {
+    transform: translateY(-0.3rem);
+    opacity: 1;
+  }
 }
 
 .hero-heatmap-wrap {
@@ -421,6 +504,12 @@ button {
 
   .hero {
     padding-right: 0;
+  }
+
+  .preset-particles {
+    position: static;
+    width: 100%;
+    margin-top: 0.3rem;
   }
 
   .hero-heatmap-wrap {

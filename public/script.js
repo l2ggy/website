@@ -285,44 +285,53 @@ const setStatsFallback = () => {
   renderPercentile("#monkeytype-percentile", null);
 };
 
-const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
 const themeToggle = document.querySelector("#theme-toggle");
 let overrideTheme = localStorage.getItem(storedThemeKey);
+if (overrideTheme !== "day" && overrideTheme !== "night") {
+  overrideTheme = null;
+  localStorage.removeItem(storedThemeKey);
+}
 
-const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
+const getHourlyTheme = () => {
+  const hour = new Date().getHours();
+  return hour >= 7 && hour < 19 ? "day" : "night";
+};
 
 const applyTheme = (theme) => {
   document.documentElement.dataset.theme = theme;
   if (themeToggle) {
-    themeToggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
-    themeToggle.setAttribute("aria-label", `Switch to ${theme === "dark" ? "light" : "dark"} mode`);
+    const nextTheme = theme === "night" ? "day" : "night";
+    themeToggle.textContent = `${nextTheme[0].toUpperCase()}${nextTheme.slice(1)} preset`;
+    themeToggle.setAttribute("aria-label", `Switch to ${nextTheme} preset`);
   }
 };
 
-applyTheme(overrideTheme || getSystemTheme());
+const scheduleThemeRefresh = () => {
+  const now = new Date();
+  const nextHour = new Date(now);
+  nextHour.setMinutes(0, 0, 0);
+  nextHour.setHours(now.getHours() + 1);
+
+  window.setTimeout(() => {
+    if (!overrideTheme) {
+      applyTheme(getHourlyTheme());
+    }
+    scheduleThemeRefresh();
+  }, Math.max(1, nextHour - now));
+};
+
+applyTheme(overrideTheme || getHourlyTheme());
+scheduleThemeRefresh();
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
-    const currentTheme = document.documentElement.dataset.theme || getSystemTheme();
-    overrideTheme = currentTheme === "dark" ? "light" : "dark";
+    const currentTheme = document.documentElement.dataset.theme || getHourlyTheme();
+    overrideTheme = currentTheme === "night" ? "day" : "night";
     localStorage.setItem(storedThemeKey, overrideTheme);
     applyTheme(overrideTheme);
   });
 }
-
-systemThemeQuery.addEventListener("change", () => {
-  const systemTheme = getSystemTheme();
-
-  if (overrideTheme && overrideTheme !== systemTheme) {
-    overrideTheme = null;
-    localStorage.removeItem(storedThemeKey);
-  }
-
-  if (!overrideTheme) {
-    applyTheme(systemTheme);
-  }
-});
 
 document.querySelectorAll(".entries").forEach((element) => {
   loadEntries(element).catch(() => {
