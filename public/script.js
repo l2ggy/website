@@ -116,6 +116,42 @@ const renderStats = ({ leetcode, monkeytype }) => {
   }
 };
 
+const parseMonkeytypeProfile = (payload) => {
+  const data = payload?.data || {};
+  const typingStats = data.typingStats || {};
+  const personalBest60 = data?.personalBests?.time?.["60"] || [];
+  const leaderboard = data?.allTimeLbs?.time?.["60"]?.english || {};
+
+  return {
+    completedTests: typingStats.completedTests ?? typingStats.testsCompleted ?? 0,
+    timeTypingSeconds: typingStats.timeTyping ?? 0,
+    pb60: personalBest60.reduce((best, run) => Math.max(best, run?.wpm || 0), 0),
+    leaderboard: {
+      rank: leaderboard.rank || null,
+      count: leaderboard.count || null,
+    },
+  };
+};
+
+const loadMonkeytypeDirect = async (username) => {
+  const endpoints = [
+    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile?isUid=false`,
+    `https://api.monkeytype.com/users/${encodeURIComponent(username)}/profile`,
+  ];
+
+  for (const endpoint of endpoints) {
+    const response = await fetch(endpoint, { headers: { accept: "application/json" } });
+    if (!response.ok) {
+      continue;
+    }
+
+    const payload = await response.json();
+    return parseMonkeytypeProfile(payload);
+  }
+
+  return null;
+};
+
 const loadStats = async () => {
   const section = document.querySelector("#stats");
   if (!section) return;
@@ -130,6 +166,9 @@ const loadStats = async () => {
   }
 
   const payload = await response.json();
+  if (!payload.monkeytype) {
+    payload.monkeytype = await loadMonkeytypeDirect(monkeytype).catch(() => null);
+  }
   renderStats(payload);
 };
 
