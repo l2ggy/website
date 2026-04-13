@@ -388,23 +388,34 @@ button {
   border: 0;
   transform: translateZ(0);
   filter: drop-shadow(0 0 0 transparent);
-  transition: filter 260ms ease, transform 260ms ease;
+  transition: filter 320ms ease, transform 320ms ease;
 }
 
 .subsection-item:hover .entry-thumb,
 .subsection-item:focus-within .entry-thumb {
-  animation: logo-glow 1200ms ease-in-out infinite;
-  transform: scale(1.035);
+  animation: logo-orbit-glow 1450ms linear infinite;
+  transform: scale(1.06) translateY(-1px);
 }
 
-@keyframes logo-glow {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 3px var(--logo-glow-a)) drop-shadow(0 0 9px var(--logo-glow-b));
+@keyframes logo-orbit-glow {
+  0% {
+    filter: drop-shadow(0 -5px 5px var(--logo-glow-a)) drop-shadow(0 -2px 10px var(--logo-glow-b));
+  }
+
+  25% {
+    filter: drop-shadow(5px 0 5px var(--logo-glow-a)) drop-shadow(2px 0 11px var(--logo-glow-b));
   }
 
   50% {
-    filter: drop-shadow(0 0 6px var(--logo-glow-a)) drop-shadow(0 0 14px var(--logo-glow-b));
+    filter: drop-shadow(0 5px 5px var(--logo-glow-a)) drop-shadow(0 2px 12px var(--logo-glow-b));
+  }
+
+  75% {
+    filter: drop-shadow(-5px 0 5px var(--logo-glow-a)) drop-shadow(-2px 0 11px var(--logo-glow-b));
+  }
+
+  100% {
+    filter: drop-shadow(0 -5px 5px var(--logo-glow-a)) drop-shadow(0 -2px 10px var(--logo-glow-b));
   }
 }
 
