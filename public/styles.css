@@ -8,6 +8,8 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --decor-glow: rgba(129, 175, 255, 0.11);
+  --decor-particle: rgba(166, 198, 255, 0.56);
 }
 
 :root[data-theme="light"] {
@@ -15,6 +17,16 @@
   --text: #161616;
   --muted: #505050;
   --line: #d5d5d5;
+}
+
+:root[data-decor-preset="day"] {
+  --decor-glow: rgba(236, 179, 82, 0.12);
+  --decor-particle: rgba(214, 150, 53, 0.45);
+}
+
+:root[data-decor-preset="night"] {
+  --decor-glow: rgba(123, 156, 229, 0.11);
+  --decor-particle: rgba(151, 182, 255, 0.56);
 }
 
 * {
@@ -26,6 +38,16 @@ body {
   background: var(--bg);
   color: var(--text);
   font: 400 15px/1.55 "Iowan Old Style", "Palatino Linotype", "URW Palladio L", "Times New Roman", serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(1100px 480px at 80% 8%, var(--decor-glow), transparent 68%);
+  z-index: -2;
+  pointer-events: none;
+  transition: background 240ms ease;
 }
 
 h1,
@@ -52,6 +74,47 @@ button {
 .container {
   width: min(840px, calc(100% - 2rem));
   margin: 0 auto;
+}
+
+.decor-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.decor-particle {
+  position: absolute;
+  opacity: 0.7;
+  color: var(--decor-particle);
+  animation: decor-float var(--float-duration, 16s) linear infinite;
+  animation-delay: var(--float-delay, 0s);
+  filter: drop-shadow(0 0 0.45rem var(--decor-glow));
+  user-select: none;
+}
+
+@keyframes decor-float {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.58;
+  }
+  80% {
+    opacity: 0.58;
+  }
+  100% {
+    transform: translate3d(0, -3.5rem, 0);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .decor-particle {
+    animation: none;
+    opacity: 0.35;
+  }
 }
 
 .bar {

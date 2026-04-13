@@ -287,8 +287,13 @@ const setStatsFallback = () => {
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const storedThemeKey = "portfolio-theme-override";
+const storedDecorModeKey = "portfolio-decor-mode";
 const themeToggle = document.querySelector("#theme-toggle");
+const decorToggle = document.querySelector("#decor-toggle");
+const decorParticles = document.querySelector("#decor-particles");
 let overrideTheme = localStorage.getItem(storedThemeKey);
+let decorMode = localStorage.getItem(storedDecorModeKey) || "auto";
+let decorTimer = null;
 
 const getSystemTheme = () => (systemThemeQuery.matches ? "dark" : "light");
 
@@ -300,7 +305,78 @@ const applyTheme = (theme) => {
   }
 };
 
+const getHourPreset = (date = new Date()) => {
+  const hour = date.getHours();
+  return hour >= 7 && hour < 19 ? "day" : "night";
+};
+
+const getDecorPreset = () => (decorMode === "auto" ? getHourPreset() : decorMode);
+
+const updateDecorToggleText = () => {
+  if (!decorToggle) {
+    return;
+  }
+  decorToggle.textContent = `Decor: ${decorMode}`;
+  decorToggle.setAttribute("aria-label", `Decorative preset ${decorMode}`);
+};
+
+const scheduleDecorRefresh = () => {
+  if (decorTimer) {
+    clearTimeout(decorTimer);
+    decorTimer = null;
+  }
+
+  if (decorMode !== "auto") {
+    return;
+  }
+
+  const now = new Date();
+  const nextHour = new Date(now);
+  nextHour.setHours(now.getHours() + 1, 0, 0, 0);
+  decorTimer = window.setTimeout(() => {
+    applyDecorPreset();
+    scheduleDecorRefresh();
+  }, nextHour.getTime() - now.getTime());
+};
+
+const particleIcons = {
+  day: ["☀", "✦", "◌", "✧"],
+  night: ["✦", "✧", "✩", "☾"],
+};
+
+const renderDecorParticles = (preset) => {
+  if (!decorParticles) {
+    return;
+  }
+
+  const icons = particleIcons[preset] || particleIcons.night;
+  decorParticles.innerHTML = "";
+  const particleCount = 10;
+
+  for (let index = 0; index < particleCount; index += 1) {
+    const node = document.createElement("span");
+    const size = 0.65 + Math.random() * 0.75;
+    node.className = "decor-particle";
+    node.textContent = icons[index % icons.length];
+    node.style.left = `${3 + Math.random() * 94}%`;
+    node.style.top = `${8 + Math.random() * 82}%`;
+    node.style.fontSize = `${size}rem`;
+    node.style.setProperty("--float-duration", `${13 + Math.random() * 8}s`);
+    node.style.setProperty("--float-delay", `${-Math.random() * 10}s`);
+    decorParticles.appendChild(node);
+  }
+};
+
+const applyDecorPreset = () => {
+  const preset = getDecorPreset();
+  document.documentElement.dataset.decorPreset = preset;
+  renderDecorParticles(preset);
+  updateDecorToggleText();
+};
+
 applyTheme(overrideTheme || getSystemTheme());
+applyDecorPreset();
+scheduleDecorRefresh();
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
@@ -308,6 +384,19 @@ if (themeToggle) {
     overrideTheme = currentTheme === "dark" ? "light" : "dark";
     localStorage.setItem(storedThemeKey, overrideTheme);
     applyTheme(overrideTheme);
+  });
+}
+
+if (decorToggle) {
+  decorToggle.addEventListener("click", () => {
+    decorMode = decorMode === "auto" ? "day" : decorMode === "day" ? "night" : "auto";
+    if (decorMode === "auto") {
+      localStorage.removeItem(storedDecorModeKey);
+    } else {
+      localStorage.setItem(storedDecorModeKey, decorMode);
+    }
+    applyDecorPreset();
+    scheduleDecorRefresh();
   });
 }
 
