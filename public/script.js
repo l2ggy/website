@@ -78,42 +78,146 @@ const setText = (selector, text) => {
   }
 };
 
+const setStatMarkup = (selector, markup) => {
+  const element = document.querySelector(selector);
+  if (element) {
+    element.innerHTML = markup;
+  }
+};
+
+const renderPercentile = (selector, percentile) => {
+  const element = document.querySelector(selector);
+  if (!element) {
+    return;
+  }
+
+  if (!percentile || percentile <= 0 || percentile > 100) {
+    element.hidden = true;
+    element.innerHTML = "";
+    return;
+  }
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const inverseNormalCdf = (p) => {
+    const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.38357751867269e2, -3.066479806614716e1, 2.506628277459239];
+    const b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1];
+    const c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
+    const d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996, 3.754408661907416];
+    const low = 0.02425;
+    const high = 1 - low;
+
+    if (p < low) {
+      const q = Math.sqrt(-2 * Math.log(p));
+      return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+        ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+    }
+    if (p <= high) {
+      const q = p - 0.5;
+      const r = q * q;
+      return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+        (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+    }
+
+    const q = Math.sqrt(-2 * Math.log(1 - p));
+    return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+      ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+  };
+
+  const chartWidth = 128;
+  const chartHeight = 56;
+  const left = 6;
+  const right = chartWidth - 6;
+  const top = 6;
+  const baseline = chartHeight - 8;
+  const domainMin = -3.5;
+  const domainMax = 3.5;
+  const sampleCount = 90;
+  const pdf = (x) => Math.exp(-(x * x) / 2) / Math.sqrt(2 * Math.PI);
+  const peak = pdf(0);
+  const toX = (z) => left + ((z - domainMin) / (domainMax - domainMin)) * (right - left);
+  const toY = (density) => baseline - (density / peak) * (baseline - top);
+
+  const topTail = clamp(percentile / 100, 0.0001, 0.9999);
+  const cutoffZ = inverseNormalCdf(1 - topTail);
+  const cutoffX = clamp(toX(cutoffZ), left, right);
+  const cutoffY = toY(pdf(cutoffZ));
+
+  const points = [];
+  const tailPoints = [];
+  for (let i = 0; i <= sampleCount; i += 1) {
+    const z = domainMin + ((domainMax - domainMin) * i) / sampleCount;
+    const x = toX(z);
+    const y = toY(pdf(z));
+    points.push(`${x.toFixed(2)},${y.toFixed(2)}`);
+    if (x >= cutoffX) {
+      tailPoints.push(`${x.toFixed(2)},${y.toFixed(2)}`);
+    }
+  }
+
+  const tailPath = tailPoints.length
+    ? `${cutoffX.toFixed(2)},${baseline.toFixed(2)} ${cutoffX.toFixed(2)},${cutoffY.toFixed(2)} ${tailPoints.join(" ")} ${right.toFixed(2)},${baseline.toFixed(2)}`
+    : `${right.toFixed(2)},${baseline.toFixed(2)} ${right.toFixed(2)},${baseline.toFixed(2)} ${right.toFixed(2)},${baseline.toFixed(2)}`;
+
+  element.hidden = false;
+  element.innerHTML = `
+    <svg viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-label="Percentile distribution">
+      <line class="percentile-axis" x1="${left}" y1="${baseline}" x2="${right}" y2="${baseline}" />
+      <polygon class="percentile-tail" points="${tailPath}" />
+      <polyline class="percentile-curve" points="${points.join(" ")}" />
+      <line class="percentile-marker" x1="${cutoffX}" y1="${baseline}" x2="${cutoffX}" y2="${cutoffY}" />
+      <circle class="percentile-dot" cx="${cutoffX}" cy="${cutoffY}" r="2" />
+    </svg>
+    <p><span class="stat-value">Top ${formatNumber(percentile, 2)}%</span></p>
+  `;
+};
+
 const renderStats = ({ leetcode, monkeytype }) => {
   const solved = leetcode?.solved;
   const contest = leetcode?.contest;
   const leaderboard = monkeytype?.leaderboard;
   setText(
     "#leetcode-solved",
-    solved
-      ? `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`
-      : unavailableText
+    unavailableText
   );
+  if (solved) {
+    setStatMarkup(
+      "#leetcode-solved",
+      `<span class="stat-value">${formatNumber(solved.all)}</span> solved (<span class="stat-value">${formatNumber(solved.easy)}</span> easy · <span class="stat-value">${formatNumber(solved.medium)}</span> medium · <span class="stat-value">${formatNumber(solved.hard)}</span> hard)`
+    );
+  }
   setText(
     "#leetcode-contest",
-    contest?.rating && contest?.topPercentage
-      ? `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`
-      : unavailableText
+    unavailableText
   );
+  if (contest?.rating && contest?.topPercentage) {
+    setStatMarkup(
+      "#leetcode-contest",
+      `Contest rating: <span class="stat-value">${formatNumber(Math.round(contest.rating))}</span> · top <span class="stat-value">${formatNumber(contest.topPercentage, 2)}%</span>`
+    );
+  }
+  renderPercentile("#leetcode-percentile", contest?.topPercentage);
 
   if (!monkeytype) {
     setText("#monkeytype-summary", unavailableText);
     setText("#monkeytype-pb", unavailableText);
+    renderPercentile("#monkeytype-percentile", null);
     return;
   }
 
   const typingHours = monkeytype.timeTypingSeconds / 3600;
   const topPercent = leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
 
-  setText(
+  setStatMarkup(
     "#monkeytype-summary",
-    `${formatNumber(monkeytype.completedTests)} tests completed · ${formatNumber(typingHours, 1)}h total typing`
+    `<span class="stat-value">${formatNumber(monkeytype.completedTests)}</span> tests completed · <span class="stat-value">${formatNumber(typingHours, 1)}h</span> total typing`
   );
-  setText(
+  setStatMarkup(
     "#monkeytype-pb",
     topPercent
-      ? `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM`
+      ? `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span> · top <span class="stat-value">${formatNumber(topPercent, 2)}%</span>`
+      : `PB (60s): <span class="stat-value">${formatNumber(monkeytype.pb60, 2)} WPM</span>`
   );
+  renderPercentile("#monkeytype-percentile", topPercent);
 };
 
 const parseMonkeytypeProfile = (payload) => {
@@ -171,6 +275,8 @@ const setStatsFallback = () => {
   ["#leetcode-solved", "#leetcode-contest", "#monkeytype-summary", "#monkeytype-pb"].forEach((selector) => {
     setText(selector, unavailableText);
   });
+  renderPercentile("#leetcode-percentile", null);
+  renderPercentile("#monkeytype-percentile", null);
 };
 
 const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
