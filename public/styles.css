@@ -8,6 +8,8 @@
   --text: #d7d7d7;
   --muted: #a1a1a1;
   --line: #2a2a2a;
+  --blob-a: rgba(88, 101, 242, 0.52);
+  --blob-b: rgba(10, 200, 185, 0.46);
 }
 
 :root[data-theme="light"] {
@@ -15,6 +17,8 @@
   --text: #161616;
   --muted: #505050;
   --line: #d5d5d5;
+  --blob-a: rgba(115, 125, 255, 0.28);
+  --blob-b: rgba(28, 166, 224, 0.24);
 }
 
 * {
@@ -147,6 +151,49 @@ button {
   padding-block: calc(var(--header-h) + var(--space-3)) calc(var(--footer-h) + var(--space-3));
   display: grid;
   gap: var(--space-3);
+}
+
+.layout > section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.layout > section::before,
+.layout > section::after {
+  content: "";
+  position: absolute;
+  width: clamp(210px, 36vw, 420px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0.22;
+  filter: blur(68px);
+  pointer-events: none;
+  z-index: -1;
+  animation: blob-drift 34s ease-in-out infinite alternate;
+}
+
+.layout > section::before {
+  top: -28%;
+  left: -16%;
+  background: radial-gradient(circle at 30% 30%, var(--blob-a), transparent 70%);
+}
+
+.layout > section::after {
+  right: -18%;
+  bottom: -34%;
+  background: radial-gradient(circle at 68% 65%, var(--blob-b), transparent 74%);
+  animation-delay: -11s;
+}
+
+@keyframes blob-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(18px, -14px, 0) scale(1.08);
+  }
 }
 
 .section {
@@ -332,6 +379,14 @@ button {
 
 .footer-content {
   font-size: 0.8rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout > section::before,
+  .layout > section::after {
+    animation: none;
+    transform: none;
+  }
 }
 
 @media (max-width: 700px) {
