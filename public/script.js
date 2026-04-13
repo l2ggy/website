@@ -26,6 +26,62 @@ const renderByKind = {
   project: renderProject,
 };
 
+const renderLeetCodeStats = (stats) => {
+  const cards = [
+    {
+      title: "Problems solved",
+      value: String(stats.totalSolved),
+    },
+    {
+      title: "Easy / Medium / Hard",
+      value: `${stats.easySolved} / ${stats.mediumSolved} / ${stats.hardSolved}`,
+    },
+    {
+      title: "Contest rating",
+      value: stats.rating ?? "No rating yet",
+    },
+  ];
+
+  return cards
+    .map(
+      ({ title, value }) => `
+        <article class="entry stat-entry">
+          <div class="entry-main">
+            <h3>${title}</h3>
+            <p class="entry-dates">${value}</p>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
+};
+
+const loadLeetCodeStats = async () => {
+  const section = document.querySelector("#leetcode");
+  const container = document.querySelector("#leetcode-stats");
+  const user = section?.dataset.leetcodeUser?.trim();
+
+  if (!section || !container || !user || user === "your-leetcode-username") {
+    container.innerHTML = `
+      <article class="entry stat-entry">
+        <div class="entry-main">
+          <h3>LeetCode username needed</h3>
+          <p class="entry-dates">Set data-leetcode-user in index.html.</p>
+        </div>
+      </article>
+    `;
+    return;
+  }
+
+  const response = await fetch(`/api/leetcode/${encodeURIComponent(user)}`);
+  if (!response.ok) {
+    throw new Error("Unable to load LeetCode stats.");
+  }
+
+  const payload = await response.json();
+  container.innerHTML = renderLeetCodeStats(payload);
+};
+
 const renderGitHubHeatmap = () => {
   const section = document.querySelector(".hero-heatmap-wrap");
   const heatmapImage = document.querySelector("#github-heatmap");
@@ -96,3 +152,15 @@ document.querySelectorAll(".entries").forEach((element) => {
 });
 
 renderGitHubHeatmap();
+loadLeetCodeStats().catch(() => {
+  const container = document.querySelector("#leetcode-stats");
+  if (!container) return;
+  container.innerHTML = `
+    <article class="entry stat-entry">
+      <div class="entry-main">
+        <h3>Unable to load LeetCode stats</h3>
+        <p class="entry-dates">Please try again later.</p>
+      </div>
+    </article>
+  `;
+});

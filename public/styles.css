@@ -233,6 +233,16 @@ button {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.stat-entry {
+  grid-template-columns: minmax(0, 1fr);
+  border: 1px solid var(--line);
+  padding: 0.7rem 0.8rem;
+}
+
 .project-tools {
   color: var(--text);
   font-size: 0.9em;
