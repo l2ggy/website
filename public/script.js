@@ -48,6 +48,105 @@ const renderGitHubHeatmap = () => {
   heatmapImage.alt = `${user}'s GitHub contribution heatmap`;
 };
 
+const initHeroNetwork = () => {
+  const svg = document.querySelector("#hero-network");
+  if (!svg) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+  if (reducedMotion || coarsePointer) {
+    svg.remove();
+    return;
+  }
+
+  const points = [
+    [0.08, 0.24],
+    [0.16, 0.64],
+    [0.24, 0.38],
+    [0.31, 0.78],
+    [0.42, 0.18],
+    [0.48, 0.56],
+    [0.58, 0.32],
+    [0.64, 0.74],
+    [0.72, 0.12],
+    [0.78, 0.48],
+    [0.86, 0.82],
+    [0.92, 0.28],
+  ];
+
+  const namespace = "http://www.w3.org/2000/svg";
+  const pointElements = points.map(() => {
+    const circle = document.createElementNS(namespace, "circle");
+    circle.setAttribute("class", "hero-network-point");
+    circle.setAttribute("r", "2.3");
+    svg.appendChild(circle);
+    return circle;
+  });
+
+  const lineElements = Array.from({ length: 3 }, () => {
+    const line = document.createElementNS(namespace, "line");
+    line.setAttribute("class", "hero-network-line");
+    svg.appendChild(line);
+    return line;
+  });
+
+  const state = { queued: null, rafId: 0 };
+  const placePoints = () => {
+    const bounds = svg.getBoundingClientRect();
+    svg.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
+    points.forEach(([x, y], index) => {
+      pointElements[index].setAttribute("cx", `${x * bounds.width}`);
+      pointElements[index].setAttribute("cy", `${y * bounds.height}`);
+    });
+  };
+
+  const clearTransient = () => {
+    pointElements.forEach((node) => node.classList.remove("is-active"));
+    lineElements.forEach((line) => line.style.opacity = "0");
+  };
+
+  const draw = () => {
+    state.rafId = 0;
+    if (!state.queued) return;
+
+    const { x, y } = state.queued;
+    const bounds = svg.getBoundingClientRect();
+    const nearest = points
+      .map(([px, py], index) => {
+        const ax = px * bounds.width;
+        const ay = py * bounds.height;
+        return { index, ax, ay, distance: Math.hypot(x - ax, y - ay) };
+      })
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, lineElements.length);
+
+    pointElements.forEach((node) => node.classList.remove("is-active"));
+    lineElements.forEach((line) => line.style.opacity = "0");
+    nearest.forEach((target, index) => {
+      pointElements[target.index].classList.add("is-active");
+      const line = lineElements[index];
+      line.setAttribute("x1", `${target.ax}`);
+      line.setAttribute("y1", `${target.ay}`);
+      line.setAttribute("x2", `${x}`);
+      line.setAttribute("y2", `${y}`);
+      line.style.opacity = `${Math.max(0.16, 1 - target.distance / 220)}`;
+    });
+  };
+
+  const queueDraw = (x, y) => {
+    const bounds = svg.getBoundingClientRect();
+    state.queued = { x: x - bounds.left, y: y - bounds.top };
+    if (!state.rafId) {
+      state.rafId = requestAnimationFrame(draw);
+    }
+  };
+
+  placePoints();
+  window.addEventListener("resize", placePoints);
+  svg.closest(".hero")?.addEventListener("pointermove", ({ clientX, clientY }) => queueDraw(clientX, clientY));
+  svg.closest(".hero")?.addEventListener("pointerleave", clearTransient);
+};
+
 const loadEntries = async (element) => {
   const source = element.dataset.source;
   const kind = element.dataset.kind || "entry";
@@ -220,3 +319,4 @@ document.querySelectorAll(".entries").forEach((element) => {
 
 loadStats().catch(setStatsFallback);
 renderGitHubHeatmap();
+initHeroNetwork();
