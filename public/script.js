@@ -63,38 +63,88 @@ const formatNumber = (value, digits = 0) =>
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(value);
+const unavailableText = "Unavailable right now.";
+const monkeytypeProfileEndpoints = (username) => {
+  const encoded = encodeURIComponent(username);
+  return [
+    `https://api.monkeytype.com/users/${encoded}/profile?isUid=false`,
+    `https://api.monkeytype.com/users/${encoded}/profile`,
+  ];
+};
+const setText = (selector, text) => {
+  const element = document.querySelector(selector);
+  if (element) {
+    element.textContent = text;
+  }
+};
 
 const renderStats = ({ leetcode, monkeytype }) => {
   const solved = leetcode?.solved;
   const contest = leetcode?.contest;
   const leaderboard = monkeytype?.leaderboard;
+  setText(
+    "#leetcode-solved",
+    solved
+      ? `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`
+      : unavailableText
+  );
+  setText(
+    "#leetcode-contest",
+    contest?.rating && contest?.topPercentage
+      ? `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`
+      : unavailableText
+  );
 
-  const leetcodeSolved = document.querySelector("#leetcode-solved");
-  const leetcodeContest = document.querySelector("#leetcode-contest");
-  const monkeytypeSummary = document.querySelector("#monkeytype-summary");
-  const monkeytypePb = document.querySelector("#monkeytype-pb");
-
-  if (leetcodeSolved && solved) {
-    leetcodeSolved.textContent = `${formatNumber(solved.all)} solved (${formatNumber(solved.easy)} easy · ${formatNumber(solved.medium)} medium · ${formatNumber(solved.hard)} hard)`;
+  if (!monkeytype) {
+    setText("#monkeytype-summary", unavailableText);
+    setText("#monkeytype-pb", unavailableText);
+    return;
   }
 
-  if (leetcodeContest && contest?.rating && contest?.topPercentage) {
-    leetcodeContest.textContent = `Contest rating: ${formatNumber(Math.round(contest.rating))} · top ${formatNumber(contest.topPercentage, 2)}%`;
+  const typingHours = monkeytype.timeTypingSeconds / 3600;
+  const topPercent = leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
+
+  setText(
+    "#monkeytype-summary",
+    `${formatNumber(monkeytype.completedTests)} tests completed · ${formatNumber(typingHours, 1)}h total typing`
+  );
+  setText(
+    "#monkeytype-pb",
+    topPercent
+      ? `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
+      : `PB (60s): ${formatNumber(monkeytype.pb60, 2)} WPM`
+  );
+};
+
+const parseMonkeytypeProfile = (payload) => {
+  const data = payload?.data || {};
+  const typingStats = data.typingStats || {};
+  const personalBest60 = data?.personalBests?.time?.["60"] || [];
+  const leaderboard = data?.allTimeLbs?.time?.["60"]?.english || {};
+
+  return {
+    completedTests: typingStats.completedTests ?? typingStats.testsCompleted ?? 0,
+    timeTypingSeconds: typingStats.timeTyping ?? 0,
+    pb60: personalBest60.reduce((best, run) => Math.max(best, run?.wpm || 0), 0),
+    leaderboard: {
+      rank: leaderboard.rank || null,
+      count: leaderboard.count || null,
+    },
+  };
+};
+
+const loadMonkeytypeDirect = async (username) => {
+  for (const endpoint of monkeytypeProfileEndpoints(username)) {
+    const response = await fetch(endpoint, { headers: { accept: "application/json" } });
+    if (!response.ok) {
+      continue;
+    }
+
+    const payload = await response.json();
+    return parseMonkeytypeProfile(payload);
   }
 
-  if (monkeytypeSummary) {
-    const typingHours = (monkeytype?.timeTypingSeconds || 0) / 3600;
-    monkeytypeSummary.textContent = `${formatNumber(monkeytype?.completedTests || 0)} tests completed · ${formatNumber(typingHours, 1)}h total typing`;
-  }
-
-  if (monkeytypePb) {
-    const topPercent =
-      leaderboard?.rank && leaderboard?.count ? (leaderboard.rank / leaderboard.count) * 100 : null;
-
-    monkeytypePb.textContent = topPercent
-      ? `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM · top ${formatNumber(topPercent, 2)}%`
-      : `PB (60s): ${formatNumber(monkeytype?.pb60 || 0, 2)} WPM`;
-  }
+  return null;
 };
 
 const loadStats = async () => {
@@ -111,15 +161,15 @@ const loadStats = async () => {
   }
 
   const payload = await response.json();
+  if (!payload.monkeytype) {
+    payload.monkeytype = await loadMonkeytypeDirect(monkeytype).catch(() => null);
+  }
   renderStats(payload);
 };
 
 const setStatsFallback = () => {
   ["#leetcode-solved", "#leetcode-contest", "#monkeytype-summary", "#monkeytype-pb"].forEach((selector) => {
-    const element = document.querySelector(selector);
-    if (element) {
-      element.textContent = "Unavailable right now.";
-    }
+    setText(selector, unavailableText);
   });
 };
 
