@@ -103,7 +103,7 @@ const geoToVector = (lat, lon) => {
   const latRad = (lat * Math.PI) / 180;
   const lonRad = (lon * Math.PI) / 180;
   const cosLat = Math.cos(latRad);
-  return [cosLat * Math.cos(lonRad), Math.sin(latRad), cosLat * Math.sin(lonRad)];
+  return [cosLat * Math.cos(lonRad), Math.sin(latRad), -cosLat * Math.sin(lonRad)];
 };
 
 const buildSphereSamples = (size) => {
