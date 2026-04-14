@@ -1,8 +1,7 @@
 const TAU = Math.PI * 2;
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
-const TORONTO = { lat: 43.6532, lon: -79.3832 };
-const TORONTO_COLOR = "#1E3765";
+const MARKER_COLOR = "#1E3765";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -136,35 +135,46 @@ const loadLandMask = () => {
   return landMaskPromise;
 };
 
-const renderTorontoMarker = (ctx, center, radius, yaw, pitch, dpr) => {
-  const markerVector = geoToVector(TORONTO.lat, TORONTO.lon);
-  let marker = rotateY(markerVector, Math.cos(yaw), Math.sin(yaw));
-  marker = rotateX(marker, Math.cos(pitch), Math.sin(pitch));
-  if (marker[2] <= 0) {
-    return;
-  }
+const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
+  const cosYaw = Math.cos(yaw);
+  const sinYaw = Math.sin(yaw);
+  const cosPitch = Math.cos(pitch);
+  const sinPitch = Math.sin(pitch);
 
-  const x = center + marker[0] * radius;
-  const y = center - marker[1] * radius;
-  const dot = Math.max(2, radius * 0.025);
+  markers.forEach((marker) => {
+    const markerVector = geoToVector(marker.lat, marker.lon);
+    let rotated = rotateY(markerVector, cosYaw, sinYaw);
+    rotated = rotateX(rotated, cosPitch, sinPitch);
+    if (rotated[2] <= 0) {
+      return;
+    }
 
-  ctx.beginPath();
-  ctx.arc(x, y, dot * 1.9, 0, TAU);
-  ctx.strokeStyle = `${TORONTO_COLOR}b8`;
-  ctx.lineWidth = Math.max(1, dpr * 0.9);
-  ctx.stroke();
+    const x = center + rotated[0] * radius;
+    const y = center - rotated[1] * radius;
+    const weight = Number.isFinite(marker.count) ? marker.count : 1;
+    const dot = Math.max(2, radius * (0.017 + Math.min(weight, 12) * 0.002));
 
-  ctx.beginPath();
-  ctx.arc(x, y, dot, 0, TAU);
-  ctx.fillStyle = TORONTO_COLOR;
-  ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, dot * 1.9, 0, TAU);
+    ctx.strokeStyle = `${MARKER_COLOR}b8`;
+    ctx.lineWidth = Math.max(1, dpr * 0.9);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(x, y, dot, 0, TAU);
+    ctx.fillStyle = MARKER_COLOR;
+    ctx.fill();
+  });
 };
 
-export const setupInteractiveGlobe = () => {
+export const setupInteractiveGlobe = (markers = []) => {
   const globe = document.querySelector("#hero-globe");
   if (!globe) {
     return;
   }
+  const safeMarkers = markers.filter(
+    (marker) => Number.isFinite(marker?.lat) && Number.isFinite(marker?.lon),
+  );
 
   const ctx = globe.getContext("2d", { alpha: true });
   if (!ctx) {
@@ -229,7 +239,7 @@ export const setupInteractiveGlobe = () => {
       });
 
       ctx.putImageData(output, 0, 0);
-      renderTorontoMarker(ctx, center, radius, yaw, pitch, dpr);
+      renderMarkers(ctx, center, radius, yaw, pitch, dpr, safeMarkers);
     }
 
     ctx.beginPath();

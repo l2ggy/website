@@ -296,6 +296,13 @@ button {
   margin-left: auto;
 }
 
+.globe-visitor-count {
+  margin-bottom: var(--space-1);
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: right;
+}
+
 .hero-globe {
   width: 100%;
   height: auto;

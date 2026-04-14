@@ -36,11 +36,35 @@ const initStats = () => {
   loadStats(section).then(renderStats).catch(setStatsFallback);
 };
 
+const initVisitStats = async () => {
+  try {
+    await fetch("/api/visit", { method: "POST", keepalive: true });
+  } catch {
+    // no-op
+  }
+
+  try {
+    const response = await fetch("/api/visit-stats");
+    if (!response.ok) {
+      return null;
+    }
+    return await response.json();
+  } catch {
+    return null;
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   setupTheme();
   splitHeroNameLetters();
   initEntries();
   initStats();
   renderGitHubHeatmap();
-  setupInteractiveGlobe();
+  initVisitStats().then((visitStats) => {
+    const visitCount = document.querySelector("#visitor-count");
+    if (visitCount && typeof visitStats?.totalVisits === "number") {
+      visitCount.textContent = String(visitStats.totalVisits);
+    }
+    setupInteractiveGlobe(visitStats?.locations || []);
+  });
 });
