@@ -301,11 +301,20 @@ button {
   height: auto;
   display: block;
   touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
   cursor: grab;
 }
 
 .hero-globe:active {
   cursor: grabbing;
+}
+
+body.is-globe-dragging,
+body.is-globe-dragging * {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .lower-layout {

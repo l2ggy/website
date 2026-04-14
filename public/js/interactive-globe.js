@@ -250,10 +250,12 @@ export const setupInteractiveGlobe = () => {
   };
 
   const onPointerDown = (event) => {
+    event.preventDefault();
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
     velocity = 0;
+    document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
   };
 
@@ -261,6 +263,7 @@ export const setupInteractiveGlobe = () => {
     if (event.pointerId !== pointerId) {
       return;
     }
+    event.preventDefault();
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
@@ -278,6 +281,7 @@ export const setupInteractiveGlobe = () => {
       return;
     }
     pointerId = null;
+    document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
   };
 
@@ -300,4 +304,5 @@ export const setupInteractiveGlobe = () => {
   globe.addEventListener("pointermove", onPointerMove);
   globe.addEventListener("pointerup", onPointerUp);
   globe.addEventListener("pointercancel", onPointerUp);
+  globe.addEventListener("dragstart", (event) => event.preventDefault());
 };
