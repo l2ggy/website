@@ -1,6 +1,7 @@
 const TAU = Math.PI * 2;
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
+const TORONTO = { lat: 43.6532, lon: -79.3832 };
 
 const normalizeLongitude = (lon) => {
   const wrapped = ((lon + 180) % 360 + 360) % 360;
@@ -97,6 +98,13 @@ const createLandMask = (geojson) => {
 const rotateY = ([x, y, z], cos, sin) => [x * cos + z * sin, y, -x * sin + z * cos];
 
 const rotateX = ([x, y, z], cos, sin) => [x, y * cos - z * sin, y * sin + z * cos];
+
+const geoToVector = (lat, lon) => {
+  const latRad = (lat * Math.PI) / 180;
+  const lonRad = (lon * Math.PI) / 180;
+  const cosLat = Math.cos(latRad);
+  return [cosLat * Math.cos(lonRad), Math.sin(latRad), cosLat * Math.sin(lonRad)];
+};
 
 const buildSphereSamples = (size) => {
   const center = size * 0.5;
@@ -197,7 +205,7 @@ export const setupInteractiveGlobe = () => {
         let rotated = rotateX(vector, cosPitch, sinPitch);
         rotated = rotateY(rotated, cosYaw, sinYaw);
 
-        const lon = Math.atan2(rotated[2], rotated[0]);
+        const lon = Math.atan2(-rotated[2], rotated[0]);
         const lat = Math.asin(rotated[1]);
 
         const u = ((lon + Math.PI) / TAU) * (landMask.width - 1);
@@ -215,6 +223,26 @@ export const setupInteractiveGlobe = () => {
       });
 
       ctx.putImageData(output, 0, 0);
+
+      const markerVector = geoToVector(TORONTO.lat, TORONTO.lon);
+      let marker = rotateY(markerVector, Math.cos(yaw), Math.sin(yaw));
+      marker = rotateX(marker, Math.cos(pitch), Math.sin(pitch));
+      if (marker[2] > 0) {
+        const markerX = center + marker[0] * radius;
+        const markerY = center - marker[1] * radius;
+        const markerSize = Math.max(2, radius * 0.025);
+
+        ctx.beginPath();
+        ctx.arc(markerX, markerY, markerSize * 1.9, 0, TAU);
+        ctx.strokeStyle = `${text}88`;
+        ctx.lineWidth = Math.max(1, (window.devicePixelRatio || 1) * 0.9);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(markerX, markerY, markerSize, 0, TAU);
+        ctx.fillStyle = `${text}e8`;
+        ctx.fill();
+      }
     }
 
     ctx.beginPath();
