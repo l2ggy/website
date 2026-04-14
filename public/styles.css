@@ -291,9 +291,8 @@ button {
 }
 
 .hero-globe-wrap {
-  width: min(30vw, 182px);
-  min-width: 128px;
-  margin-left: auto;
+  width: min(34vw, 260px);
+  min-width: 170px;
 }
 
 .hero-globe {
@@ -309,8 +308,19 @@ button {
 }
 
 .globe-section {
-  margin-top: -0.7rem;
-  margin-bottom: -0.2rem;
+  align-self: start;
+}
+
+.closing-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-3);
+}
+
+.closing-main {
+  display: grid;
+  gap: var(--space-3);
 }
 
 .hero-heatmap-wrap {
@@ -634,8 +644,13 @@ button {
   }
 
   .hero-globe-wrap {
-    width: min(48vw, 176px);
-    margin-left: 0;
+    width: min(64vw, 220px);
+    min-width: 0;
+  }
+
+  .closing-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
   }
 
   .entry-head {

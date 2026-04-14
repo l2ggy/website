@@ -45,12 +45,6 @@
           <img class="hero-heatmap" id="github-heatmap" src="" alt="GitHub contribution heatmap" loading="lazy" />
         </div>
       </section>
-      <section class="section globe-section" aria-label="Interactive globe">
-        <div class="hero-globe-wrap">
-          <canvas class="hero-globe" id="hero-globe" width="188" height="188" aria-label="Interactive globe"></canvas>
-        </div>
-      </section>
-
       <section class="section" id="education">
         <h2>Education</h2>
         <div class="entries" data-source="education.json" data-kind="entry"></div>
@@ -87,15 +81,24 @@
         <div class="entries" data-source="projects.json" data-kind="project"></div>
       </section>
 
-      <section class="section" id="leadership">
-        <h2>Leadership</h2>
-        <div class="entries leadership-list" data-source="leadership.json" data-kind="leadership"></div>
-      </section>
+      <div class="closing-layout">
+        <div class="closing-main">
+          <section class="section" id="leadership">
+            <h2>Leadership</h2>
+            <div class="entries leadership-list" data-source="leadership.json" data-kind="leadership"></div>
+          </section>
 
-      <section class="section" id="contact">
-        <h2>Contact</h2>
-        <div class="entries" data-source="contact.json" data-kind="contact"></div>
-      </section>
+          <section class="section" id="contact">
+            <h2>Contact</h2>
+            <div class="entries" data-source="contact.json" data-kind="contact"></div>
+          </section>
+        </div>
+        <section class="section globe-section" aria-label="Interactive globe">
+          <div class="hero-globe-wrap">
+            <canvas class="hero-globe" id="hero-globe" width="240" height="240" aria-label="Interactive globe"></canvas>
+          </div>
+        </section>
+      </div>
     </main>
 
     <footer class="bar bottombar">
