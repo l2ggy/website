@@ -33,8 +33,8 @@ const unwrapRing = (ring) => {
 
 const drawRing = (ctx, ring, shift = 0) => {
   ring.forEach(([lon, lat], index) => {
-    const x = ((lon + shift + 180) / 360) * MASK_WIDTH;
-    const y = ((90 - lat) / 180) * MASK_HEIGHT;
+    const x = ((lon + shift + 180) / 360) * (MASK_WIDTH - 1);
+    const y = ((90 - lat) / 180) * (MASK_HEIGHT - 1);
 
     if (index === 0) {
       ctx.moveTo(x, y);
@@ -251,7 +251,7 @@ export const setupInteractiveGlobe = () => {
     dragX = event.clientX;
     dragY = event.clientY;
     yaw += deltaX * 0.012;
-    pitch = Math.max(-1.3, Math.min(1.3, pitch - deltaY * 0.008));
+    pitch = Math.max(-1.3, Math.min(1.3, pitch + deltaY * 0.008));
     velocity = deltaX * 0.00075;
     draw();
   };
