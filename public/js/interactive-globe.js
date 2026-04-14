@@ -60,20 +60,18 @@ const createLandMask = (geojson) => {
   context.fillRect(0, 0, MASK_WIDTH, MASK_HEIGHT);
   context.fillStyle = "#fff";
 
-  const drawPolygon = (rings) => {
-    if (!rings.length) {
+  const drawPolygon = (ring) => {
+    if (!ring?.length) {
       return;
     }
 
-    context.beginPath();
-    rings.forEach((ring) => {
-      const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
-      const unwrapped = unwrapRing(normalized);
-      drawRing(context, unwrapped, 0);
-      drawRing(context, unwrapped, -360);
-      drawRing(context, unwrapped, 360);
+    const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
+    const unwrapped = unwrapRing(normalized);
+    [-360, 0, 360].forEach((shift) => {
+      context.beginPath();
+      drawRing(context, unwrapped, shift);
+      context.fill();
     });
-    context.fill("evenodd");
   };
 
   geojson.features?.forEach((feature) => {
@@ -83,12 +81,12 @@ const createLandMask = (geojson) => {
     }
 
     if (geometry.type === "Polygon") {
-      drawPolygon(geometry.coordinates);
+      drawPolygon(geometry.coordinates[0]);
       return;
     }
 
     if (geometry.type === "MultiPolygon") {
-      geometry.coordinates.forEach((polygon) => drawPolygon(polygon));
+      geometry.coordinates.forEach((polygon) => drawPolygon(polygon[0]));
     }
   });
 
@@ -118,7 +116,7 @@ const buildSphereSamples = (size) => {
       samples.push({
         x,
         y,
-        vector: [xN, yN, zN]
+        vector: [xN, -yN, zN]
       });
     }
   }
@@ -163,11 +161,11 @@ export const setupInteractiveGlobe = () => {
 
   const updateSize = () => {
     const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const size = Math.max(120, Math.round(globe.clientWidth || 188));
-    globe.width = Math.round(size * dpr);
-    globe.height = Math.round(size * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    sphere = buildSphereSamples(size);
+    const cssSize = Math.max(120, Math.round(globe.clientWidth || 188));
+    const pixelSize = Math.round(cssSize * dpr);
+    globe.width = pixelSize;
+    globe.height = pixelSize;
+    sphere = buildSphereSamples(pixelSize);
   };
 
   const draw = () => {
@@ -222,7 +220,7 @@ export const setupInteractiveGlobe = () => {
     ctx.beginPath();
     ctx.arc(center, center, radius * 0.99, 0, TAU);
     ctx.strokeStyle = `${text}55`;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = Math.max(1, window.devicePixelRatio || 1);
     ctx.stroke();
   };
 
