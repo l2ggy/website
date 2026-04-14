@@ -290,6 +290,40 @@ button {
   gap: 0.2rem;
 }
 
+.hero-globe-wrap {
+  width: min(35vw, 250px);
+  min-width: 170px;
+  margin-left: auto;
+}
+
+.hero-globe {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+}
+
+.hero-globe:active {
+  cursor: grabbing;
+}
+
+.globe-section {
+  align-content: start;
+}
+
+.lower-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.lower-main {
+  display: grid;
+  gap: var(--space-3);
+}
+
 .hero-heatmap-wrap {
   position: absolute;
   top: 50%;
@@ -608,6 +642,20 @@ button {
   .hero-heatmap {
     width: 100%;
     max-width: 100%;
+  }
+
+  .hero-globe-wrap {
+    width: min(70vw, 240px);
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .lower-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .globe-section {
+    margin-top: -0.2rem;
   }
 
   .entry-head {
