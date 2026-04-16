@@ -8,3 +8,8 @@ binding = "ASSETS"
 
 [build]
 command = "node scripts/sync-shared-monkeytype.mjs"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-visits"
+database_id = "6fb68f3d-a55c-4355-9e6e-af65475f7f28"
