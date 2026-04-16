@@ -192,11 +192,13 @@ export const setupInteractiveGlobe = (markers = []) => {
   let pitch = 0.05;
   let velocity = 0.005;
   let pointerId = null;
+  let pointerType = "mouse";
   let previousX = 0;
   let previousY = 0;
   let dpr = Math.max(1, window.devicePixelRatio || 1);
   let sphere = buildSphereSamples(globe.clientWidth || 248);
   let landMask = null;
+  let isAnimating = false;
 
   const updateSize = () => {
     dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -269,6 +271,7 @@ export const setupInteractiveGlobe = (markers = []) => {
   const onPointerDown = (event) => {
     event.preventDefault();
     pointerId = event.pointerId;
+    pointerType = event.pointerType || "mouse";
     previousX = event.clientX;
     previousY = event.clientY;
     velocity = 0;
@@ -282,15 +285,23 @@ export const setupInteractiveGlobe = (markers = []) => {
     }
     event.preventDefault();
 
-    const deltaX = event.clientX - previousX;
-    const deltaY = event.clientY - previousY;
-    previousX = event.clientX;
-    previousY = event.clientY;
+    const coalescedEvents = event.getCoalescedEvents?.();
+    const latestEvent = coalescedEvents?.length
+      ? coalescedEvents[coalescedEvents.length - 1]
+      : event;
 
-    yaw += deltaX * 0.012;
-    pitch = clamp(pitch + deltaY * 0.008, -1.3, 1.3);
-    velocity = deltaX * 0.00075;
-    draw();
+    const deltaX = latestEvent.clientX - previousX;
+    const deltaY = latestEvent.clientY - previousY;
+    previousX = latestEvent.clientX;
+    previousY = latestEvent.clientY;
+
+    const dragScale = pointerType === "touch" ? 1.55 : pointerType === "pen" ? 1.2 : 1;
+    yaw += deltaX * 0.012 * dragScale;
+    pitch = clamp(pitch + deltaY * 0.008 * dragScale, -1.3, 1.3);
+    velocity = deltaX * 0.00075 * dragScale;
+    if (!isAnimating) {
+      draw();
+    }
   };
 
   const onPointerUp = (event) => {
@@ -306,7 +317,8 @@ export const setupInteractiveGlobe = (markers = []) => {
     updateSize();
     draw();
 
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isAnimating) {
       window.requestAnimationFrame(onFrame);
     }
   };
