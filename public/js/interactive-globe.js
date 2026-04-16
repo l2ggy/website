@@ -195,11 +195,18 @@ export const setupInteractiveGlobe = (markers = []) => {
   let previousX = 0;
   let previousY = 0;
   let dpr = Math.max(1, window.devicePixelRatio || 1);
+  let isAnimating = false;
   let sphere = buildSphereSamples(globe.clientWidth || 248);
   let landMask = null;
 
+  const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+  const getRenderDpr = () => {
+    const nextDpr = Math.max(1, window.devicePixelRatio || 1);
+    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+  };
+
   const updateSize = () => {
-    dpr = Math.max(1, window.devicePixelRatio || 1);
+    dpr = getRenderDpr();
     const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
     const pixelSize = Math.round(cssSize * dpr);
     globe.width = pixelSize;
@@ -286,11 +293,17 @@ export const setupInteractiveGlobe = (markers = []) => {
     const deltaY = event.clientY - previousY;
     previousX = event.clientX;
     previousY = event.clientY;
+    const dragScale = event.pointerType === "touch" ? 1.45 : 1;
+    const yawFactor = 0.012 * dragScale;
+    const pitchFactor = 0.008 * dragScale;
+    const velocityFactor = 0.00075 * dragScale;
 
-    yaw += deltaX * 0.012;
-    pitch = clamp(pitch + deltaY * 0.008, -1.3, 1.3);
-    velocity = deltaX * 0.00075;
-    draw();
+    yaw += deltaX * yawFactor;
+    pitch = clamp(pitch + deltaY * pitchFactor, -1.3, 1.3);
+    velocity = deltaX * velocityFactor;
+    if (!isAnimating) {
+      draw();
+    }
   };
 
   const onPointerUp = (event) => {
@@ -305,8 +318,8 @@ export const setupInteractiveGlobe = (markers = []) => {
   const start = () => {
     updateSize();
     draw();
-
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isAnimating) {
       window.requestAnimationFrame(onFrame);
     }
   };
