@@ -1,7 +1,9 @@
 const TAU = Math.PI * 2;
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
-const MARKER_COLOR = "#1E3765";
+const HOME_MARKER_COLOR = "#1E3765";
+const VISITOR_MARKER_COLOR = "#8A6E4A";
+const HOME_MARKER = { lat: 43.6532, lon: -79.3832, count: 1 };
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -135,36 +137,59 @@ const loadLandMask = () => {
   return landMaskPromise;
 };
 
-const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
+const drawMarker = (ctx, x, y, dot, color, dpr, withRing = false) => {
+  if (withRing) {
+    ctx.beginPath();
+    ctx.arc(x, y, dot * 1.9, 0, TAU);
+    ctx.strokeStyle = `${color}b8`;
+    ctx.lineWidth = Math.max(1, dpr * 0.9);
+    ctx.stroke();
+  }
+
+  ctx.beginPath();
+  ctx.arc(x, y, dot, 0, TAU);
+  ctx.fillStyle = color;
+  ctx.fill();
+};
+
+const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers, homeMarker) => {
   const cosYaw = Math.cos(yaw);
   const sinYaw = Math.sin(yaw);
   const cosPitch = Math.cos(pitch);
   const sinPitch = Math.sin(pitch);
 
-  markers.forEach((marker) => {
+  const projectMarker = (marker) => {
     const markerVector = geoToVector(marker.lat, marker.lon);
     let rotated = rotateY(markerVector, cosYaw, sinYaw);
     rotated = rotateX(rotated, cosPitch, sinPitch);
     if (rotated[2] <= 0) {
+      return null;
+    }
+
+    return {
+      x: center + rotated[0] * radius,
+      y: center - rotated[1] * radius,
+    };
+  };
+
+  markers.forEach((marker) => {
+    const position = projectMarker(marker);
+    if (!position) {
       return;
     }
 
-    const x = center + rotated[0] * radius;
-    const y = center - rotated[1] * radius;
     const weight = Number.isFinite(marker.count) ? marker.count : 1;
-    const dot = Math.max(2, radius * (0.017 + Math.min(weight, 12) * 0.002));
-
-    ctx.beginPath();
-    ctx.arc(x, y, dot * 1.9, 0, TAU);
-    ctx.strokeStyle = `${MARKER_COLOR}b8`;
-    ctx.lineWidth = Math.max(1, dpr * 0.9);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(x, y, dot, 0, TAU);
-    ctx.fillStyle = MARKER_COLOR;
-    ctx.fill();
+    const dot = Math.max(1.8, radius * (0.012 + Math.min(weight, 12) * 0.0012));
+    drawMarker(ctx, position.x, position.y, dot, VISITOR_MARKER_COLOR, dpr, false);
   });
+
+  const homePosition = projectMarker(homeMarker);
+  if (!homePosition) {
+    return;
+  }
+
+  const homeDot = Math.max(2.2, radius * 0.017);
+  drawMarker(ctx, homePosition.x, homePosition.y, homeDot, HOME_MARKER_COLOR, dpr, true);
 };
 
 export const setupInteractiveGlobe = (markers = []) => {
@@ -239,7 +264,7 @@ export const setupInteractiveGlobe = (markers = []) => {
       });
 
       ctx.putImageData(output, 0, 0);
-      renderMarkers(ctx, center, radius, yaw, pitch, dpr, safeMarkers);
+      renderMarkers(ctx, center, radius, yaw, pitch, dpr, safeMarkers, HOME_MARKER);
     }
 
     ctx.beginPath();
