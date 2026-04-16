@@ -1,7 +1,9 @@
 const TAU = Math.PI * 2;
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
-const MARKER_COLOR = "#1E3765";
+const HOME_MARKER = { lat: 43.65, lon: -79.38 };
+const HOME_MARKER_COLOR = "#1E3765";
+const VISITOR_MARKER_COLOR = "#B5744A";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -152,17 +154,21 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
     const x = center + rotated[0] * radius;
     const y = center - rotated[1] * radius;
     const weight = Number.isFinite(marker.count) ? marker.count : 1;
-    const dot = Math.max(2, radius * (0.017 + Math.min(weight, 12) * 0.002));
+    const dot = marker.isHome
+      ? Math.max(2.8, radius * 0.022)
+      : Math.max(1.4, radius * (0.012 + Math.min(weight, 12) * 0.0016));
 
-    ctx.beginPath();
-    ctx.arc(x, y, dot * 1.9, 0, TAU);
-    ctx.strokeStyle = `${MARKER_COLOR}b8`;
-    ctx.lineWidth = Math.max(1, dpr * 0.9);
-    ctx.stroke();
+    if (marker.isHome) {
+      ctx.beginPath();
+      ctx.arc(x, y, dot * 1.8, 0, TAU);
+      ctx.strokeStyle = `${HOME_MARKER_COLOR}b8`;
+      ctx.lineWidth = Math.max(1, dpr * 0.9);
+      ctx.stroke();
+    }
 
     ctx.beginPath();
     ctx.arc(x, y, dot, 0, TAU);
-    ctx.fillStyle = MARKER_COLOR;
+    ctx.fillStyle = marker.isHome ? HOME_MARKER_COLOR : VISITOR_MARKER_COLOR;
     ctx.fill();
   });
 };
@@ -175,6 +181,7 @@ export const setupInteractiveGlobe = (markers = []) => {
   const safeMarkers = markers.filter(
     (marker) => Number.isFinite(marker?.lat) && Number.isFinite(marker?.lon),
   );
+  const renderableMarkers = [...safeMarkers, { ...HOME_MARKER, isHome: true }];
 
   const ctx = globe.getContext("2d", { alpha: true });
   if (!ctx) {
@@ -239,7 +246,7 @@ export const setupInteractiveGlobe = (markers = []) => {
       });
 
       ctx.putImageData(output, 0, 0);
-      renderMarkers(ctx, center, radius, yaw, pitch, dpr, safeMarkers);
+      renderMarkers(ctx, center, radius, yaw, pitch, dpr, renderableMarkers);
     }
 
     ctx.beginPath();
