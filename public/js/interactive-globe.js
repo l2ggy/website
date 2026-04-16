@@ -69,7 +69,11 @@ const createLandMask = (geojson) => {
 
     const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
     const unwrapped = unwrapRing(normalized);
-    [-360, 0, 360].forEach((shift) => {
+    const longitudes = unwrapped.map(([lon]) => lon);
+    const span = Math.max(...longitudes) - Math.min(...longitudes);
+    const shifts = span > 300 ? [0] : [-360, 0, 360];
+
+    shifts.forEach((shift) => {
       context.beginPath();
       drawRing(context, unwrapped, shift);
       context.fill();
