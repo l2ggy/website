@@ -661,8 +661,11 @@ body.is-globe-dragging * {
   }
 
   .hero-globe-wrap {
-    width: min(60vw, 220px);
-    margin-left: 0;
+    width: min(100%, 17rem);
+    margin-inline: auto;
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
   }
 
   .lower-layout {
@@ -672,6 +675,19 @@ body.is-globe-dragging * {
 
   .globe-column {
     position: static;
+    display: grid;
+    justify-items: center;
+    padding: 0.6rem 0 0.15rem;
+  }
+
+  .globe-visitor-count {
+    margin-bottom: 0;
+    text-align: center;
+    font-size: 0.74rem;
+  }
+
+  .hero-globe {
+    width: clamp(170px, 64vw, 248px);
   }
 
   .entry-head {
