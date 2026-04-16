@@ -9,7 +9,11 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const normalizeLongitude = (lon) => {
   const wrapped = ((lon + 180) % 360 + 360) % 360;
-  return wrapped - 180;
+  const normalized = wrapped - 180;
+  if (normalized === -180 && lon > 0) {
+    return 180;
+  }
+  return normalized;
 };
 
 const unwrapRing = (ring) => {
@@ -22,6 +26,12 @@ const unwrapRing = (ring) => {
     const [lon, lat] = ring[index];
     const previousLon = unwrapped[index - 1][0];
     let adjustedLon = lon;
+    const delta = adjustedLon - previousLon;
+
+    if (Math.abs(delta) === 360) {
+      unwrapped.push([adjustedLon, lat]);
+      continue;
+    }
 
     while (adjustedLon - previousLon > 180) {
       adjustedLon -= 360;
@@ -62,18 +72,23 @@ const createLandMask = (geojson) => {
   context.fillRect(0, 0, MASK_WIDTH, MASK_HEIGHT);
   context.fillStyle = "#fff";
 
-  const fillOuterRing = (ring) => {
-    if (!ring?.length) {
+  const fillPolygon = (rings) => {
+    if (!rings?.length) {
       return;
     }
 
-    const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
-    const unwrapped = unwrapRing(normalized);
-    [-360, 0, 360].forEach((shift) => {
-      context.beginPath();
-      drawRing(context, unwrapped, shift);
-      context.fill();
+    context.beginPath();
+    rings.forEach((ring) => {
+      if (!ring?.length) {
+        return;
+      }
+      const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
+      const unwrapped = unwrapRing(normalized);
+      [-360, 0, 360].forEach((shift) => {
+        drawRing(context, unwrapped, shift);
+      });
     });
+    context.fill("evenodd");
   };
 
   geojson.features?.forEach((feature) => {
@@ -83,9 +98,9 @@ const createLandMask = (geojson) => {
     }
 
     if (geometry.type === "Polygon") {
-      fillOuterRing(geometry.coordinates[0]);
+      fillPolygon(geometry.coordinates);
     } else if (geometry.type === "MultiPolygon") {
-      geometry.coordinates.forEach((polygon) => fillOuterRing(polygon[0]));
+      geometry.coordinates.forEach((polygon) => fillPolygon(polygon));
     }
   });
 
