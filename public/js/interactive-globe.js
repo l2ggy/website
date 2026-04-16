@@ -1,6 +1,7 @@
 const TAU = Math.PI * 2;
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
+const LONGITUDE_SHIFTS = [-360, 0, 360];
 const HOME_MARKER = { lat: 43.65, lon: -79.38 };
 const HOME_MARKER_COLOR = "#1E3765";
 const VISITOR_MARKER_COLOR = "#B5744A";
@@ -9,7 +10,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const normalizeLongitude = (lon) => {
   const wrapped = ((lon + 180) % 360 + 360) % 360;
-  return wrapped - 180;
+  return wrapped === 0 && lon > 0 ? 180 : wrapped - 180;
 };
 
 const unwrapRing = (ring) => {
@@ -22,6 +23,12 @@ const unwrapRing = (ring) => {
     const [lon, lat] = ring[index];
     const previousLon = unwrapped[index - 1][0];
     let adjustedLon = lon;
+    const delta = adjustedLon - previousLon;
+
+    if (Math.abs(delta) === 360) {
+      unwrapped.push([adjustedLon, lat]);
+      continue;
+    }
 
     while (adjustedLon - previousLon > 180) {
       adjustedLon -= 360;
@@ -62,18 +69,26 @@ const createLandMask = (geojson) => {
   context.fillRect(0, 0, MASK_WIDTH, MASK_HEIGHT);
   context.fillStyle = "#fff";
 
-  const fillOuterRing = (ring) => {
-    if (!ring?.length) {
+  const fillPolygon = (rings) => {
+    if (!rings?.length) {
       return;
     }
 
-    const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
-    const unwrapped = unwrapRing(normalized);
-    [-360, 0, 360].forEach((shift) => {
-      context.beginPath();
-      drawRing(context, unwrapped, shift);
-      context.fill();
+    const preparedRings = rings
+      .filter((ring) => ring?.length)
+      .map((ring) => unwrapRing(ring.map(([lon, lat]) => [normalizeLongitude(lon), lat])));
+
+    if (!preparedRings.length) {
+      return;
+    }
+
+    context.beginPath();
+    preparedRings.forEach((ring) => {
+      LONGITUDE_SHIFTS.forEach((shift) => {
+        drawRing(context, ring, shift);
+      });
     });
+    context.fill("evenodd");
   };
 
   geojson.features?.forEach((feature) => {
@@ -83,9 +98,9 @@ const createLandMask = (geojson) => {
     }
 
     if (geometry.type === "Polygon") {
-      fillOuterRing(geometry.coordinates[0]);
+      fillPolygon(geometry.coordinates);
     } else if (geometry.type === "MultiPolygon") {
-      geometry.coordinates.forEach((polygon) => fillOuterRing(polygon[0]));
+      geometry.coordinates.forEach((polygon) => fillPolygon(polygon));
     }
   });
 
