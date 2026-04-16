@@ -1,6 +1,8 @@
 const TAU = Math.PI * 2;
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
+const LONGITUDE_SHIFTS = [-360, 0, 360];
+const FULL_WRAP_EPSILON = 1e-9;
 const HOME_MARKER = { lat: 43.65, lon: -79.38 };
 const HOME_MARKER_COLOR = "#1E3765";
 const VISITOR_MARKER_COLOR = "#B5744A";
@@ -10,10 +12,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const normalizeLongitude = (lon) => {
   const wrapped = ((lon + 180) % 360 + 360) % 360;
   const normalized = wrapped - 180;
-  if (normalized === -180 && lon > 0) {
-    return 180;
-  }
-  return normalized;
+  return normalized === -180 && lon > 0 ? 180 : normalized;
 };
 
 const unwrapRing = (ring) => {
@@ -28,7 +27,7 @@ const unwrapRing = (ring) => {
     let adjustedLon = lon;
     const delta = adjustedLon - previousLon;
 
-    if (Math.abs(delta) === 360) {
+    if (Math.abs(Math.abs(delta) - 360) < FULL_WRAP_EPSILON) {
       unwrapped.push([adjustedLon, lat]);
       continue;
     }
@@ -72,6 +71,9 @@ const createLandMask = (geojson) => {
   context.fillRect(0, 0, MASK_WIDTH, MASK_HEIGHT);
   context.fillStyle = "#fff";
 
+  const normalizeAndUnwrapRing = (ring) =>
+    unwrapRing(ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]));
+
   const fillPolygon = (rings) => {
     if (!rings?.length) {
       return;
@@ -82,9 +84,8 @@ const createLandMask = (geojson) => {
       if (!ring?.length) {
         return;
       }
-      const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
-      const unwrapped = unwrapRing(normalized);
-      [-360, 0, 360].forEach((shift) => {
+      const unwrapped = normalizeAndUnwrapRing(ring);
+      LONGITUDE_SHIFTS.forEach((shift) => {
         drawRing(context, unwrapped, shift);
       });
     });
