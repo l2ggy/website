@@ -94,8 +94,56 @@ const createLandMask = (geojson) => {
     }
   });
 
+  const image = context.getImageData(0, 0, MASK_WIDTH, MASK_HEIGHT);
+  const { data } = image;
+  const isLandPixel = (x, y) => data[(y * MASK_WIDTH + x) * 4] > 120;
+
+  const southPoleX = Math.floor(MASK_WIDTH * 0.5);
+  const southPoleY = MASK_HEIGHT - 1;
+  if (!isLandPixel(southPoleX, southPoleY)) {
+    const stack = [[southPoleX, southPoleY]];
+    const visited = new Uint8Array(MASK_WIDTH * MASK_HEIGHT);
+    const region = [];
+    const capStart = Math.floor(MASK_HEIGHT * 0.7);
+    let escapedCap = false;
+
+    while (stack.length) {
+      const [x, y] = stack.pop();
+      const wrappedX = (x + MASK_WIDTH) % MASK_WIDTH;
+      if (y < 0 || y >= MASK_HEIGHT) {
+        continue;
+      }
+      const offset = y * MASK_WIDTH + wrappedX;
+      if (visited[offset]) {
+        continue;
+      }
+      visited[offset] = 1;
+      if (isLandPixel(wrappedX, y)) {
+        continue;
+      }
+      region.push(offset);
+      if (y < capStart) {
+        escapedCap = true;
+      }
+      stack.push([wrappedX - 1, y]);
+      stack.push([wrappedX + 1, y]);
+      stack.push([wrappedX, y - 1]);
+      stack.push([wrappedX, y + 1]);
+    }
+
+    if (!escapedCap) {
+      region.forEach((offset) => {
+        const pixelIndex = offset * 4;
+        data[pixelIndex] = 255;
+        data[pixelIndex + 1] = 255;
+        data[pixelIndex + 2] = 255;
+        data[pixelIndex + 3] = 255;
+      });
+    }
+  }
+
   return {
-    data: context.getImageData(0, 0, MASK_WIDTH, MASK_HEIGHT).data,
+    data,
     width: MASK_WIDTH,
     height: MASK_HEIGHT
   };
