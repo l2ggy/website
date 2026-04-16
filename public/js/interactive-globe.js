@@ -109,7 +109,13 @@ const geoToVector = (lat, lon) => {
 const buildSphereSamples = (size) => {
   const center = size * 0.5;
   const radius = size * 0.44;
-  const samples = [];
+  const sampleCount = size * size;
+  const sampleX = new Uint16Array(sampleCount);
+  const sampleY = new Uint16Array(sampleCount);
+  const sampleVX = new Float32Array(sampleCount);
+  const sampleVY = new Float32Array(sampleCount);
+  const sampleVZ = new Float32Array(sampleCount);
+  let count = 0;
 
   for (let y = 0; y < size; y += 1) {
     const yN = (y + 0.5 - center) / radius;
@@ -119,11 +125,16 @@ const buildSphereSamples = (size) => {
       if (radialSq > 1) {
         continue;
       }
-      samples.push({ x, y, vector: [xN, -yN, Math.sqrt(1 - radialSq)] });
+      sampleX[count] = x;
+      sampleY[count] = y;
+      sampleVX[count] = xN;
+      sampleVY[count] = -yN;
+      sampleVZ[count] = Math.sqrt(1 - radialSq);
+      count += 1;
     }
   }
 
-  return { size, center, radius, samples };
+  return { size, center, radius, count, sampleX, sampleY, sampleVX, sampleVY, sampleVZ };
 };
 
 let landMaskPromise;
@@ -144,8 +155,7 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
   const sinPitch = Math.sin(pitch);
 
   markers.forEach((marker) => {
-    const markerVector = geoToVector(marker.lat, marker.lon);
-    let rotated = rotateY(markerVector, cosYaw, sinYaw);
+    let rotated = rotateY(marker.vector, cosYaw, sinYaw);
     rotated = rotateX(rotated, cosPitch, sinPitch);
     if (rotated[2] <= 0) {
       return;
@@ -181,7 +191,10 @@ export const setupInteractiveGlobe = (markers = []) => {
   const safeMarkers = markers.filter(
     (marker) => Number.isFinite(marker?.lat) && Number.isFinite(marker?.lon),
   );
-  const renderableMarkers = [...safeMarkers, { ...HOME_MARKER, isHome: true }];
+  const renderableMarkers = [...safeMarkers, { ...HOME_MARKER, isHome: true }].map((marker) => ({
+    ...marker,
+    vector: geoToVector(marker.lat, marker.lon),
+  }));
 
   const ctx = globe.getContext("2d", { alpha: true });
   if (!ctx) {
@@ -195,68 +208,89 @@ export const setupInteractiveGlobe = (markers = []) => {
   let previousX = 0;
   let previousY = 0;
   let dpr = Math.max(1, window.devicePixelRatio || 1);
+  let isAnimating = false;
   let sphere = buildSphereSamples(globe.clientWidth || 248);
   let landMask = null;
+  let frameBuffer = null;
+  let lineColor = "#d9dce1";
+  let textColor = "#15191f";
+
+  const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+  const getRenderDpr = () => {
+    const nextDpr = Math.max(1, window.devicePixelRatio || 1);
+    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+  };
 
   const updateSize = () => {
-    dpr = Math.max(1, window.devicePixelRatio || 1);
+    dpr = getRenderDpr();
     const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
     const pixelSize = Math.round(cssSize * dpr);
     globe.width = pixelSize;
     globe.height = pixelSize;
     sphere = buildSphereSamples(pixelSize);
+    frameBuffer = ctx.createImageData(pixelSize, pixelSize);
+  };
+
+  const updateColors = () => {
+    const styles = getComputedStyle(document.documentElement);
+    lineColor = styles.getPropertyValue("--line").trim();
+    textColor = styles.getPropertyValue("--text").trim();
   };
 
   const draw = () => {
-    const styles = getComputedStyle(document.documentElement);
-    const line = styles.getPropertyValue("--line").trim();
-    const text = styles.getPropertyValue("--text").trim();
-    const { size, center, radius, samples } = sphere;
+    const { size, center, radius, count, sampleX, sampleY, sampleVX, sampleVY, sampleVZ } = sphere;
 
     ctx.clearRect(0, 0, size, size);
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, TAU);
-    ctx.fillStyle = `${line}78`;
+    ctx.fillStyle = `${lineColor}78`;
     ctx.fill();
 
-    if (landMask) {
+    if (landMask && frameBuffer) {
       const cosYaw = Math.cos(-yaw);
       const sinYaw = Math.sin(-yaw);
       const cosPitch = Math.cos(-pitch);
       const sinPitch = Math.sin(-pitch);
-      const output = ctx.createImageData(size, size);
+      const pixels = frameBuffer.data;
 
-      samples.forEach(({ x, y, vector }) => {
-        let rotated = rotateX(vector, cosPitch, sinPitch);
-        rotated = rotateY(rotated, cosYaw, sinYaw);
-
-        const lon = Math.atan2(-rotated[2], rotated[0]);
-        const lat = Math.asin(rotated[1]);
+      for (let index = 0; index < count; index += 1) {
+        const x = sampleX[index];
+        const y = sampleY[index];
+        const x1 = sampleVX[index];
+        const y1 = sampleVY[index] * cosPitch - sampleVZ[index] * sinPitch;
+        const z1 = sampleVY[index] * sinPitch + sampleVZ[index] * cosPitch;
+        const x2 = x1 * cosYaw + z1 * sinYaw;
+        const y2 = y1;
+        const z2 = -x1 * sinYaw + z1 * cosYaw;
+        const lon = Math.atan2(-z2, x2);
+        const lat = Math.asin(y2);
         const u = ((lon + Math.PI) / TAU) * (landMask.width - 1);
         const v = ((Math.PI / 2 - lat) / Math.PI) * (landMask.height - 1);
-
         const maskIndex = ((Math.floor(v) * landMask.width) + Math.floor(u)) * 4;
         const isLand = landMask.data[maskIndex] > 120;
         const pixelIndex = (y * size + x) * 4;
+        pixels[pixelIndex] = isLand ? 220 : 25;
+        pixels[pixelIndex + 1] = isLand ? 220 : 25;
+        pixels[pixelIndex + 2] = isLand ? 220 : 25;
+        pixels[pixelIndex + 3] = isLand ? 214 : 170;
+      }
 
-        output.data[pixelIndex] = isLand ? 220 : 25;
-        output.data[pixelIndex + 1] = isLand ? 220 : 25;
-        output.data[pixelIndex + 2] = isLand ? 220 : 25;
-        output.data[pixelIndex + 3] = isLand ? 214 : 170;
-      });
-
-      ctx.putImageData(output, 0, 0);
+      ctx.putImageData(frameBuffer, 0, 0);
       renderMarkers(ctx, center, radius, yaw, pitch, dpr, renderableMarkers);
     }
 
     ctx.beginPath();
     ctx.arc(center, center, radius * 0.99, 0, TAU);
-    ctx.strokeStyle = `${text}55`;
+    ctx.strokeStyle = `${textColor}55`;
     ctx.lineWidth = Math.max(1, dpr);
     ctx.stroke();
   };
 
   const onFrame = () => {
+    if (document.hidden) {
+      window.requestAnimationFrame(onFrame);
+      return;
+    }
     yaw += velocity;
     velocity *= 0.986;
     if (Math.abs(velocity) < 0.00035) {
@@ -286,11 +320,17 @@ export const setupInteractiveGlobe = (markers = []) => {
     const deltaY = event.clientY - previousY;
     previousX = event.clientX;
     previousY = event.clientY;
+    const dragScale = event.pointerType === "touch" ? 1.45 : 1;
+    const yawFactor = 0.012 * dragScale;
+    const pitchFactor = 0.008 * dragScale;
+    const velocityFactor = 0.00075 * dragScale;
 
-    yaw += deltaX * 0.012;
-    pitch = clamp(pitch + deltaY * 0.008, -1.3, 1.3);
-    velocity = deltaX * 0.00075;
-    draw();
+    yaw += deltaX * yawFactor;
+    pitch = clamp(pitch + deltaY * pitchFactor, -1.3, 1.3);
+    velocity = deltaX * velocityFactor;
+    if (!isAnimating) {
+      draw();
+    }
   };
 
   const onPointerUp = (event) => {
@@ -304,9 +344,10 @@ export const setupInteractiveGlobe = (markers = []) => {
 
   const start = () => {
     updateSize();
+    updateColors();
     draw();
-
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isAnimating) {
       window.requestAnimationFrame(onFrame);
     }
   };
@@ -317,6 +358,10 @@ export const setupInteractiveGlobe = (markers = []) => {
   });
 
   window.addEventListener("resize", updateSize);
+  new MutationObserver(updateColors).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
   globe.addEventListener("pointerdown", onPointerDown);
   globe.addEventListener("pointermove", onPointerMove);
   globe.addEventListener("pointerup", onPointerUp);
