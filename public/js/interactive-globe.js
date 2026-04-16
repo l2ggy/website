@@ -62,18 +62,23 @@ const createLandMask = (geojson) => {
   context.fillRect(0, 0, MASK_WIDTH, MASK_HEIGHT);
   context.fillStyle = "#fff";
 
-  const fillOuterRing = (ring) => {
-    if (!ring?.length) {
+  const fillPolygon = (rings) => {
+    if (!rings?.length) {
       return;
     }
 
-    const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
-    const unwrapped = unwrapRing(normalized);
-    [-360, 0, 360].forEach((shift) => {
-      context.beginPath();
-      drawRing(context, unwrapped, shift);
-      context.fill();
+    context.beginPath();
+    rings.forEach((ring) => {
+      if (!ring?.length) {
+        return;
+      }
+      const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
+      const unwrapped = unwrapRing(normalized);
+      [-360, 0, 360].forEach((shift) => {
+        drawRing(context, unwrapped, shift);
+      });
     });
+    context.fill("evenodd");
   };
 
   geojson.features?.forEach((feature) => {
@@ -83,9 +88,9 @@ const createLandMask = (geojson) => {
     }
 
     if (geometry.type === "Polygon") {
-      fillOuterRing(geometry.coordinates[0]);
+      fillPolygon(geometry.coordinates);
     } else if (geometry.type === "MultiPolygon") {
-      geometry.coordinates.forEach((polygon) => fillOuterRing(polygon[0]));
+      geometry.coordinates.forEach((polygon) => fillPolygon(polygon));
     }
   });
 
