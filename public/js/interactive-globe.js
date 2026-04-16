@@ -17,6 +17,7 @@ const unwrapRing = (ring) => {
     return [];
   }
 
+  const [firstLon, firstLat] = ring[0];
   const unwrapped = [[ring[0][0], ring[0][1]]];
   for (let index = 1; index < ring.length; index += 1) {
     const [lon, lat] = ring[index];
@@ -31,6 +32,13 @@ const unwrapRing = (ring) => {
     }
 
     unwrapped.push([adjustedLon, lat]);
+  }
+
+  if (ring.length > 1) {
+    const [lastLon, lastLat] = ring[ring.length - 1];
+    if (lastLon === firstLon && lastLat === firstLat) {
+      unwrapped[unwrapped.length - 1] = [unwrapped[0][0], unwrapped[0][1]];
+    }
   }
 
   return unwrapped;
