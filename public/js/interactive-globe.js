@@ -1,7 +1,9 @@
 const TAU = Math.PI * 2;
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
-const MARKER_COLOR = "#1E3765";
+const OWNER_MARKER_COLOR = "#1E3765";
+const VISITOR_MARKER_COLOR = "#A4865A";
+const OWNER_MARKER = { lat: 43.65, lon: -79.38, count: 1 };
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -135,6 +137,21 @@ const loadLandMask = () => {
   return landMaskPromise;
 };
 
+const renderMarker = (ctx, x, y, dot, dpr, color, withRing = false) => {
+  if (withRing) {
+    ctx.beginPath();
+    ctx.arc(x, y, dot * 1.9, 0, TAU);
+    ctx.strokeStyle = `${color}b8`;
+    ctx.lineWidth = Math.max(1, dpr * 0.9);
+    ctx.stroke();
+  }
+
+  ctx.beginPath();
+  ctx.arc(x, y, dot, 0, TAU);
+  ctx.fillStyle = color;
+  ctx.fill();
+};
+
 const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
   const cosYaw = Math.cos(yaw);
   const sinYaw = Math.sin(yaw);
@@ -153,17 +170,9 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
     const y = center - rotated[1] * radius;
     const weight = Number.isFinite(marker.count) ? marker.count : 1;
     const dot = Math.max(2, radius * (0.017 + Math.min(weight, 12) * 0.002));
+    const isOwner = marker.type === "owner";
 
-    ctx.beginPath();
-    ctx.arc(x, y, dot * 1.9, 0, TAU);
-    ctx.strokeStyle = `${MARKER_COLOR}b8`;
-    ctx.lineWidth = Math.max(1, dpr * 0.9);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(x, y, dot, 0, TAU);
-    ctx.fillStyle = MARKER_COLOR;
-    ctx.fill();
+    renderMarker(ctx, x, y, dot, dpr, isOwner ? OWNER_MARKER_COLOR : VISITOR_MARKER_COLOR, isOwner);
   });
 };
 
@@ -172,9 +181,12 @@ export const setupInteractiveGlobe = (markers = []) => {
   if (!globe) {
     return;
   }
-  const safeMarkers = markers.filter(
-    (marker) => Number.isFinite(marker?.lat) && Number.isFinite(marker?.lon),
-  );
+  const safeMarkers = [
+    ...markers
+      .filter((marker) => Number.isFinite(marker?.lat) && Number.isFinite(marker?.lon))
+      .map((marker) => ({ ...marker, type: "visitor" })),
+    { ...OWNER_MARKER, type: "owner" },
+  ];
 
   const ctx = globe.getContext("2d", { alpha: true });
   if (!ctx) {
