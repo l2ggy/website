@@ -661,17 +661,32 @@ body.is-globe-dragging * {
   }
 
   .hero-globe-wrap {
-    width: min(60vw, 220px);
-    margin-left: 0;
+    width: min(78vw, 260px);
+    max-width: 100%;
+    margin-inline: auto;
+    display: grid;
+    gap: calc(var(--space-1) * 0.75);
+    justify-items: center;
+    padding: calc(var(--space-1) * 0.8);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(127, 127, 127, 0.08);
+  }
+
+  .globe-column {
+    position: static;
+    display: flex;
+    justify-content: center;
+  }
+
+  .globe-visitor-count {
+    margin-bottom: 0;
+    text-align: center;
   }
 
   .lower-layout {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-2);
-  }
-
-  .globe-column {
-    position: static;
   }
 
   .entry-head {
