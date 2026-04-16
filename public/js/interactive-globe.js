@@ -144,8 +144,7 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
   const sinPitch = Math.sin(pitch);
 
   markers.forEach((marker) => {
-    const markerVector = geoToVector(marker.lat, marker.lon);
-    let rotated = rotateY(markerVector, cosYaw, sinYaw);
+    let rotated = rotateY(marker.vector, cosYaw, sinYaw);
     rotated = rotateX(rotated, cosPitch, sinPitch);
     if (rotated[2] <= 0) {
       return;
@@ -181,7 +180,10 @@ export const setupInteractiveGlobe = (markers = []) => {
   const safeMarkers = markers.filter(
     (marker) => Number.isFinite(marker?.lat) && Number.isFinite(marker?.lon),
   );
-  const renderableMarkers = [...safeMarkers, { ...HOME_MARKER, isHome: true }];
+  const renderableMarkers = [...safeMarkers, { ...HOME_MARKER, isHome: true }].map((marker) => ({
+    ...marker,
+    vector: geoToVector(marker.lat, marker.lon)
+  }));
 
   const ctx = globe.getContext("2d", { alpha: true });
   if (!ctx) {
@@ -195,38 +197,66 @@ export const setupInteractiveGlobe = (markers = []) => {
   let previousX = 0;
   let previousY = 0;
   let dpr = Math.max(1, window.devicePixelRatio || 1);
+  let isAnimating = false;
+  let frameId = null;
+  let isPageVisible = !document.hidden;
+  let isInViewport = true;
   let sphere = buildSphereSamples(globe.clientWidth || 248);
+  let globeFrame = null;
   let landMask = null;
+  let globeFillColor = "";
+  let globeStrokeColor = "";
+
+  const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+  const getRenderDpr = () => {
+    const nextDpr = Math.max(1, window.devicePixelRatio || 1);
+    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+  };
 
   const updateSize = () => {
-    dpr = Math.max(1, window.devicePixelRatio || 1);
+    dpr = getRenderDpr();
     const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
     const pixelSize = Math.round(cssSize * dpr);
     globe.width = pixelSize;
     globe.height = pixelSize;
     sphere = buildSphereSamples(pixelSize);
+    globeFrame = ctx.createImageData(pixelSize, pixelSize);
+  };
+
+  const refreshThemeColors = () => {
+    const styles = getComputedStyle(document.documentElement);
+    globeFillColor = `${styles.getPropertyValue("--line").trim()}78`;
+    globeStrokeColor = `${styles.getPropertyValue("--text").trim()}55`;
+  };
+
+  const shouldAnimate = () => isAnimating && isPageVisible && isInViewport;
+
+  const requestFrame = () => {
+    if (frameId !== null || !shouldAnimate()) {
+      return;
+    }
+    frameId = window.requestAnimationFrame(onFrame);
   };
 
   const draw = () => {
-    const styles = getComputedStyle(document.documentElement);
-    const line = styles.getPropertyValue("--line").trim();
-    const text = styles.getPropertyValue("--text").trim();
     const { size, center, radius, samples } = sphere;
 
     ctx.clearRect(0, 0, size, size);
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, TAU);
-    ctx.fillStyle = `${line}78`;
+    ctx.fillStyle = globeFillColor;
     ctx.fill();
 
-    if (landMask) {
+    if (landMask && globeFrame) {
       const cosYaw = Math.cos(-yaw);
       const sinYaw = Math.sin(-yaw);
       const cosPitch = Math.cos(-pitch);
       const sinPitch = Math.sin(-pitch);
-      const output = ctx.createImageData(size, size);
+      const output = globeFrame;
+      const outputData = output.data;
 
-      samples.forEach(({ x, y, vector }) => {
+      for (let index = 0; index < samples.length; index += 1) {
+        const { x, y, vector } = samples[index];
         let rotated = rotateX(vector, cosPitch, sinPitch);
         rotated = rotateY(rotated, cosYaw, sinYaw);
 
@@ -239,11 +269,11 @@ export const setupInteractiveGlobe = (markers = []) => {
         const isLand = landMask.data[maskIndex] > 120;
         const pixelIndex = (y * size + x) * 4;
 
-        output.data[pixelIndex] = isLand ? 220 : 25;
-        output.data[pixelIndex + 1] = isLand ? 220 : 25;
-        output.data[pixelIndex + 2] = isLand ? 220 : 25;
-        output.data[pixelIndex + 3] = isLand ? 214 : 170;
-      });
+        outputData[pixelIndex] = isLand ? 220 : 25;
+        outputData[pixelIndex + 1] = isLand ? 220 : 25;
+        outputData[pixelIndex + 2] = isLand ? 220 : 25;
+        outputData[pixelIndex + 3] = isLand ? 214 : 170;
+      }
 
       ctx.putImageData(output, 0, 0);
       renderMarkers(ctx, center, radius, yaw, pitch, dpr, renderableMarkers);
@@ -251,19 +281,23 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     ctx.beginPath();
     ctx.arc(center, center, radius * 0.99, 0, TAU);
-    ctx.strokeStyle = `${text}55`;
+    ctx.strokeStyle = globeStrokeColor;
     ctx.lineWidth = Math.max(1, dpr);
     ctx.stroke();
   };
 
   const onFrame = () => {
+    frameId = null;
+    if (!shouldAnimate()) {
+      return;
+    }
     yaw += velocity;
     velocity *= 0.986;
     if (Math.abs(velocity) < 0.00035) {
       velocity = 0.00035;
     }
     draw();
-    window.requestAnimationFrame(onFrame);
+    requestFrame();
   };
 
   const onPointerDown = (event) => {
@@ -286,11 +320,17 @@ export const setupInteractiveGlobe = (markers = []) => {
     const deltaY = event.clientY - previousY;
     previousX = event.clientX;
     previousY = event.clientY;
+    const dragScale = event.pointerType === "touch" ? 1.45 : 1;
+    const yawFactor = 0.012 * dragScale;
+    const pitchFactor = 0.008 * dragScale;
+    const velocityFactor = 0.00075 * dragScale;
 
-    yaw += deltaX * 0.012;
-    pitch = clamp(pitch + deltaY * 0.008, -1.3, 1.3);
-    velocity = deltaX * 0.00075;
-    draw();
+    yaw += deltaX * yawFactor;
+    pitch = clamp(pitch + deltaY * pitchFactor, -1.3, 1.3);
+    velocity = deltaX * velocityFactor;
+    if (!shouldAnimate()) {
+      draw();
+    }
   };
 
   const onPointerUp = (event) => {
@@ -304,11 +344,10 @@ export const setupInteractiveGlobe = (markers = []) => {
 
   const start = () => {
     updateSize();
+    refreshThemeColors();
     draw();
-
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      window.requestAnimationFrame(onFrame);
-    }
+    isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    requestFrame();
   };
 
   loadLandMask().then((mask) => {
@@ -316,7 +355,31 @@ export const setupInteractiveGlobe = (markers = []) => {
     start();
   });
 
-  window.addEventListener("resize", updateSize);
+  const themeObserver = new MutationObserver(() => {
+    refreshThemeColors();
+    draw();
+  });
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  const viewportObserver = new IntersectionObserver(
+    ([entry]) => {
+      isInViewport = entry.isIntersecting;
+      requestFrame();
+    },
+    { threshold: 0.1 },
+  );
+  viewportObserver.observe(globe);
+
+  document.addEventListener("visibilitychange", () => {
+    isPageVisible = !document.hidden;
+    requestFrame();
+  });
+
+  window.addEventListener("resize", () => {
+    updateSize();
+    draw();
+    requestFrame();
+  });
   globe.addEventListener("pointerdown", onPointerDown);
   globe.addEventListener("pointermove", onPointerMove);
   globe.addEventListener("pointerup", onPointerUp);
