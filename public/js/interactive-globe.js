@@ -49,6 +49,67 @@ const drawRing = (ctx, ring, shift = 0) => {
   ctx.closePath();
 };
 
+const RING_SHIFTS = [-360, 0, 360];
+
+const createPreparedRing = (ring) => {
+  if (!ring?.length) {
+    return null;
+  }
+  const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
+  const points = unwrapRing(normalized);
+  let minLon = Infinity;
+  let maxLon = -Infinity;
+  let minLat = Infinity;
+  let maxLat = -Infinity;
+
+  points.forEach(([lon, lat]) => {
+    minLon = Math.min(minLon, lon);
+    maxLon = Math.max(maxLon, lon);
+    minLat = Math.min(minLat, lat);
+    maxLat = Math.max(maxLat, lat);
+  });
+
+  return { points, minLon, maxLon, minLat, maxLat };
+};
+
+const isPointInRing = (x, y, ring) => {
+  const { points } = ring;
+  let inside = false;
+
+  for (let index = 0, previous = points.length - 1; index < points.length; previous = index, index += 1) {
+    const [x1, y1] = points[index];
+    const [x2, y2] = points[previous];
+    const crosses = (y1 > y) !== (y2 > y);
+    if (!crosses) {
+      continue;
+    }
+    const intersectX = ((x2 - x1) * (y - y1)) / (y2 - y1) + x1;
+    if (x < intersectX) {
+      inside = !inside;
+    }
+  }
+
+  return inside;
+};
+
+const ringContainsLonLat = (ring, lon, lat) => {
+  if (!ring || lat < ring.minLat || lat > ring.maxLat) {
+    return false;
+  }
+
+  for (let index = 0; index < RING_SHIFTS.length; index += 1) {
+    const x = lon + RING_SHIFTS[index];
+    if (x < ring.minLon || x > ring.maxLon) {
+      continue;
+    }
+    if (isPointInRing(x, lat, ring)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 const createLandMask = (geojson) => {
   const canvas = document.createElement("canvas");
   canvas.width = MASK_WIDTH;
@@ -62,18 +123,26 @@ const createLandMask = (geojson) => {
   context.fillRect(0, 0, MASK_WIDTH, MASK_HEIGHT);
   context.fillStyle = "#fff";
 
-  const fillOuterRing = (ring) => {
-    if (!ring?.length) {
+  const preparedPolygons = [];
+
+  const fillPolygon = (rings) => {
+    if (!rings?.length) {
       return;
     }
 
-    const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
-    const unwrapped = unwrapRing(normalized);
-    [-360, 0, 360].forEach((shift) => {
-      context.beginPath();
-      drawRing(context, unwrapped, shift);
-      context.fill();
+    const preparedRings = rings.map(createPreparedRing).filter(Boolean);
+    if (!preparedRings.length) {
+      return;
+    }
+    preparedPolygons.push(preparedRings);
+
+    context.beginPath();
+    preparedRings.forEach((preparedRing) => {
+      RING_SHIFTS.forEach((shift) => {
+        drawRing(context, preparedRing.points, shift);
+      });
     });
+    context.fill("evenodd");
   };
 
   geojson.features?.forEach((feature) => {
@@ -83,14 +152,58 @@ const createLandMask = (geojson) => {
     }
 
     if (geometry.type === "Polygon") {
-      fillOuterRing(geometry.coordinates[0]);
+      fillPolygon(geometry.coordinates);
     } else if (geometry.type === "MultiPolygon") {
-      geometry.coordinates.forEach((polygon) => fillOuterRing(polygon[0]));
+      geometry.coordinates.forEach((polygon) => fillPolygon(polygon));
     }
   });
 
+  const imageData = context.getImageData(0, 0, MASK_WIDTH, MASK_HEIGHT);
+  const data = imageData.data;
+  const southernLimitLat = -55;
+  const southernStartRow = Math.max(
+    0,
+    Math.floor(((90 - southernLimitLat) / 180) * (MASK_HEIGHT - 1)),
+  );
+
+  for (let y = southernStartRow; y < MASK_HEIGHT; y += 1) {
+    const lat = 90 - (y / (MASK_HEIGHT - 1)) * 180;
+
+    for (let x = 0; x < MASK_WIDTH; x += 1) {
+      const lon = (x / (MASK_WIDTH - 1)) * 360 - 180;
+      let isLand = false;
+
+      for (let polygonIndex = 0; polygonIndex < preparedPolygons.length; polygonIndex += 1) {
+        const rings = preparedPolygons[polygonIndex];
+        if (!ringContainsLonLat(rings[0], lon, lat)) {
+          continue;
+        }
+
+        let inHole = false;
+        for (let holeIndex = 1; holeIndex < rings.length; holeIndex += 1) {
+          if (ringContainsLonLat(rings[holeIndex], lon, lat)) {
+            inHole = true;
+            break;
+          }
+        }
+
+        if (!inHole) {
+          isLand = true;
+          break;
+        }
+      }
+
+      const pixelIndex = (y * MASK_WIDTH + x) * 4;
+      const channel = isLand ? 255 : 0;
+      data[pixelIndex] = channel;
+      data[pixelIndex + 1] = channel;
+      data[pixelIndex + 2] = channel;
+      data[pixelIndex + 3] = 255;
+    }
+  }
+
   return {
-    data: context.getImageData(0, 0, MASK_WIDTH, MASK_HEIGHT).data,
+    data,
     width: MASK_WIDTH,
     height: MASK_HEIGHT
   };
