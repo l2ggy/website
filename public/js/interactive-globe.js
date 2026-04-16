@@ -1,6 +1,9 @@
 const TAU = Math.PI * 2;
+const FULL_LONGITUDE = 360;
+const HALF_LONGITUDE = 180;
 const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
+const MASK_SHIFTS = [-FULL_LONGITUDE, 0, FULL_LONGITUDE];
 const HOME_MARKER = { lat: 43.65, lon: -79.38 };
 const HOME_MARKER_COLOR = "#1E3765";
 const VISITOR_MARKER_COLOR = "#B5744A";
@@ -8,8 +11,12 @@ const VISITOR_MARKER_COLOR = "#B5744A";
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const normalizeLongitude = (lon) => {
-  const wrapped = ((lon + 180) % 360 + 360) % 360;
-  return wrapped - 180;
+  const wrapped = ((lon + HALF_LONGITUDE) % FULL_LONGITUDE + FULL_LONGITUDE) % FULL_LONGITUDE;
+  const normalized = wrapped - HALF_LONGITUDE;
+  if (normalized === -HALF_LONGITUDE && lon > 0) {
+    return HALF_LONGITUDE;
+  }
+  return normalized;
 };
 
 const unwrapRing = (ring) => {
@@ -22,12 +29,18 @@ const unwrapRing = (ring) => {
     const [lon, lat] = ring[index];
     const previousLon = unwrapped[index - 1][0];
     let adjustedLon = lon;
+    const delta = adjustedLon - previousLon;
 
-    while (adjustedLon - previousLon > 180) {
-      adjustedLon -= 360;
+    if (Math.abs(Math.abs(delta) - FULL_LONGITUDE) < Number.EPSILON) {
+      unwrapped.push([adjustedLon, lat]);
+      continue;
     }
-    while (adjustedLon - previousLon < -180) {
-      adjustedLon += 360;
+
+    while (adjustedLon - previousLon > HALF_LONGITUDE) {
+      adjustedLon -= FULL_LONGITUDE;
+    }
+    while (adjustedLon - previousLon < -HALF_LONGITUDE) {
+      adjustedLon += FULL_LONGITUDE;
     }
 
     unwrapped.push([adjustedLon, lat]);
@@ -38,7 +51,7 @@ const unwrapRing = (ring) => {
 
 const drawRing = (ctx, ring, shift = 0) => {
   ring.forEach(([lon, lat], index) => {
-    const x = ((lon + shift + 180) / 360) * (MASK_WIDTH - 1);
+    const x = ((lon + shift + HALF_LONGITUDE) / FULL_LONGITUDE) * (MASK_WIDTH - 1);
     const y = ((90 - lat) / 180) * (MASK_HEIGHT - 1);
     if (index === 0) {
       ctx.moveTo(x, y);
@@ -62,18 +75,22 @@ const createLandMask = (geojson) => {
   context.fillRect(0, 0, MASK_WIDTH, MASK_HEIGHT);
   context.fillStyle = "#fff";
 
-  const fillOuterRing = (ring) => {
-    if (!ring?.length) {
+  const fillPolygon = (rings) => {
+    const normalizedRings = (rings || [])
+      .filter((ring) => ring?.length)
+      .map((ring) => unwrapRing(ring.map(([lon, lat]) => [normalizeLongitude(lon), lat])));
+
+    if (!normalizedRings.length) {
       return;
     }
 
-    const normalized = ring.map(([lon, lat]) => [normalizeLongitude(lon), lat]);
-    const unwrapped = unwrapRing(normalized);
-    [-360, 0, 360].forEach((shift) => {
-      context.beginPath();
-      drawRing(context, unwrapped, shift);
-      context.fill();
+    context.beginPath();
+    normalizedRings.forEach((ring) => {
+      MASK_SHIFTS.forEach((shift) => {
+        drawRing(context, ring, shift);
+      });
     });
+    context.fill("evenodd");
   };
 
   geojson.features?.forEach((feature) => {
@@ -83,9 +100,9 @@ const createLandMask = (geojson) => {
     }
 
     if (geometry.type === "Polygon") {
-      fillOuterRing(geometry.coordinates[0]);
+      fillPolygon(geometry.coordinates);
     } else if (geometry.type === "MultiPolygon") {
-      geometry.coordinates.forEach((polygon) => fillOuterRing(polygon[0]));
+      geometry.coordinates.forEach((polygon) => fillPolygon(polygon));
     }
   });
 
