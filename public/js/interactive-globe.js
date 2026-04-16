@@ -4,6 +4,9 @@ const MASK_HEIGHT = 360;
 const HOME_MARKER = { lat: 43.65, lon: -79.38 };
 const HOME_MARKER_COLOR = "#1E3765";
 const VISITOR_MARKER_COLOR = "#B5744A";
+const MAX_CANVAS_DPR = 2;
+const TOUCH_YAW_SENSITIVITY = 0.016;
+const POINTER_YAW_SENSITIVITY = 0.012;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -194,12 +197,12 @@ export const setupInteractiveGlobe = (markers = []) => {
   let pointerId = null;
   let previousX = 0;
   let previousY = 0;
-  let dpr = Math.max(1, window.devicePixelRatio || 1);
+  let dpr = Math.min(MAX_CANVAS_DPR, Math.max(1, window.devicePixelRatio || 1));
   let sphere = buildSphereSamples(globe.clientWidth || 248);
   let landMask = null;
 
   const updateSize = () => {
-    dpr = Math.max(1, window.devicePixelRatio || 1);
+    dpr = Math.min(MAX_CANVAS_DPR, Math.max(1, window.devicePixelRatio || 1));
     const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
     const pixelSize = Math.round(cssSize * dpr);
     globe.width = pixelSize;
@@ -287,7 +290,8 @@ export const setupInteractiveGlobe = (markers = []) => {
     previousX = event.clientX;
     previousY = event.clientY;
 
-    yaw += deltaX * 0.012;
+    const yawSensitivity = event.pointerType === "touch" ? TOUCH_YAW_SENSITIVITY : POINTER_YAW_SENSITIVITY;
+    yaw += deltaX * yawSensitivity;
     pitch = clamp(pitch + deltaY * 0.008, -1.3, 1.3);
     velocity = deltaX * 0.00075;
     draw();
