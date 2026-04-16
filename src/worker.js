@@ -56,7 +56,7 @@ const trackVisit = async (request, env) => {
   const cf = request.cf || {};
   await env.DB.prepare(
     `
-      INSERT INTO visits (visited_at, page_path, ip, country, region, city, latitude, longitude)
+      INSERT INTO visits (visited_at, path, ip, country, region, city, lat, lon)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `,
   )
@@ -84,10 +84,10 @@ const getVisitStats = async (env) => {
     env.DB.prepare("SELECT COUNT(DISTINCT ip) AS count FROM visits WHERE ip IS NOT NULL AND ip != ''").first(),
     env.DB.prepare(
       `
-        SELECT ROUND(CAST(latitude AS REAL), 2) AS lat, ROUND(CAST(longitude AS REAL), 2) AS lon, COUNT(*) AS count
+        SELECT ROUND(CAST(lat AS REAL), 2) AS lat, ROUND(CAST(lon AS REAL), 2) AS lon, COUNT(*) AS count
         FROM visits
-        WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-        GROUP BY ROUND(CAST(latitude AS REAL), 2), ROUND(CAST(longitude AS REAL), 2)
+        WHERE lat IS NOT NULL AND lon IS NOT NULL
+        GROUP BY ROUND(CAST(lat AS REAL), 2), ROUND(CAST(lon AS REAL), 2)
         ORDER BY count DESC
       `,
     ).all(),
