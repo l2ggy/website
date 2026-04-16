@@ -290,6 +290,56 @@ button {
   gap: 0.2rem;
 }
 
+.hero-globe-wrap {
+  width: min(30vw, 248px);
+  min-width: 128px;
+  margin-left: auto;
+}
+
+.globe-visitor-count {
+  margin-bottom: var(--space-1);
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+.hero-globe {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  cursor: grab;
+}
+
+.hero-globe:active {
+  cursor: grabbing;
+}
+
+body.is-globe-dragging,
+body.is-globe-dragging * {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.lower-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 248px);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.lower-main {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.globe-column {
+  position: sticky;
+  top: calc(var(--header-h) + var(--space-2));
+}
+
 .hero-heatmap-wrap {
   position: absolute;
   top: 50%;
@@ -608,6 +658,29 @@ button {
   .hero-heatmap {
     width: 100%;
     max-width: 100%;
+  }
+
+  .hero-globe-wrap {
+    width: min(72vw, 252px);
+    margin: 0 auto;
+    display: grid;
+    gap: var(--space-1);
+    justify-items: center;
+  }
+
+  .globe-visitor-count {
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  .lower-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .globe-column {
+    position: static;
+    margin-top: var(--space-1);
   }
 
   .entry-head {
