@@ -109,7 +109,11 @@ const geoToVector = (lat, lon) => {
 const buildSphereSamples = (size) => {
   const center = size * 0.5;
   const radius = size * 0.44;
-  const samples = [];
+  const xs = [];
+  const ys = [];
+  const vx = [];
+  const vy = [];
+  const vz = [];
 
   for (let y = 0; y < size; y += 1) {
     const yN = (y + 0.5 - center) / radius;
@@ -119,11 +123,25 @@ const buildSphereSamples = (size) => {
       if (radialSq > 1) {
         continue;
       }
-      samples.push({ x, y, vector: [xN, -yN, Math.sqrt(1 - radialSq)] });
+      xs.push(x);
+      ys.push(y);
+      vx.push(xN);
+      vy.push(-yN);
+      vz.push(Math.sqrt(1 - radialSq));
     }
   }
 
-  return { size, center, radius, samples };
+  return {
+    size,
+    center,
+    radius,
+    count: xs.length,
+    xs: Uint16Array.from(xs),
+    ys: Uint16Array.from(ys),
+    vx: Float32Array.from(vx),
+    vy: Float32Array.from(vy),
+    vz: Float32Array.from(vz)
+  };
 };
 
 let landMaskPromise;
@@ -195,23 +213,35 @@ export const setupInteractiveGlobe = (markers = []) => {
   let previousX = 0;
   let previousY = 0;
   let dpr = Math.max(1, window.devicePixelRatio || 1);
+  let shouldAnimate = false;
+  let frameId = 0;
+  let isInView = true;
   let sphere = buildSphereSamples(globe.clientWidth || 248);
   let landMask = null;
+  let globeImage = null;
+
+  const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const getRenderDpr = () => {
+    const nextDpr = Math.max(1, window.devicePixelRatio || 1);
+    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+  };
 
   const updateSize = () => {
-    dpr = Math.max(1, window.devicePixelRatio || 1);
+    dpr = getRenderDpr();
     const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
     const pixelSize = Math.round(cssSize * dpr);
     globe.width = pixelSize;
     globe.height = pixelSize;
     sphere = buildSphereSamples(pixelSize);
+    globeImage = ctx.createImageData(pixelSize, pixelSize);
   };
 
   const draw = () => {
     const styles = getComputedStyle(document.documentElement);
     const line = styles.getPropertyValue("--line").trim();
     const text = styles.getPropertyValue("--text").trim();
-    const { size, center, radius, samples } = sphere;
+    const { size, center, radius, count, xs, ys, vx, vy, vz } = sphere;
 
     ctx.clearRect(0, 0, size, size);
     ctx.beginPath();
@@ -224,26 +254,36 @@ export const setupInteractiveGlobe = (markers = []) => {
       const sinYaw = Math.sin(-yaw);
       const cosPitch = Math.cos(-pitch);
       const sinPitch = Math.sin(-pitch);
-      const output = ctx.createImageData(size, size);
+      const output = globeImage;
+      if (!output) {
+        return;
+      }
 
-      samples.forEach(({ x, y, vector }) => {
-        let rotated = rotateX(vector, cosPitch, sinPitch);
-        rotated = rotateY(rotated, cosYaw, sinYaw);
+      const outputData = output.data;
+      const maskWidth = landMask.width;
+      const maskWidthMax = maskWidth - 1;
+      const maskHeightMax = landMask.height - 1;
 
-        const lon = Math.atan2(-rotated[2], rotated[0]);
-        const lat = Math.asin(rotated[1]);
-        const u = ((lon + Math.PI) / TAU) * (landMask.width - 1);
-        const v = ((Math.PI / 2 - lat) / Math.PI) * (landMask.height - 1);
+      for (let index = 0; index < count; index += 1) {
+        const firstY = vy[index] * cosPitch - vz[index] * sinPitch;
+        const firstZ = vy[index] * sinPitch + vz[index] * cosPitch;
+        const xRot = vx[index] * cosYaw + firstZ * sinYaw;
+        const zRot = -vx[index] * sinYaw + firstZ * cosYaw;
 
-        const maskIndex = ((Math.floor(v) * landMask.width) + Math.floor(u)) * 4;
+        const lon = Math.atan2(-zRot, xRot);
+        const lat = Math.asin(firstY);
+        const u = ((lon + Math.PI) / TAU) * maskWidthMax;
+        const v = ((Math.PI / 2 - lat) / Math.PI) * maskHeightMax;
+
+        const maskIndex = ((Math.floor(v) * maskWidth) + Math.floor(u)) * 4;
         const isLand = landMask.data[maskIndex] > 120;
-        const pixelIndex = (y * size + x) * 4;
+        const pixelIndex = (ys[index] * size + xs[index]) * 4;
 
-        output.data[pixelIndex] = isLand ? 220 : 25;
-        output.data[pixelIndex + 1] = isLand ? 220 : 25;
-        output.data[pixelIndex + 2] = isLand ? 220 : 25;
-        output.data[pixelIndex + 3] = isLand ? 214 : 170;
-      });
+        outputData[pixelIndex] = isLand ? 220 : 25;
+        outputData[pixelIndex + 1] = isLand ? 220 : 25;
+        outputData[pixelIndex + 2] = isLand ? 220 : 25;
+        outputData[pixelIndex + 3] = isLand ? 214 : 170;
+      }
 
       ctx.putImageData(output, 0, 0);
       renderMarkers(ctx, center, radius, yaw, pitch, dpr, renderableMarkers);
@@ -256,14 +296,36 @@ export const setupInteractiveGlobe = (markers = []) => {
     ctx.stroke();
   };
 
+  const updateAnimationState = () => {
+    const nextShouldAnimate = !reducedMotionQuery.matches && isInView && !document.hidden;
+    if (nextShouldAnimate === shouldAnimate) {
+      return;
+    }
+
+    shouldAnimate = nextShouldAnimate;
+    if (!shouldAnimate) {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+        frameId = 0;
+      }
+      return;
+    }
+
+    frameId = window.requestAnimationFrame(onFrame);
+  };
+
   const onFrame = () => {
+    if (!shouldAnimate) {
+      frameId = 0;
+      return;
+    }
     yaw += velocity;
     velocity *= 0.986;
     if (Math.abs(velocity) < 0.00035) {
       velocity = 0.00035;
     }
     draw();
-    window.requestAnimationFrame(onFrame);
+    frameId = window.requestAnimationFrame(onFrame);
   };
 
   const onPointerDown = (event) => {
@@ -286,11 +348,17 @@ export const setupInteractiveGlobe = (markers = []) => {
     const deltaY = event.clientY - previousY;
     previousX = event.clientX;
     previousY = event.clientY;
+    const dragScale = event.pointerType === "touch" ? 1.45 : 1;
+    const yawFactor = 0.012 * dragScale;
+    const pitchFactor = 0.008 * dragScale;
+    const velocityFactor = 0.00075 * dragScale;
 
-    yaw += deltaX * 0.012;
-    pitch = clamp(pitch + deltaY * 0.008, -1.3, 1.3);
-    velocity = deltaX * 0.00075;
-    draw();
+    yaw += deltaX * yawFactor;
+    pitch = clamp(pitch + deltaY * pitchFactor, -1.3, 1.3);
+    velocity = deltaX * velocityFactor;
+    if (!shouldAnimate) {
+      draw();
+    }
   };
 
   const onPointerUp = (event) => {
@@ -305,10 +373,7 @@ export const setupInteractiveGlobe = (markers = []) => {
   const start = () => {
     updateSize();
     draw();
-
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      window.requestAnimationFrame(onFrame);
-    }
+    updateAnimationState();
   };
 
   loadLandMask().then((mask) => {
@@ -317,9 +382,19 @@ export const setupInteractiveGlobe = (markers = []) => {
   });
 
   window.addEventListener("resize", updateSize);
+  document.addEventListener("visibilitychange", updateAnimationState);
+  reducedMotionQuery.addEventListener("change", updateAnimationState);
   globe.addEventListener("pointerdown", onPointerDown);
   globe.addEventListener("pointermove", onPointerMove);
   globe.addEventListener("pointerup", onPointerUp);
   globe.addEventListener("pointercancel", onPointerUp);
   globe.addEventListener("dragstart", (event) => event.preventDefault());
+
+  if (typeof IntersectionObserver === "function") {
+    const observer = new IntersectionObserver(([entry]) => {
+      isInView = entry.isIntersecting;
+      updateAnimationState();
+    });
+    observer.observe(globe);
+  }
 };
