@@ -191,6 +191,7 @@ export const setupInteractiveGlobe = (markers = []) => {
   let yaw = -0.4;
   let pitch = 0.05;
   let velocity = 0.005;
+  let isAnimating = true;
   let pointerId = null;
   let previousX = 0;
   let previousY = 0;
@@ -287,10 +288,16 @@ export const setupInteractiveGlobe = (markers = []) => {
     previousX = event.clientX;
     previousY = event.clientY;
 
-    yaw += deltaX * 0.012;
-    pitch = clamp(pitch + deltaY * 0.008, -1.3, 1.3);
+    const dragScale = event.pointerType === "touch" ? 0.016 : 0.012;
+    const pitchScale = event.pointerType === "touch" ? 0.011 : 0.008;
+
+    yaw += deltaX * dragScale;
+    pitch = clamp(pitch + deltaY * pitchScale, -1.3, 1.3);
     velocity = deltaX * 0.00075;
-    draw();
+
+    if (!isAnimating) {
+      draw();
+    }
   };
 
   const onPointerUp = (event) => {
@@ -306,7 +313,8 @@ export const setupInteractiveGlobe = (markers = []) => {
     updateSize();
     draw();
 
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isAnimating) {
       window.requestAnimationFrame(onFrame);
     }
   };
