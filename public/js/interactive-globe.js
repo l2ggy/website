@@ -3,7 +3,7 @@ const MASK_WIDTH = 720;
 const MASK_HEIGHT = 360;
 const HOME_MARKER = { lat: 43.65, lon: -79.38 };
 const HOME_MARKER_COLOR = "#1E3765";
-const VISITOR_MARKER_COLOR = "#8E7C6B";
+const VISITOR_MARKER_COLOR = "#A08B7A";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 

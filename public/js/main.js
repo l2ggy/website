@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initStats();
   renderGitHubHeatmap();
   initVisitStats().then((visitStats) => {
-    const visitCount = document.querySelector("#visitor-count");
+    const visitCount = document.querySelector("#visit-count");
     if (visitCount && typeof visitStats?.totalVisits === "number") {
       visitCount.textContent = String(visitStats.totalVisits);
     }

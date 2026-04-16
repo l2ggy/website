@@ -296,7 +296,7 @@ button {
   margin-left: auto;
 }
 
-.globe-visitor-count {
+.globe-visit-count {
   margin-bottom: var(--space-1);
   color: var(--muted);
   font-size: 0.78rem;
