@@ -36,6 +36,22 @@ const initStats = () => {
   loadStats(section).then(renderStats).catch(setStatsFallback);
 };
 
+
+const setupMobileEntryIndentToggle = () => {
+  if (!window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+    return;
+  }
+
+  document.addEventListener("click", (event) => {
+    const entry = event.target.closest(".entry.subsection-item");
+    if (!entry) {
+      return;
+    }
+
+    entry.classList.toggle("mobile-indented");
+  });
+};
+
 const initVisitStats = async () => {
   try {
     await fetch("/api/visit", { method: "POST", keepalive: true });
@@ -60,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initEntries();
   initStats();
   renderGitHubHeatmap();
+  setupMobileEntryIndentToggle();
   initVisitStats().then((visitStats) => {
     const visitCount = document.querySelector("#visitor-count");
     if (visitCount && typeof visitStats?.totalVisits === "number") {
