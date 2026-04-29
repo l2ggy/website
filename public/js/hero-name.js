@@ -42,9 +42,26 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
+  const toggleAnimatedName = () => {
+    if (heroName.classList.contains("hero-name-animate")) {
+      showPlainName();
+      return;
+    }
+
+    showAnimatedName();
+  };
+
+  const supportsHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   showPlainName();
-  heroName.addEventListener("pointerenter", showAnimatedName);
+
+  if (supportsHover) {
+    heroName.addEventListener("pointerenter", showAnimatedName);
+    heroName.addEventListener("pointerleave", showPlainName);
+  } else {
+    heroName.addEventListener("click", toggleAnimatedName);
+  }
+
   heroName.addEventListener("focusin", showAnimatedName);
-  heroName.addEventListener("pointerleave", showPlainName);
   heroName.addEventListener("focusout", showPlainName);
 };
