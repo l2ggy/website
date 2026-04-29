@@ -420,6 +420,17 @@ body.is-globe-dragging * {
   transform: translateX(0.35rem);
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .subsection-item:hover,
+  .subsection-item:focus-within {
+    transform: none;
+  }
+
+  .subsection-item.is-tapped {
+    transform: translateX(0.35rem);
+  }
+}
+
 .entry {
   width: 100%;
   display: grid;

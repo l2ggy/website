@@ -27,6 +27,24 @@ const initEntries = () => {
   });
 };
 
+const setupMobileEntryIndentation = () => {
+  const supportsTapIndent =
+    typeof window.matchMedia === "function" && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+  if (!supportsTapIndent) {
+    return;
+  }
+
+  document.addEventListener("click", (event) => {
+    const item = event.target.closest(".subsection-item");
+    if (!item) {
+      return;
+    }
+
+    item.classList.toggle("is-tapped");
+  });
+};
+
 const initStats = () => {
   const section = document.querySelector("#stats");
   if (!section) {
@@ -58,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupTheme();
   splitHeroNameLetters();
   initEntries();
+  setupMobileEntryIndentation();
   initStats();
   renderGitHubHeatmap();
   initVisitStats().then((visitStats) => {
