@@ -42,9 +42,33 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
+  let isToggled = false;
+  const toggleAnimatedName = () => {
+    isToggled = !isToggled;
+    if (isToggled) {
+      showAnimatedName();
+      return;
+    }
+    showPlainName();
+  };
+
   showPlainName();
-  heroName.addEventListener("pointerenter", showAnimatedName);
-  heroName.addEventListener("focusin", showAnimatedName);
-  heroName.addEventListener("pointerleave", showPlainName);
-  heroName.addEventListener("focusout", showPlainName);
+  const supportsHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  if (supportsHover) {
+    heroName.addEventListener("pointerenter", showAnimatedName);
+    heroName.addEventListener("focusin", showAnimatedName);
+    heroName.addEventListener("pointerleave", showPlainName);
+    heroName.addEventListener("focusout", showPlainName);
+    return;
+  }
+
+  heroName.addEventListener("click", toggleAnimatedName);
+  heroName.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    event.preventDefault();
+    toggleAnimatedName();
+  });
 };
