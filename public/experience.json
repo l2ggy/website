@@ -1,9 +1,15 @@
 [
   {
+    "icon": "images/experience/amazon.png",
+    "title": "Amazon",
+    "subtitle": "Jr. Software Development Engineer",
+    "dates": "2026 (Incoming)"
+  },
+  {
     "icon": "images/experience/wheeler-lab.png",
     "title": "Wheeler Lab, University of Toronto",
     "subtitle": "Software Engineer (Work Study)",
-    "dates": "2025 – Present"
+    "dates": "2025 – 2026"
   },
   {
     "icon": "images/experience/helmholtz-munich.png",
