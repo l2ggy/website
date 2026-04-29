@@ -6,13 +6,36 @@ const renderIcon = (icon, title) => {
   return `<img class="entry-icon entry-thumb" src="${icon}" alt="${title} logo" loading="lazy" />`;
 };
 
-export const renderEntry = ({ icon, title, subtitle, dates }) => `
+const isFutureStartDate = (startDate) => {
+  if (!startDate) {
+    return false;
+  }
+
+  const parsed = new Date(startDate);
+  if (Number.isNaN(parsed.getTime())) {
+    return false;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return parsed > today;
+};
+
+const formatEntryDates = ({ dates, startDate }) => {
+  if (!isFutureStartDate(startDate)) {
+    return dates || "";
+  }
+
+  return dates ? `Incoming · ${dates}` : "Incoming";
+};
+
+export const renderEntry = ({ icon, title, subtitle, dates, startDate }) => `
   <article class="entry subsection-item">
     ${renderIcon(icon, title)}
     <div class="entry-main">
       <div class="entry-head">
         <h3>${title}</h3>
-        <p class="entry-dates">${dates || ""}</p>
+        <p class="entry-dates">${formatEntryDates({ dates, startDate })}</p>
       </div>
       <p>${subtitle}</p>
     </div>

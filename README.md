@@ -19,6 +19,7 @@ At runtime, the Worker serves static files through the `ASSETS` binding and expo
 - `index.html` defines section containers (education, experience, stats, projects, leadership, contact).
 - `public/js/main.js` initializes theme, entries, remote stats, visit tracking, GitHub heatmap, and interactive globe.
 - Content is loaded from JSON files (`education.json`, `experience.json`, `projects.json`, etc.) and rendered client-side.
+- Entry-type JSON records (e.g., education/experience) can optionally include `startDate` (ISO date string). When `startDate` is in the future, the UI automatically labels the item as `Incoming`.
 
 ### Backend (`src/worker.js`)
 
