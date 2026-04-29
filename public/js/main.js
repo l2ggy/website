@@ -27,6 +27,34 @@ const initEntries = () => {
   });
 };
 
+
+const initMobileEntryTapIndent = () => {
+  if (!window.matchMedia("(hover: none), (pointer: coarse)").matches) {
+    return;
+  }
+
+  let activeEntry = null;
+
+  document.addEventListener("click", (event) => {
+    const entry = event.target.closest(".entry.subsection-item");
+    if (!entry) {
+      activeEntry?.classList.remove("is-tapped");
+      activeEntry = null;
+      return;
+    }
+
+    if (activeEntry === entry) {
+      entry.classList.remove("is-tapped");
+      activeEntry = null;
+      return;
+    }
+
+    activeEntry?.classList.remove("is-tapped");
+    entry.classList.add("is-tapped");
+    activeEntry = entry;
+  });
+};
+
 const initStats = () => {
   const section = document.querySelector("#stats");
   if (!section) {
@@ -59,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
   splitHeroNameLetters();
   initEntries();
   initStats();
+  initMobileEntryTapIndent();
   renderGitHubHeatmap();
   initVisitStats().then((visitStats) => {
     const visitCount = document.querySelector("#visitor-count");

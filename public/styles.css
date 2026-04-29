@@ -415,9 +415,17 @@ body.is-globe-dragging * {
   transition: transform 180ms ease;
 }
 
-.subsection-item:hover,
-.subsection-item:focus-within {
-  transform: translateX(0.35rem);
+@media (hover: hover) and (pointer: fine) {
+  .subsection-item:hover,
+  .subsection-item:focus-within {
+    transform: translateX(0.35rem);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .subsection-item.is-tapped {
+    transform: translateX(0.35rem);
+  }
 }
 
 .entry {
