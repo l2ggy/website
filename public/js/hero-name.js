@@ -42,6 +42,21 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
+  const isTouchInteraction = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
+  if (isTouchInteraction) {
+    let isAnimated = false;
+    heroName.addEventListener("click", () => {
+      if (isAnimated) {
+        showPlainName();
+      } else {
+        showAnimatedName();
+      }
+      isAnimated = !isAnimated;
+    });
+    return;
+  }
+
   showPlainName();
   heroName.addEventListener("pointerenter", showAnimatedName);
   heroName.addEventListener("focusin", showAnimatedName);
