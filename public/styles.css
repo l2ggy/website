@@ -416,7 +416,8 @@ body.is-globe-dragging * {
 }
 
 .subsection-item:hover,
-.subsection-item:focus-within {
+.subsection-item:focus-within,
+.subsection-item.is-tapped {
   transform: translateX(0.35rem);
 }
 
