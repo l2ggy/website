@@ -9,6 +9,8 @@ export const splitHeroNameLetters = () => {
     return;
   }
 
+  const supportsHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   const letterSpans = Array.from(originalText).map((letter, index) => {
     const span = document.createElement("span");
     span.className = "hero-letter";
@@ -43,8 +45,31 @@ export const splitHeroNameLetters = () => {
   };
 
   showPlainName();
-  heroName.addEventListener("pointerenter", showAnimatedName);
-  heroName.addEventListener("focusin", showAnimatedName);
-  heroName.addEventListener("pointerleave", showPlainName);
-  heroName.addEventListener("focusout", showPlainName);
+
+  if (supportsHover) {
+    heroName.addEventListener("pointerenter", showAnimatedName);
+    heroName.addEventListener("focusin", showAnimatedName);
+    heroName.addEventListener("pointerleave", showPlainName);
+    heroName.addEventListener("focusout", showPlainName);
+    return;
+  }
+
+  let isTappedOpen = false;
+  const toggleTappedState = () => {
+    isTappedOpen = !isTappedOpen;
+    if (isTappedOpen) {
+      showAnimatedName();
+      return;
+    }
+    showPlainName();
+  };
+
+  heroName.addEventListener("click", toggleTappedState);
+  heroName.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    event.preventDefault();
+    toggleTappedState();
+  });
 };
