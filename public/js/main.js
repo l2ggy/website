@@ -58,6 +58,28 @@ const initStats = () => {
   loadStats(section).then(renderStats).catch(setStatsFallback);
 };
 
+const initMobileGlobePlacement = () => {
+  const media = window.matchMedia("(max-width: 700px)");
+  const lowerMain = document.querySelector(".lower-main");
+  const globeColumn = document.querySelector(".globe-column");
+  const contactSection = document.querySelector("#contact");
+  const lowerLayout = document.querySelector(".lower-layout");
+  if (!lowerMain || !globeColumn || !contactSection || !lowerLayout) {
+    return;
+  }
+
+  const placeGlobe = () => {
+    if (media.matches) {
+      lowerMain.insertBefore(globeColumn, contactSection);
+      return;
+    }
+    lowerLayout.appendChild(globeColumn);
+  };
+
+  placeGlobe();
+  media.addEventListener("change", placeGlobe);
+};
+
 const initVisitStats = async () => {
   try {
     await fetch("/api/visit", { method: "POST", keepalive: true });
@@ -82,6 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initEntries();
   initEntryTapIndentation();
   initStats();
+  initMobileGlobePlacement();
   renderGitHubHeatmap();
   initVisitStats().then((visitStats) => {
     const visitCount = document.querySelector("#visitor-count");
