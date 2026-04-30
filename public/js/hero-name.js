@@ -42,9 +42,27 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
-  showPlainName();
-  heroName.addEventListener("pointerenter", showAnimatedName);
-  heroName.addEventListener("focusin", showAnimatedName);
-  heroName.addEventListener("pointerleave", showPlainName);
-  heroName.addEventListener("focusout", showPlainName);
+  const canHoverWithCursor = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+
+  if (canHoverWithCursor) {
+    showPlainName();
+    heroName.addEventListener("pointerenter", showAnimatedName);
+    heroName.addEventListener("focusin", showAnimatedName);
+    heroName.addEventListener("pointerleave", showPlainName);
+    heroName.addEventListener("focusout", showPlainName);
+    return;
+  }
+
+  {
+    showPlainName();
+    let isAnimated = false;
+    heroName.addEventListener("click", () => {
+      if (isAnimated) {
+        showPlainName();
+      } else {
+        showAnimatedName();
+      }
+      isAnimated = !isAnimated;
+    });
+  }
 };
