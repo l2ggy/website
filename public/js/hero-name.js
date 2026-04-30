@@ -42,9 +42,9 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
-  const isTouchInteraction = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+  const supportsHoverCursor = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
 
-  if (isTouchInteraction) {
+  if (!supportsHoverCursor) {
     let isAnimated = false;
     heroName.addEventListener("click", () => {
       if (isAnimated) {
