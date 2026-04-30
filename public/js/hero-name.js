@@ -18,6 +18,8 @@ export const splitHeroNameLetters = () => {
     span.setAttribute("aria-hidden", "true");
     return span;
   });
+  const LETTER_TRANSITION_MS = 320;
+  let resetTimerId;
 
   const randomizeHeroLetters = () => {
     letterSpans.forEach((span) => {
@@ -26,13 +28,28 @@ export const splitHeroNameLetters = () => {
     });
   };
 
-  const showPlainName = () => {
-    heroName.classList.remove("hero-name-animate", "hero-name-split");
-    heroName.removeAttribute("aria-label");
-    heroName.textContent = originalText;
+  const showPlainName = (immediate = false) => {
+    clearTimeout(resetTimerId);
+    if (!heroName.classList.contains("hero-name-split") || immediate) {
+      heroName.classList.remove("hero-name-animate", "hero-name-split");
+      heroName.removeAttribute("aria-label");
+      heroName.textContent = originalText;
+      return;
+    }
+
+    heroName.classList.remove("hero-name-animate");
+    resetTimerId = window.setTimeout(() => {
+      if (heroName.classList.contains("hero-name-animate")) {
+        return;
+      }
+      heroName.classList.remove("hero-name-split");
+      heroName.removeAttribute("aria-label");
+      heroName.textContent = originalText;
+    }, LETTER_TRANSITION_MS);
   };
 
   const showAnimatedName = () => {
+    clearTimeout(resetTimerId);
     randomizeHeroLetters();
     heroName.classList.remove("hero-name-animate");
     heroName.classList.add("hero-name-split");
