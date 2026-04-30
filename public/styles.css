@@ -312,11 +312,11 @@ button {
 
 .hero-globe {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 50%;
-  width: calc(100% * var(--globe-scale, 1));
-  height: calc(100% * var(--globe-scale, 1));
-  transform: translate(-50%, -50%);
+  width: min(calc(100% * var(--globe-scale, 1)), calc(100vw - 1.2rem));
+  height: auto;
+  transform: translateX(-50%);
   display: block;
   touch-action: none;
   -webkit-user-select: none;
@@ -694,6 +694,7 @@ body.is-globe-dragging * {
   .globe-column {
     position: static;
     margin-top: var(--space-1);
+    order: -1;
   }
 
   .entry-head {
