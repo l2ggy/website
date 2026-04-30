@@ -9,12 +9,32 @@ export const splitHeroNameLetters = () => {
     return;
   }
 
-  const letterSpans = Array.from(originalText).map((letter, index) => {
+  const ligatureGroups = ["ffl", "ffi", "ff", "fi", "fl"];
+  const splitIntoAnimatedUnits = (text) => {
+    const units = [];
+    let index = 0;
+
+    while (index < text.length) {
+      const ligature = ligatureGroups.find((group) => text.startsWith(group, index));
+      if (ligature) {
+        units.push(ligature);
+        index += ligature.length;
+        continue;
+      }
+
+      units.push(text[index]);
+      index += 1;
+    }
+
+    return units;
+  };
+
+  const letterSpans = splitIntoAnimatedUnits(originalText).map((unit, index) => {
     const span = document.createElement("span");
     span.className = "hero-letter";
     span.style.setProperty("--hero-letter-i", index);
     span.style.setProperty("--hero-letter-stagger", String(index));
-    span.textContent = letter === " " ? "\u00A0" : letter;
+    span.textContent = unit === " " ? "\u00A0" : unit;
     span.setAttribute("aria-hidden", "true");
     return span;
   });
