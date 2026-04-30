@@ -294,6 +294,8 @@ button {
   width: min(30vw, 248px);
   min-width: 128px;
   margin-left: auto;
+  position: relative;
+  overflow: visible;
 }
 
 .globe-visitor-count {
@@ -311,7 +313,16 @@ button {
   -webkit-user-select: none;
   user-select: none;
   -webkit-user-drag: none;
-  cursor: grab;
+  transform-origin: center;
+  transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+  cursor: zoom-in;
+}
+
+.hero-globe.is-zoomed {
+  transform: scale(1.85);
+  cursor: zoom-out;
+  z-index: 2;
 }
 
 .hero-globe:active {

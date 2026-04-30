@@ -231,6 +231,8 @@ export const setupInteractiveGlobe = (markers = []) => {
   let previousY = 0;
   let dpr = Math.max(1, window.devicePixelRatio || 1);
   let isAnimating = false;
+  let isZoomed = false;
+  let draggedDistance = 0;
   let sphere = buildSphereSamples(globe.clientWidth || 248);
   let landMask = null;
   let frameBuffer = null;
@@ -322,11 +324,17 @@ export const setupInteractiveGlobe = (markers = []) => {
     window.requestAnimationFrame(onFrame);
   };
 
+  const toggleZoom = () => {
+    isZoomed = !isZoomed;
+    globe.classList.toggle("is-zoomed", isZoomed);
+  };
+
   const onPointerDown = (event) => {
     event.preventDefault();
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    draggedDistance = 0;
     velocity = 0;
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
@@ -342,6 +350,7 @@ export const setupInteractiveGlobe = (markers = []) => {
     const deltaY = event.clientY - previousY;
     previousX = event.clientX;
     previousY = event.clientY;
+    draggedDistance += Math.hypot(deltaX, deltaY);
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
     const yawFactor = 0.012 * dragScale;
     const pitchFactor = 0.008 * dragScale;
@@ -359,9 +368,14 @@ export const setupInteractiveGlobe = (markers = []) => {
     if (event.pointerId !== pointerId) {
       return;
     }
+    const wasTap = draggedDistance < 10;
     pointerId = null;
+    draggedDistance = 0;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
+    if (wasTap) {
+      toggleZoom();
+    }
   };
 
   const start = () => {
