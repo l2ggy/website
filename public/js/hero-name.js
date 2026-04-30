@@ -18,7 +18,6 @@ export const splitHeroNameLetters = () => {
     span.setAttribute("aria-hidden", "true");
     return span;
   });
-  const plainResetDurationMs = 320 + letterSpans.length * 18;
   let plainResetTimeoutId = null;
 
   const randomizeHeroLetters = () => {
@@ -26,6 +25,21 @@ export const splitHeroNameLetters = () => {
       span.style.setProperty("--hero-letter-seed", (Math.random() * 2 - 1).toFixed(3));
       span.style.setProperty("--hero-letter-stagger", String(Math.floor(Math.random() * letterSpans.length)));
     });
+  };
+
+
+  const resetToPlainText = () => {
+    heroName.classList.remove("hero-name-split");
+    heroName.removeAttribute("aria-label");
+    heroName.textContent = originalText;
+  };
+
+  const getReturnAnimationDurationMs = () => {
+    const durations = letterSpans.map((span) => {
+      const computed = window.getComputedStyle(span);
+      return (parseFloat(computed.transitionDuration) + parseFloat(computed.transitionDelay)) * 1000;
+    });
+    return Math.max(...durations, 0);
   };
 
   const showPlainName = () => {
@@ -38,11 +52,9 @@ export const splitHeroNameLetters = () => {
       window.clearTimeout(plainResetTimeoutId);
     }
     plainResetTimeoutId = window.setTimeout(() => {
-      heroName.classList.remove("hero-name-split");
-      heroName.removeAttribute("aria-label");
-      heroName.textContent = originalText;
+      resetToPlainText();
       plainResetTimeoutId = null;
-    }, plainResetDurationMs);
+    }, getReturnAnimationDurationMs());
   };
 
   const showAnimatedName = () => {
