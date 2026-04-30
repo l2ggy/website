@@ -5,6 +5,7 @@ const LONGITUDE_SHIFTS = [-360, 0, 360];
 const HOME_MARKER = { lat: 43.65, lon: -79.38 };
 const HOME_MARKER_COLOR = "#1E3765";
 const VISITOR_MARKER_COLOR = "#B5744A";
+const ZOOM_SCALE = 1.95;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -236,11 +237,40 @@ export const setupInteractiveGlobe = (markers = []) => {
   let frameBuffer = null;
   let lineColor = "#d9dce1";
   let textColor = "#15191f";
+  let isZoomed = false;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
   const getRenderDpr = () => {
-    const nextDpr = Math.max(1, window.devicePixelRatio || 1);
-    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+    const nativeDpr = Math.max(1, window.devicePixelRatio || 1);
+    const baseCap = isCoarsePointer() ? 1.75 : 2.5;
+    const zoomCap = isCoarsePointer() ? 2.5 : 3.5;
+    const targetDpr = isZoomed ? nativeDpr * 1.2 : nativeDpr;
+    return Math.min(targetDpr, isZoomed ? zoomCap : baseCap);
+  };
+
+  let zoomTransitionFrame = 0;
+  const redrawDuringZoomTransition = () => {
+    updateSize();
+    draw();
+    zoomTransitionFrame = window.requestAnimationFrame(redrawDuringZoomTransition);
+  };
+
+  const syncZoomTransition = () => {
+    if (zoomTransitionFrame) {
+      window.cancelAnimationFrame(zoomTransitionFrame);
+    }
+    redrawDuringZoomTransition();
+    window.setTimeout(() => {
+      if (zoomTransitionFrame) {
+        window.cancelAnimationFrame(zoomTransitionFrame);
+        zoomTransitionFrame = 0;
+      }
+      updateSize();
+      draw();
+    }, 340);
   };
 
   const updateSize = () => {
@@ -327,6 +357,9 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    pointerMoved = false;
     velocity = 0;
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
@@ -340,6 +373,11 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
+    if (!pointerMoved) {
+      const movedX = event.clientX - pointerStartX;
+      const movedY = event.clientY - pointerStartY;
+      pointerMoved = (movedX * movedX) + (movedY * movedY) > 49;
+    }
     previousX = event.clientX;
     previousY = event.clientY;
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
@@ -362,6 +400,12 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
+    if (!pointerMoved) {
+      isZoomed = !isZoomed;
+      globe.classList.toggle("is-zoomed", isZoomed);
+      globe.style.setProperty("--globe-scale", isZoomed ? String(ZOOM_SCALE) : "1");
+      syncZoomTransition();
+    }
   };
 
   const start = () => {

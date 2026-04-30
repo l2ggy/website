@@ -296,6 +296,13 @@ button {
   margin-left: auto;
 }
 
+.hero-globe-stage {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  overflow: visible;
+}
+
 .globe-visitor-count {
   margin-bottom: var(--space-1);
   color: var(--muted);
@@ -304,14 +311,26 @@ button {
 }
 
 .hero-globe {
-  width: 100%;
-  height: auto;
+  --globe-scale: 1;
+  width: calc(100% * var(--globe-scale));
+  height: calc(100% * var(--globe-scale));
   display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
   -webkit-user-drag: none;
   cursor: grab;
+  transition:
+    width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-globe.is-zoomed {
+  --globe-scale: 1.95;
 }
 
 .hero-globe:active {
