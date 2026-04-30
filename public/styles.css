@@ -680,23 +680,6 @@ body.is-globe-dragging * {
     margin-top: var(--space-1);
   }
 
-  .entry-head {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: baseline;
-    column-gap: 0.2rem;
-  }
-
-  .entry-head h3 {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
-
-  .entry-dates {
-    font-size: 0.74rem;
-    letter-spacing: -0.01em;
-  }
-
   .stats-item {
     gap: 0.28rem;
     padding-right: 0;
