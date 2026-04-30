@@ -635,7 +635,6 @@ body.is-globe-dragging * {
 @media (max-width: 700px) {
   :root {
     --footer-h: 64px;
-    --entry-icon-size: 39.1px;
   }
 
   .container {
@@ -681,13 +680,19 @@ body.is-globe-dragging * {
     margin-top: var(--space-1);
   }
 
-  .entry h3 {
-    font-size: 0.867rem;
+  .entry-head {
+    gap: 0.5rem;
   }
 
-  .entry-main > p,
+  .entry-head h3 {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .entry-dates {
-    font-size: 0.85rem;
+    font-size: 0.92rem;
   }
 
   .stats-item {
