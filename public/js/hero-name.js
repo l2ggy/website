@@ -20,6 +20,7 @@ export const splitHeroNameLetters = () => {
   });
   const plainResetDurationMs = 320 + letterSpans.length * 18;
   let plainResetTimeoutId = null;
+  let pendingTransitions = 0;
 
   const randomizeHeroLetters = () => {
     letterSpans.forEach((span) => {
@@ -34,6 +35,7 @@ export const splitHeroNameLetters = () => {
       return;
     }
     heroName.classList.remove("hero-name-animate");
+    pendingTransitions = letterSpans.length;
     if (plainResetTimeoutId) {
       window.clearTimeout(plainResetTimeoutId);
     }
@@ -56,8 +58,25 @@ export const splitHeroNameLetters = () => {
     heroName.setAttribute("aria-label", originalText);
     heroName.textContent = "";
     letterSpans.forEach((span) => heroName.append(span));
-    requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
+    void heroName.offsetWidth;
+    heroName.classList.add("hero-name-animate");
   };
+
+  heroName.addEventListener("transitionend", (event) => {
+    if (!event.target.classList.contains("hero-letter") || heroName.classList.contains("hero-name-animate")) {
+      return;
+    }
+    pendingTransitions -= 1;
+    if (pendingTransitions <= 0) {
+      heroName.classList.remove("hero-name-split");
+      heroName.removeAttribute("aria-label");
+      heroName.textContent = originalText;
+      if (plainResetTimeoutId) {
+        window.clearTimeout(plainResetTimeoutId);
+        plainResetTimeoutId = null;
+      }
+    }
+  });
 
   const supportsHoverCursor = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
 
