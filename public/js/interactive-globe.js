@@ -178,6 +178,8 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
 
     const x = center + rotated[0] * radius;
     const y = center - rotated[1] * radius;
+    const markerX = Math.round(x * dpr) / dpr;
+    const markerY = Math.round(y * dpr) / dpr;
     const weight = Number.isFinite(marker.count) ? marker.count : 1;
     const dot = marker.isHome
       ? Math.max(2.8, radius * 0.022)
@@ -186,19 +188,19 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
 
     if (marker.isHome) {
       ctx.beginPath();
-      ctx.arc(x, y, dot * 1.8, 0, TAU);
+      ctx.arc(markerX, markerY, dot * 1.8, 0, TAU);
       ctx.strokeStyle = `${HOME_MARKER_COLOR}b8`;
       ctx.lineWidth = Math.max(1, dpr * 0.9);
       ctx.stroke();
     }
 
     ctx.beginPath();
-    ctx.arc(x, y, dot, 0, TAU);
+    ctx.arc(markerX, markerY, dot, 0, TAU);
     ctx.fillStyle = marker.isHome ? HOME_MARKER_COLOR : VISITOR_MARKER_COLOR;
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(x, y, dot, 0, TAU);
+    ctx.arc(markerX, markerY, dot, 0, TAU);
     ctx.strokeStyle = marker.isHome ? "rgba(255, 255, 255, 0.78)" : "rgba(8, 12, 22, 0.38)";
     ctx.lineWidth = outline;
     ctx.stroke();
@@ -236,11 +238,17 @@ export const setupInteractiveGlobe = (markers = []) => {
   let frameBuffer = null;
   let lineColor = "#d9dce1";
   let textColor = "#15191f";
+  let isZoomed = false;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
   const getRenderDpr = () => {
     const nextDpr = Math.max(1, window.devicePixelRatio || 1);
-    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+    const baseCap = isCoarsePointer() ? 1.75 : 2.5;
+    const zoomCap = isCoarsePointer() ? 3 : 4;
+    return Math.min(nextDpr, isZoomed ? zoomCap : baseCap);
   };
 
   const updateSize = () => {
@@ -263,6 +271,7 @@ export const setupInteractiveGlobe = (markers = []) => {
     const { size, center, radius, count, sampleX, sampleY, sampleVX, sampleVY, sampleVZ } = sphere;
 
     ctx.clearRect(0, 0, size, size);
+    ctx.imageSmoothingEnabled = false;
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, TAU);
     ctx.fillStyle = `${lineColor}78`;
@@ -327,6 +336,9 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    pointerMoved = false;
     velocity = 0;
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
@@ -340,6 +352,11 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
+    if (!pointerMoved) {
+      const movedX = event.clientX - pointerStartX;
+      const movedY = event.clientY - pointerStartY;
+      pointerMoved = (movedX * movedX) + (movedY * movedY) > 49;
+    }
     previousX = event.clientX;
     previousY = event.clientY;
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
@@ -362,6 +379,12 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
+    if (!pointerMoved) {
+      isZoomed = !isZoomed;
+      globe.classList.toggle("is-zoomed", isZoomed);
+      updateSize();
+      draw();
+    }
   };
 
   const start = () => {
