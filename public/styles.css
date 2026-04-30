@@ -317,7 +317,7 @@ button {
 }
 
 .hero-globe.is-zoomed {
-  transform: scale(1.95);
+  transform: scale(2);
 }
 
 .hero-globe:active {

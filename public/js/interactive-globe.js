@@ -176,8 +176,10 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
       return;
     }
 
-    const x = center + rotated[0] * radius;
-    const y = center - rotated[1] * radius;
+    const xRaw = center + rotated[0] * radius;
+    const yRaw = center - rotated[1] * radius;
+    const x = Math.round(xRaw * 2) / 2;
+    const y = Math.round(yRaw * 2) / 2;
     const weight = Number.isFinite(marker.count) ? marker.count : 1;
     const dot = marker.isHome
       ? Math.max(2.8, radius * 0.022)
@@ -268,6 +270,7 @@ export const setupInteractiveGlobe = (markers = []) => {
   const draw = () => {
     const { size, center, radius, count, sampleX, sampleY, sampleVX, sampleVY, sampleVZ } = sphere;
 
+    ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, size, size);
     ctx.beginPath();
     ctx.arc(center, center, radius, 0, TAU);
