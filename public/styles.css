@@ -327,6 +327,13 @@ button {
   transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1), height 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@media (min-width: 701px) {
+  .hero-globe {
+    top: auto;
+    bottom: 0;
+  }
+}
+
 .hero-globe:active {
   cursor: grabbing;
 }
