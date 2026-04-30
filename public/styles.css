@@ -680,11 +680,15 @@ body.is-globe-dragging * {
     margin-top: var(--space-1);
   }
 
+  .entry {
+    gap: 0.7rem;
+  }
+
   .entry-head {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: baseline;
-    column-gap: 0.45rem;
+    column-gap: 0.3rem;
   }
 
   .entry-head h3 {
@@ -693,7 +697,8 @@ body.is-globe-dragging * {
   }
 
   .entry-dates {
-    font-size: 0.82rem;
+    font-size: 0.76rem;
+    letter-spacing: -0.01em;
   }
 
   .stats-item {
