@@ -210,6 +210,10 @@ export const setupInteractiveGlobe = (markers = []) => {
   if (!globe) {
     return;
   }
+  const globeFrame = globe.closest(".hero-globe-frame");
+  if (!globeFrame) {
+    return;
+  }
   const safeMarkers = markers.filter(
     (marker) => Number.isFinite(marker?.lat) && Number.isFinite(marker?.lon),
   );
@@ -236,16 +240,24 @@ export const setupInteractiveGlobe = (markers = []) => {
   let frameBuffer = null;
   let lineColor = "#d9dce1";
   let textColor = "#15191f";
+  let isZoomed = false;
+  const zoomScale = 1.95;
+  const renderScale = 1.6;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
   const getRenderDpr = () => {
-    const nextDpr = Math.max(1, window.devicePixelRatio || 1);
-    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+    const nativeDpr = Math.max(1, window.devicePixelRatio || 1);
+    const dprCap = isCoarsePointer() ? 1.6 : 2.2;
+    return Math.min(nativeDpr, dprCap);
   };
 
   const updateSize = () => {
     dpr = getRenderDpr();
-    const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
+    const baseSize = globeFrame.clientWidth || 248;
+    const cssSize = Math.max(140, Math.round(baseSize * renderScale));
     const pixelSize = Math.round(cssSize * dpr);
     globe.width = pixelSize;
     globe.height = pixelSize;
@@ -327,6 +339,9 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    pointerMoved = false;
     velocity = 0;
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
@@ -340,6 +355,11 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
+    if (!pointerMoved) {
+      const movedX = event.clientX - pointerStartX;
+      const movedY = event.clientY - pointerStartY;
+      pointerMoved = (movedX * movedX) + (movedY * movedY) > 49;
+    }
     previousX = event.clientX;
     previousY = event.clientY;
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
@@ -362,6 +382,10 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
+    if (!pointerMoved) {
+      isZoomed = !isZoomed;
+      globe.style.setProperty("--globe-scale", isZoomed ? `${zoomScale}` : "1");
+    }
   };
 
   const start = () => {
@@ -379,7 +403,9 @@ export const setupInteractiveGlobe = (markers = []) => {
     start();
   });
 
-  window.addEventListener("resize", updateSize);
+  window.addEventListener("resize", () => {
+    updateSize();
+  });
   new MutationObserver(updateColors).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"],
