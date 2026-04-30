@@ -42,7 +42,7 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
-  const supportsHoverCursor = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+  const supportsHoverCursor = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   if (!supportsHoverCursor) {
     let isAnimated = false;
