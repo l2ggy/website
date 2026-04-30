@@ -291,6 +291,7 @@ button {
 }
 
 .hero-globe-wrap {
+  position: relative;
   width: min(30vw, 248px);
   min-width: 128px;
   margin-left: auto;
@@ -312,6 +313,13 @@ button {
   user-select: none;
   -webkit-user-drag: none;
   cursor: grab;
+  transform-origin: center;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.hero-globe-wrap.is-globe-zoomed .hero-globe {
+  transform: scale(1.9);
 }
 
 .hero-globe:active {
@@ -322,6 +330,12 @@ body.is-globe-dragging,
 body.is-globe-dragging * {
   -webkit-user-select: none;
   user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-globe {
+    transition: none;
+  }
 }
 
 .lower-layout {

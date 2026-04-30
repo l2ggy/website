@@ -207,6 +207,7 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
 
 export const setupInteractiveGlobe = (markers = []) => {
   const globe = document.querySelector("#hero-globe");
+  const globeWrap = globe?.closest(".hero-globe-wrap");
   if (!globe) {
     return;
   }
@@ -229,6 +230,9 @@ export const setupInteractiveGlobe = (markers = []) => {
   let pointerId = null;
   let previousX = 0;
   let previousY = 0;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let didDrag = false;
   let dpr = Math.max(1, window.devicePixelRatio || 1);
   let isAnimating = false;
   let sphere = buildSphereSamples(globe.clientWidth || 248);
@@ -327,6 +331,9 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    didDrag = false;
     velocity = 0;
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
@@ -340,6 +347,13 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
+    if (!didDrag) {
+      const moveX = event.clientX - pointerStartX;
+      const moveY = event.clientY - pointerStartY;
+      if ((moveX * moveX) + (moveY * moveY) > 64) {
+        didDrag = true;
+      }
+    }
     previousX = event.clientX;
     previousY = event.clientY;
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
@@ -358,6 +372,9 @@ export const setupInteractiveGlobe = (markers = []) => {
   const onPointerUp = (event) => {
     if (event.pointerId !== pointerId) {
       return;
+    }
+    if (!didDrag && globeWrap) {
+      globeWrap.classList.toggle("is-globe-zoomed");
     }
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
