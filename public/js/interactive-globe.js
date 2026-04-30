@@ -210,6 +210,10 @@ export const setupInteractiveGlobe = (markers = []) => {
   if (!globe) {
     return;
   }
+  const globeFrame = globe.closest(".hero-globe-frame");
+  if (!globeFrame) {
+    return;
+  }
   const safeMarkers = markers.filter(
     (marker) => Number.isFinite(marker?.lat) && Number.isFinite(marker?.lon),
   );
@@ -236,16 +240,54 @@ export const setupInteractiveGlobe = (markers = []) => {
   let frameBuffer = null;
   let lineColor = "#d9dce1";
   let textColor = "#15191f";
+  let isZoomed = false;
+  const defaultZoomScale = 1.95;
+  let isInteracting = false;
+  let settleTimer = null;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+  const getZoomScale = () => {
+    const frameSize = globeFrame.clientWidth || 248;
+    const viewportLimit = Math.max(240, window.innerWidth - 24);
+    const fitScale = viewportLimit / frameSize;
+    return Math.max(1, Math.min(defaultZoomScale, fitScale));
+  };
   const getRenderDpr = () => {
-    const nextDpr = Math.max(1, window.devicePixelRatio || 1);
-    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+    const nativeDpr = Math.max(1, window.devicePixelRatio || 1);
+    const currentZoomScale = getZoomScale();
+    const idleCap = isZoomed
+      ? (isCoarsePointer() ? 2.4 : 3.2)
+      : (isCoarsePointer() ? 1.6 : 2.2);
+    const activeCap = isZoomed
+      ? (isCoarsePointer() ? 1.6 : 2.2)
+      : (isCoarsePointer() ? 1.35 : 1.7);
+    const zoomWeight = isZoomed ? Math.max(1, currentZoomScale / defaultZoomScale) : 1;
+    return Math.min(nativeDpr, (isInteracting ? activeCap : idleCap) * zoomWeight);
   };
 
-  const updateSize = () => {
+  const refreshRenderScale = (scale) => {
+    updateSize(scale);
+    draw();
+  };
+
+  const scheduleIdleQuality = (scale, delay = 140) => {
+    if (settleTimer) {
+      window.clearTimeout(settleTimer);
+    }
+    settleTimer = window.setTimeout(() => {
+      isInteracting = false;
+      refreshRenderScale(scale);
+      settleTimer = null;
+    }, delay);
+  };
+
+  const updateSize = (scale = 1) => {
     dpr = getRenderDpr();
-    const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
+    const baseSize = globeFrame.clientWidth || 248;
+    const cssSize = Math.max(140, Math.round(baseSize * scale));
     const pixelSize = Math.round(cssSize * dpr);
     globe.width = pixelSize;
     globe.height = pixelSize;
@@ -327,7 +369,16 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    pointerMoved = false;
     velocity = 0;
+    isInteracting = true;
+    if (settleTimer) {
+      window.clearTimeout(settleTimer);
+      settleTimer = null;
+    }
+    refreshRenderScale(isZoomed ? getZoomScale() : 1);
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
   };
@@ -340,6 +391,11 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
+    if (!pointerMoved) {
+      const movedX = event.clientX - pointerStartX;
+      const movedY = event.clientY - pointerStartY;
+      pointerMoved = (movedX * movedX) + (movedY * movedY) > 49;
+    }
     previousX = event.clientX;
     previousY = event.clientY;
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
@@ -362,10 +418,19 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
+    if (!pointerMoved) {
+      isZoomed = !isZoomed;
+      const nextScale = isZoomed ? getZoomScale() : 1;
+      globe.style.setProperty("--globe-scale", `${nextScale}`);
+      refreshRenderScale(nextScale);
+      scheduleIdleQuality(nextScale, 360);
+      return;
+    }
+    scheduleIdleQuality(isZoomed ? getZoomScale() : 1);
   };
 
   const start = () => {
-    updateSize();
+    updateSize(1);
     updateColors();
     draw();
     isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -379,7 +444,11 @@ export const setupInteractiveGlobe = (markers = []) => {
     start();
   });
 
-  window.addEventListener("resize", updateSize);
+  window.addEventListener("resize", () => {
+    const nextScale = isZoomed ? getZoomScale() : 1;
+    globe.style.setProperty("--globe-scale", `${nextScale}`);
+    updateSize(nextScale);
+  });
   new MutationObserver(updateColors).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"],
