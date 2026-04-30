@@ -302,11 +302,6 @@ button {
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: visible;
-  transition: margin-bottom 320ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.hero-globe-wrap.is-zoomed .hero-globe-frame {
-  margin-bottom: calc((var(--globe-zoom-scale) - 1) * 100%);
 }
 
 .globe-visitor-count {
@@ -690,6 +685,14 @@ body.is-globe-dragging * {
   .globe-visitor-count {
     margin-bottom: 0;
     text-align: center;
+  }
+
+  .hero-globe-frame {
+    transition: margin-bottom 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .hero-globe-wrap.is-zoomed .hero-globe-frame {
+    margin-bottom: calc((var(--globe-zoom-scale) - 1) * 100%);
   }
 
   .lower-layout {
