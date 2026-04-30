@@ -236,21 +236,46 @@ export const setupInteractiveGlobe = (markers = []) => {
   let frameBuffer = null;
   let lineColor = "#d9dce1";
   let textColor = "#15191f";
+  let isZoomed = false;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
   const getRenderDpr = () => {
-    const nextDpr = Math.max(1, window.devicePixelRatio || 1);
-    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+    const nativeDpr = Math.max(1, window.devicePixelRatio || 1);
+    const baseCap = isCoarsePointer() ? 1.75 : 2.5;
+    const zoomCap = isCoarsePointer() ? 3.5 : 5;
+    const targetDpr = isZoomed ? nativeDpr * 2 : nativeDpr;
+    return Math.min(targetDpr, isZoomed ? zoomCap : baseCap);
   };
 
   const updateSize = () => {
     dpr = getRenderDpr();
     const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
     const pixelSize = Math.round(cssSize * dpr);
+    if (pixelSize === lastPixelSize) {
+      return false;
+    }
+    lastPixelSize = pixelSize;
     globe.width = pixelSize;
     globe.height = pixelSize;
     sphere = buildSphereSamples(pixelSize);
     frameBuffer = ctx.createImageData(pixelSize, pixelSize);
+    return true;
+  };
+
+  const scheduleResizeRender = () => {
+    if (resizeRaf) {
+      return;
+    }
+    resizeRaf = window.requestAnimationFrame(() => {
+      resizeRaf = 0;
+      const sizeChanged = updateSize();
+      if (sizeChanged || !isAnimating) {
+        draw();
+      }
+    });
   };
 
   const updateColors = () => {
@@ -327,6 +352,9 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    pointerMoved = false;
     velocity = 0;
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
@@ -340,6 +368,11 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
+    if (!pointerMoved) {
+      const movedX = event.clientX - pointerStartX;
+      const movedY = event.clientY - pointerStartY;
+      pointerMoved = (movedX * movedX) + (movedY * movedY) > 49;
+    }
     previousX = event.clientX;
     previousY = event.clientY;
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
@@ -362,6 +395,11 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
+    if (!pointerMoved) {
+      isZoomed = !isZoomed;
+      globe.style.setProperty("--globe-scale", isZoomed ? "1.95" : "1");
+      scheduleResizeRender();
+    }
   };
 
   const start = () => {
@@ -379,7 +417,8 @@ export const setupInteractiveGlobe = (markers = []) => {
     start();
   });
 
-  window.addEventListener("resize", updateSize);
+  window.addEventListener("resize", scheduleResizeRender);
+  new ResizeObserver(scheduleResizeRender).observe(globe);
   new MutationObserver(updateColors).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"],
@@ -390,3 +429,5 @@ export const setupInteractiveGlobe = (markers = []) => {
   globe.addEventListener("pointercancel", onPointerUp);
   globe.addEventListener("dragstart", (event) => event.preventDefault());
 };
+  let lastPixelSize = 0;
+  let resizeRaf = 0;
