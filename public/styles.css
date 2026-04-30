@@ -635,7 +635,7 @@ body.is-globe-dragging * {
 @media (max-width: 700px) {
   :root {
     --footer-h: 64px;
-    --entry-icon-size: 41.4px;
+    --entry-icon-size: 39.1px;
   }
 
   .container {
@@ -682,12 +682,12 @@ body.is-globe-dragging * {
   }
 
   .entry h3 {
-    font-size: 0.918rem;
+    font-size: 0.867rem;
   }
 
   .entry-main > p,
   .entry-dates {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
   .stats-item {
