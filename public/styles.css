@@ -689,9 +689,7 @@ body.is-globe-dragging * {
 
   .entry-head h3 {
     min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
   }
 
   .entry-dates {
