@@ -244,7 +244,9 @@ export const setupInteractiveGlobe = (markers = []) => {
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
   const getRenderDpr = () => {
     const nextDpr = Math.max(1, window.devicePixelRatio || 1);
-    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+    const baseCap = isCoarsePointer() ? 1.75 : 2.5;
+    const zoomCap = isCoarsePointer() ? 2.5 : 3.5;
+    return Math.min(nextDpr, isZoomed ? zoomCap : baseCap);
   };
 
   const updateSize = () => {
@@ -377,6 +379,8 @@ export const setupInteractiveGlobe = (markers = []) => {
     if (!pointerMoved) {
       isZoomed = !isZoomed;
       globe.classList.toggle("is-zoomed", isZoomed);
+      updateSize();
+      draw();
     }
   };
 
