@@ -18,6 +18,8 @@ export const splitHeroNameLetters = () => {
     span.setAttribute("aria-hidden", "true");
     return span;
   });
+  const resetDurationMs = letterSpans.length * 18 + 320;
+  let resetTimer = null;
 
   const randomizeHeroLetters = () => {
     letterSpans.forEach((span) => {
@@ -27,12 +29,32 @@ export const splitHeroNameLetters = () => {
   };
 
   const showPlainName = () => {
-    heroName.classList.remove("hero-name-animate", "hero-name-split");
-    heroName.removeAttribute("aria-label");
-    heroName.textContent = originalText;
+    if (resetTimer) {
+      clearTimeout(resetTimer);
+      resetTimer = null;
+    }
+
+    if (!heroName.classList.contains("hero-name-split")) {
+      heroName.classList.remove("hero-name-animate");
+      heroName.removeAttribute("aria-label");
+      heroName.textContent = originalText;
+      return;
+    }
+
+    heroName.classList.remove("hero-name-animate");
+    resetTimer = window.setTimeout(() => {
+      heroName.classList.remove("hero-name-split");
+      heroName.removeAttribute("aria-label");
+      heroName.textContent = originalText;
+      resetTimer = null;
+    }, resetDurationMs);
   };
 
   const showAnimatedName = () => {
+    if (resetTimer) {
+      clearTimeout(resetTimer);
+      resetTimer = null;
+    }
     randomizeHeroLetters();
     heroName.classList.remove("hero-name-animate");
     heroName.classList.add("hero-name-split");
@@ -42,9 +64,35 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
-  showPlainName();
-  heroName.addEventListener("pointerenter", showAnimatedName);
-  heroName.addEventListener("focusin", showAnimatedName);
-  heroName.addEventListener("pointerleave", showPlainName);
-  heroName.addEventListener("focusout", showPlainName);
+  const supportsHoverCursor = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+
+  let isAnimated = false;
+  let lastPointerType = "";
+  const toggleAnimatedName = () => {
+    if (isAnimated) {
+      showPlainName();
+    } else {
+      showAnimatedName();
+    }
+    isAnimated = !isAnimated;
+  };
+
+  heroName.addEventListener("pointerdown", (event) => {
+    lastPointerType = event.pointerType;
+  });
+
+  heroName.addEventListener("click", () => {
+    if (supportsHoverCursor && lastPointerType !== "touch" && lastPointerType !== "pen") {
+      return;
+    }
+    toggleAnimatedName();
+  });
+
+  if (supportsHoverCursor) {
+    showPlainName();
+    heroName.addEventListener("pointerenter", showAnimatedName);
+    heroName.addEventListener("focusin", showAnimatedName);
+    heroName.addEventListener("pointerleave", showPlainName);
+    heroName.addEventListener("focusout", showPlainName);
+  }
 };
