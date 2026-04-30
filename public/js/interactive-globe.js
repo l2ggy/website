@@ -5,6 +5,8 @@ const LONGITUDE_SHIFTS = [-360, 0, 360];
 const HOME_MARKER = { lat: 43.65, lon: -79.38 };
 const HOME_MARKER_COLOR = "#1E3765";
 const VISITOR_MARKER_COLOR = "#B5744A";
+const VISITOR_MARKER_OUTLINE = "rgba(255, 247, 236, 0.78)";
+const VISITOR_MARKER_GLOW = "rgba(181, 116, 74, 0.22)";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -195,6 +197,17 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
     ctx.arc(x, y, dot, 0, TAU);
     ctx.fillStyle = marker.isHome ? HOME_MARKER_COLOR : VISITOR_MARKER_COLOR;
     ctx.fill();
+
+    if (!marker.isHome) {
+      ctx.strokeStyle = VISITOR_MARKER_OUTLINE;
+      ctx.lineWidth = Math.max(0.6, dpr * 0.48);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(x, y, dot * 1.55, 0, TAU);
+      ctx.strokeStyle = VISITOR_MARKER_GLOW;
+      ctx.lineWidth = Math.max(0.7, dpr * 0.56);
+      ctx.stroke();
+    }
   });
 };
 
