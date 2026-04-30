@@ -706,9 +706,12 @@ body.is-globe-dragging * {
   }
 
   .entry-head {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.08rem;
+    align-items: baseline;
+    gap: var(--space-1);
+  }
+
+  .entry-dates {
+    margin-left: auto;
   }
 
   .stats-item {
