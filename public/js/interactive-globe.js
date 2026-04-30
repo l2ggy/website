@@ -380,8 +380,10 @@ export const setupInteractiveGlobe = (markers = []) => {
     if (!pointerMoved) {
       isZoomed = !isZoomed;
       globe.style.setProperty("--globe-scale", isZoomed ? "1.95" : "1");
-      updateSize();
-      draw();
+      window.requestAnimationFrame(() => {
+        updateSize();
+        draw();
+      });
     }
   };
 
