@@ -176,8 +176,8 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
       return;
     }
 
-    const x = center + rotated[0] * radius;
-    const y = center - rotated[1] * radius;
+    const x = Math.round((center + rotated[0] * radius) * dpr) / dpr;
+    const y = Math.round((center - rotated[1] * radius) * dpr) / dpr;
     const weight = Number.isFinite(marker.count) ? marker.count : 1;
     const dot = marker.isHome
       ? Math.max(2.8, radius * 0.022)
@@ -236,11 +236,17 @@ export const setupInteractiveGlobe = (markers = []) => {
   let frameBuffer = null;
   let lineColor = "#d9dce1";
   let textColor = "#15191f";
+  let isZoomed = false;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
   const getRenderDpr = () => {
     const nextDpr = Math.max(1, window.devicePixelRatio || 1);
-    return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
+    const baseCap = isCoarsePointer() ? 1.75 : 2.5;
+    const boostedDpr = Math.min(nextDpr, baseCap) * (isZoomed ? 1.9 : 1);
+    return Math.min(boostedDpr, isCoarsePointer() ? 3.5 : 5);
   };
 
   const updateSize = () => {
@@ -327,6 +333,9 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    pointerMoved = false;
     velocity = 0;
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
@@ -340,6 +349,11 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
+    if (!pointerMoved) {
+      const movedX = event.clientX - pointerStartX;
+      const movedY = event.clientY - pointerStartY;
+      pointerMoved = (movedX * movedX) + (movedY * movedY) > 49;
+    }
     previousX = event.clientX;
     previousY = event.clientY;
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
@@ -362,6 +376,12 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
+    if (!pointerMoved) {
+      isZoomed = !isZoomed;
+      globe.classList.toggle("is-zoomed", isZoomed);
+      updateSize();
+      draw();
+    }
   };
 
   const start = () => {
