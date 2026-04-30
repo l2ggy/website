@@ -236,6 +236,10 @@ export const setupInteractiveGlobe = (markers = []) => {
   let frameBuffer = null;
   let lineColor = "#d9dce1";
   let textColor = "#15191f";
+  let isZoomed = false;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
   const getRenderDpr = () => {
@@ -243,8 +247,10 @@ export const setupInteractiveGlobe = (markers = []) => {
     return Math.min(nextDpr, isCoarsePointer() ? 1.75 : 2.5);
   };
 
+  const getZoomRenderScale = () => (isZoomed ? 1.9 : 1);
+
   const updateSize = () => {
-    dpr = getRenderDpr();
+    dpr = getRenderDpr() * getZoomRenderScale();
     const cssSize = Math.max(140, Math.round(globe.clientWidth || 248));
     const pixelSize = Math.round(cssSize * dpr);
     globe.width = pixelSize;
@@ -327,6 +333,9 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = event.pointerId;
     previousX = event.clientX;
     previousY = event.clientY;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    pointerMoved = false;
     velocity = 0;
     document.body.classList.add("is-globe-dragging");
     globe.setPointerCapture(event.pointerId);
@@ -340,6 +349,11 @@ export const setupInteractiveGlobe = (markers = []) => {
 
     const deltaX = event.clientX - previousX;
     const deltaY = event.clientY - previousY;
+    if (!pointerMoved) {
+      const movedX = event.clientX - pointerStartX;
+      const movedY = event.clientY - pointerStartY;
+      pointerMoved = (movedX * movedX) + (movedY * movedY) > 49;
+    }
     previousX = event.clientX;
     previousY = event.clientY;
     const dragScale = event.pointerType === "touch" ? 1.45 : 1;
@@ -362,6 +376,12 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
+    if (!pointerMoved) {
+      isZoomed = !isZoomed;
+      globe.classList.toggle("is-zoomed", isZoomed);
+      updateSize();
+      draw();
+    }
   };
 
   const start = () => {
