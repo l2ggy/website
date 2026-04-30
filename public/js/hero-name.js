@@ -9,11 +9,24 @@ export const splitHeroNameLetters = () => {
     return;
   }
 
-  const letterSpans = Array.from(originalText).map((letter, index) => {
+  const kerningPairNudges = {
+    fi: -0.08,
+    fl: -0.06,
+    ff: -0.04,
+    ffi: -0.1,
+    ffl: -0.08,
+  };
+
+  const letterSpans = Array.from(originalText).map((letter, index, letters) => {
     const span = document.createElement("span");
     span.className = "hero-letter";
     span.style.setProperty("--hero-letter-i", index);
     span.style.setProperty("--hero-letter-stagger", String(index));
+    const previousLetter = letters[index - 1] || "";
+    const pair = `${previousLetter}${letter}`.toLowerCase();
+    const triple = `${letters[index - 2] || ""}${pair}`.toLowerCase();
+    const kerningNudge = kerningPairNudges[triple] ?? kerningPairNudges[pair] ?? 0;
+    span.style.setProperty("--hero-letter-kerning-nudge", `${kerningNudge}em`);
     span.textContent = letter === " " ? "\u00A0" : letter;
     span.setAttribute("aria-hidden", "true");
     return span;
