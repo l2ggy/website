@@ -9,12 +9,15 @@ export const splitHeroNameLetters = () => {
     return;
   }
 
-  const letterSpans = Array.from(originalText).map((letter, index) => {
+  const ligaturePattern = /(ffi|ffl|ff|fi|fl)/g;
+  const textParts = originalText.split(ligaturePattern).filter(Boolean);
+
+  const letterSpans = textParts.map((part, index) => {
     const span = document.createElement("span");
     span.className = "hero-letter";
     span.style.setProperty("--hero-letter-i", index);
     span.style.setProperty("--hero-letter-stagger", String(index));
-    span.textContent = letter === " " ? "\u00A0" : letter;
+    span.textContent = part === " " ? "\u00A0" : part;
     span.setAttribute("aria-hidden", "true");
     return span;
   });
