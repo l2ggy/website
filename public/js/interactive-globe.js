@@ -247,11 +247,12 @@ export const setupInteractiveGlobe = (markers = []) => {
   let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+  const getMaxRenderPixels = () => (isCoarsePointer() ? 760 : 980);
   const getRenderDpr = () => {
     const nativeDpr = Math.max(1, window.devicePixelRatio || 1);
     const baseCap = isCoarsePointer() ? 1.75 : 2.5;
-    const zoomCap = isCoarsePointer() ? 3.5 : 5;
-    const targetDpr = isZoomed ? nativeDpr * 2 : nativeDpr;
+    const zoomCap = isCoarsePointer() ? 2 : 3;
+    const targetDpr = isZoomed ? nativeDpr * 1.35 : nativeDpr;
     return Math.min(targetDpr, isZoomed ? zoomCap : baseCap);
   };
 
@@ -259,7 +260,7 @@ export const setupInteractiveGlobe = (markers = []) => {
     dpr = getRenderDpr();
     const baseSize = globeFrame.clientWidth || 248;
     const cssSize = Math.max(140, Math.round(baseSize * scale));
-    const pixelSize = Math.round(cssSize * dpr);
+    const pixelSize = Math.min(getMaxRenderPixels(), Math.round(cssSize * dpr));
     globe.width = pixelSize;
     globe.height = pixelSize;
     sphere = buildSphereSamples(pixelSize);
