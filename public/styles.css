@@ -641,10 +641,6 @@ body.is-globe-dragging * {
     width: calc(100% - 1.2rem);
   }
 
-  .entry-dates {
-    text-align: left;
-  }
-
   .hero {
     padding-right: 0;
   }
@@ -685,9 +681,19 @@ body.is-globe-dragging * {
   }
 
   .entry-head {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.08rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: 0.45rem;
+  }
+
+  .entry-head h3 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .entry-dates {
+    font-size: 0.82rem;
   }
 
   .stats-item {
