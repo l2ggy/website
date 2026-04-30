@@ -182,6 +182,7 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
     const dot = marker.isHome
       ? Math.max(2.8, radius * 0.022)
       : Math.max(1.4, radius * (0.012 + Math.min(weight, 12) * 0.0016));
+    const outline = Math.max(0.75, dpr * 0.55);
 
     if (marker.isHome) {
       ctx.beginPath();
@@ -195,6 +196,12 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
     ctx.arc(x, y, dot, 0, TAU);
     ctx.fillStyle = marker.isHome ? HOME_MARKER_COLOR : VISITOR_MARKER_COLOR;
     ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(x, y, dot, 0, TAU);
+    ctx.strokeStyle = marker.isHome ? "rgba(255, 255, 255, 0.78)" : "rgba(8, 12, 22, 0.38)";
+    ctx.lineWidth = outline;
+    ctx.stroke();
   });
 };
 
