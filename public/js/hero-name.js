@@ -42,9 +42,35 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
-  showPlainName();
-  heroName.addEventListener("pointerenter", showAnimatedName);
-  heroName.addEventListener("focusin", showAnimatedName);
-  heroName.addEventListener("pointerleave", showPlainName);
-  heroName.addEventListener("focusout", showPlainName);
+  const supportsHoverCursor = window.matchMedia("(any-hover: hover) and (any-pointer: fine)").matches;
+
+  let isAnimated = false;
+  let lastPointerType = "";
+  const toggleAnimatedName = () => {
+    if (isAnimated) {
+      showPlainName();
+    } else {
+      showAnimatedName();
+    }
+    isAnimated = !isAnimated;
+  };
+
+  heroName.addEventListener("pointerdown", (event) => {
+    lastPointerType = event.pointerType;
+  });
+
+  heroName.addEventListener("click", () => {
+    if (supportsHoverCursor && lastPointerType !== "touch" && lastPointerType !== "pen") {
+      return;
+    }
+    toggleAnimatedName();
+  });
+
+  if (supportsHoverCursor) {
+    showPlainName();
+    heroName.addEventListener("pointerenter", showAnimatedName);
+    heroName.addEventListener("focusin", showAnimatedName);
+    heroName.addEventListener("pointerleave", showPlainName);
+    heroName.addEventListener("focusout", showPlainName);
+  }
 };
