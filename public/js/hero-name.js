@@ -42,9 +42,46 @@ export const splitHeroNameLetters = () => {
     requestAnimationFrame(() => heroName.classList.add("hero-name-animate"));
   };
 
-  showPlainName();
-  heroName.addEventListener("pointerenter", showAnimatedName);
-  heroName.addEventListener("focusin", showAnimatedName);
-  heroName.addEventListener("pointerleave", showPlainName);
-  heroName.addEventListener("focusout", showPlainName);
+  let isTapLocked = false;
+
+  heroName.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse") {
+      return;
+    }
+
+    if (isTapLocked) {
+      showPlainName();
+    } else {
+      showAnimatedName();
+    }
+    isTapLocked = !isTapLocked;
+  });
+
+  heroName.addEventListener("pointerenter", (event) => {
+    if (event.pointerType !== "mouse" || isTapLocked) {
+      return;
+    }
+    showAnimatedName();
+  });
+
+  heroName.addEventListener("pointerleave", (event) => {
+    if (event.pointerType !== "mouse" || isTapLocked) {
+      return;
+    }
+    showPlainName();
+  });
+
+  heroName.addEventListener("focusin", () => {
+    if (isTapLocked) {
+      return;
+    }
+    showAnimatedName();
+  });
+
+  heroName.addEventListener("focusout", () => {
+    if (isTapLocked) {
+      return;
+    }
+    showPlainName();
+  });
 };
