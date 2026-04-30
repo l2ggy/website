@@ -296,6 +296,13 @@ button {
   margin-left: auto;
 }
 
+.hero-globe-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: visible;
+}
+
 .globe-visitor-count {
   margin-bottom: var(--space-1);
   color: var(--muted);
@@ -304,14 +311,19 @@ button {
 }
 
 .hero-globe {
-  width: 100%;
-  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(100% * var(--globe-scale, 1));
+  height: calc(100% * var(--globe-scale, 1));
+  transform: translate(-50%, -50%);
   display: block;
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
   -webkit-user-drag: none;
   cursor: grab;
+  transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1), height 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .hero-globe:active {
