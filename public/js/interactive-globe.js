@@ -191,10 +191,20 @@ const renderMarkers = (ctx, center, radius, yaw, pitch, dpr, markers) => {
       ctx.stroke();
     }
 
+    const fillColor = marker.isHome ? HOME_MARKER_COLOR : VISITOR_MARKER_COLOR;
+    const strokeColor = marker.isHome ? "#f8fbff" : "#f4e5da";
+
     ctx.beginPath();
     ctx.arc(x, y, dot, 0, TAU);
-    ctx.fillStyle = marker.isHome ? HOME_MARKER_COLOR : VISITOR_MARKER_COLOR;
+    ctx.fillStyle = fillColor;
+    ctx.shadowColor = `${fillColor}66`;
+    ctx.shadowBlur = Math.max(1.5, dpr * 1.2);
     ctx.fill();
+
+    ctx.lineWidth = Math.max(0.7, dpr * 0.55);
+    ctx.strokeStyle = strokeColor;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
   });
 };
 
