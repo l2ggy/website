@@ -635,14 +635,11 @@ body.is-globe-dragging * {
 @media (max-width: 700px) {
   :root {
     --footer-h: 64px;
+    --entry-icon-size: 41.4px;
   }
 
   .container {
     width: calc(100% - 1.2rem);
-  }
-
-  .entry-dates {
-    text-align: left;
   }
 
   .hero {
@@ -684,10 +681,9 @@ body.is-globe-dragging * {
     margin-top: var(--space-1);
   }
 
-  .entry-head {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.08rem;
+  .entry h3,
+  .entry p {
+    font-size: 0.9em;
   }
 
   .stats-item {
