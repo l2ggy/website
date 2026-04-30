@@ -240,6 +240,7 @@ export const setupInteractiveGlobe = (markers = []) => {
   let pointerStartX = 0;
   let pointerStartY = 0;
   let pointerMoved = false;
+  let sizeUpdateQueued = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
   const getRenderDpr = () => {
@@ -258,6 +259,18 @@ export const setupInteractiveGlobe = (markers = []) => {
     globe.height = pixelSize;
     sphere = buildSphereSamples(pixelSize);
     frameBuffer = ctx.createImageData(pixelSize, pixelSize);
+  };
+
+  const scheduleSizeUpdate = () => {
+    if (sizeUpdateQueued) {
+      return;
+    }
+    sizeUpdateQueued = true;
+    window.requestAnimationFrame(() => {
+      sizeUpdateQueued = false;
+      updateSize();
+      draw();
+    });
   };
 
   const updateColors = () => {
@@ -380,8 +393,7 @@ export const setupInteractiveGlobe = (markers = []) => {
     if (!pointerMoved) {
       isZoomed = !isZoomed;
       globe.classList.toggle("is-zoomed", isZoomed);
-      updateSize();
-      draw();
+      scheduleSizeUpdate();
     }
   };
 
@@ -400,7 +412,8 @@ export const setupInteractiveGlobe = (markers = []) => {
     start();
   });
 
-  window.addEventListener("resize", updateSize);
+  window.addEventListener("resize", scheduleSizeUpdate);
+  new ResizeObserver(scheduleSizeUpdate).observe(globe);
   new MutationObserver(updateColors).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"],
