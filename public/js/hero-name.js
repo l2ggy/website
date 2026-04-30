@@ -18,7 +18,7 @@ export const splitHeroNameLetters = () => {
     span.setAttribute("aria-hidden", "true");
     return span;
   });
-  const plainResetDurationMs = 320 + letterSpans.length * 18;
+  const plainResetDurationMs = 200;
   let plainResetTimeoutId = null;
 
   const randomizeHeroLetters = () => {
@@ -34,6 +34,7 @@ export const splitHeroNameLetters = () => {
       return;
     }
     heroName.classList.remove("hero-name-animate");
+    heroName.classList.add("hero-name-resetting");
     if (plainResetTimeoutId) {
       window.clearTimeout(plainResetTimeoutId);
     }
@@ -51,6 +52,7 @@ export const splitHeroNameLetters = () => {
       plainResetTimeoutId = null;
     }
     randomizeHeroLetters();
+    heroName.classList.remove("hero-name-resetting");
     heroName.classList.remove("hero-name-animate");
     heroName.classList.add("hero-name-split");
     heroName.setAttribute("aria-label", originalText);
