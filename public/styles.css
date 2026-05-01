@@ -110,9 +110,11 @@ button {
 }
 
 .logo-slot,
-.text-btn {
+.text-btn,
+.logo-wordmark {
   color: var(--muted);
   font-size: 0.84rem;
+  line-height: 1.2;
 }
 
 .logo-slot {
@@ -128,12 +130,12 @@ button {
   display: block;
 }
 
-.text-btn {
+.bar-link {
   position: relative;
-  transition: color 180ms ease, transform 180ms ease;
+  transition: color 180ms ease;
 }
 
-.text-btn::after {
+.bar-link::after {
   content: "";
   position: absolute;
   left: 0;
@@ -146,14 +148,18 @@ button {
   transition: transform 180ms ease;
 }
 
-.text-btn:hover,
-.text-btn:focus-visible {
+.bar-link:hover,
+.bar-link:focus-visible {
   color: var(--text);
 }
 
-.text-btn:hover::after,
-.text-btn:focus-visible::after {
+.bar-link:hover::after,
+.bar-link:focus-visible::after {
   transform: scaleX(1);
+}
+
+.text-btn {
+  transition: color 180ms ease, transform 180ms ease;
 }
 
 .text-btn:active {
