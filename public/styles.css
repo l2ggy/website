@@ -121,6 +121,32 @@ button {
   align-items: center;
 }
 
+
+.logo-wordmark {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--text);
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--card) 30%, transparent);
+  position: relative;
+}
+
+.logo-wordmark::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.22em;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line), var(--text) 45%, var(--line));
+  opacity: 0.8;
+}
+
+.logo-slot:hover .logo-wordmark,
+.logo-slot:focus-visible .logo-wordmark {
+  color: color-mix(in srgb, var(--text) 82%, var(--muted));
+}
+
 .site-icon {
   width: 32px;
   height: 32px;
