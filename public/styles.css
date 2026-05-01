@@ -116,9 +116,52 @@ button {
 }
 
 .logo-slot {
+  position: relative;
   display: inline-flex;
   gap: 0.5rem;
   align-items: center;
+}
+
+.logo-wordmark {
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-wordmark::after {
+  content: "";
+  position: absolute;
+  inset: -10% auto -10% 0;
+  width: 40%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0.2) 52%,
+    rgba(255, 255, 255, 0.08) 60%,
+    transparent 100%
+  );
+  transform: translateX(-180%);
+}
+
+.logo-slot:hover .logo-wordmark::after,
+.logo-slot:focus-visible .logo-wordmark::after {
+  animation: logo-wordmark-glint 380ms ease-out 1;
+}
+
+@keyframes logo-wordmark-glint {
+  0% {
+    opacity: 0;
+    transform: translateX(-180%);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(290%);
+  }
 }
 
 .site-icon {
@@ -632,6 +675,11 @@ body.is-globe-dragging * {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .logo-slot:hover .logo-wordmark::after,
+  .logo-slot:focus-visible .logo-wordmark::after {
+    animation: none;
+  }
+
   .subsection-item,
   .theme-icon,
   .theme-icon__sun,
