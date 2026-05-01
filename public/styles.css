@@ -121,6 +121,25 @@ button {
   align-items: center;
 }
 
+.logo-wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0 0.48rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  line-height: 1;
+  background: transparent;
+  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.logo-slot:hover .logo-wordmark,
+.logo-slot:focus-visible .logo-wordmark {
+  color: var(--text);
+  background: color-mix(in srgb, var(--muted) 8%, transparent);
+}
+
 .site-icon {
   width: 32px;
   height: 32px;
