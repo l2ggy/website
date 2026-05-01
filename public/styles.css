@@ -117,15 +117,22 @@ button {
 
 .logo-slot {
   display: inline-flex;
-  gap: 0.5rem;
-  align-items: center;
+  gap: 0.42rem;
+  align-items: baseline;
 }
 
 .site-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
   display: block;
+}
+
+.logo-wordmark {
+  line-height: 1;
+  transform: translateY(0.03em);
 }
 
 .text-btn {
@@ -742,5 +749,15 @@ body.is-globe-dragging * {
 
   .hero h1 {
     font-size: 2.3rem;
+  }
+
+  .logo-slot {
+    gap: 0.38rem;
+  }
+
+  .site-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
   }
 }
