@@ -121,6 +121,33 @@ button {
   align-items: center;
 }
 
+.logo-wordmark {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+}
+
+.logo-wordmark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 65%
+  );
+  opacity: 0;
+  transform: translateX(-135%);
+  pointer-events: none;
+}
+
+.logo-slot:hover .logo-wordmark::after,
+.logo-slot:focus-visible .logo-wordmark::after {
+  opacity: 0.7;
+  animation: wordmark-glint 380ms ease-out 1;
+}
+
 .site-icon {
   width: 32px;
   height: 32px;
@@ -627,6 +654,16 @@ body.is-globe-dragging * {
   fill: var(--text);
 }
 
+@keyframes wordmark-glint {
+  from {
+    transform: translateX(-135%);
+  }
+
+  to {
+    transform: translateX(135%);
+  }
+}
+
 .footer-content {
   font-size: 0.8rem;
 }
@@ -642,6 +679,12 @@ body.is-globe-dragging * {
 
   .theme-toggle:active::before {
     animation: none;
+  }
+
+  .logo-slot:hover .logo-wordmark::after,
+  .logo-slot:focus-visible .logo-wordmark::after {
+    animation: none;
+    opacity: 0;
   }
 }
 
