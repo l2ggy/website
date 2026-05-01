@@ -9,6 +9,8 @@
   --bg: #121212;
   --text: #d7d7d7;
   --muted: #a1a1a1;
+  --wordmark-tone-start: #b4b4b4;
+  --wordmark-tone-end: #d0d0d0;
   --line: #2a2a2a;
 }
 
@@ -16,6 +18,8 @@
   --bg: #f4f4f4;
   --text: #161616;
   --muted: #505050;
+  --wordmark-tone-start: #5a5a5a;
+  --wordmark-tone-end: #2a2a2a;
   --line: #d5d5d5;
 }
 
@@ -119,6 +123,24 @@ button {
   display: inline-flex;
   gap: 0.5rem;
   align-items: center;
+}
+
+.logo-wordmark {
+  color: var(--text);
+  background-image: linear-gradient(
+    120deg,
+    var(--wordmark-tone-start) 0%,
+    var(--wordmark-tone-end) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: opacity 180ms ease;
+}
+
+.logo-slot:hover .logo-wordmark,
+.logo-slot:focus-visible .logo-wordmark {
+  opacity: 0.92;
 }
 
 .site-icon {
