@@ -121,6 +121,20 @@ button {
   align-items: center;
 }
 
+
+.logo-wordmark {
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  font-variant-caps: all-small-caps;
+  color: var(--muted);
+  transition: color 180ms ease;
+}
+
+.logo-slot:hover .logo-wordmark,
+.logo-slot:focus-visible .logo-wordmark {
+  color: var(--text);
+}
 .site-icon {
   width: 32px;
   height: 32px;
