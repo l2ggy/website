@@ -250,6 +250,7 @@ export const setupInteractiveGlobe = (markers = []) => {
   let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+  const isDesktopScreen = () => window.matchMedia("(min-width: 701px)").matches;
   const getZoomScale = () => {
     const raw = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--globe-zoom-scale"));
     const preferred = Number.isFinite(raw) && raw > 1 ? raw : 1.85;
@@ -422,6 +423,15 @@ export const setupInteractiveGlobe = (markers = []) => {
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
     if (!pointerMoved) {
+      if (isDesktopScreen()) {
+        const desktopScale = getZoomScale();
+        isZoomed = true;
+        globeWrap.classList.add("is-zoomed");
+        globe.style.setProperty("--globe-scale", `${desktopScale}`);
+        refreshRenderScale(desktopScale);
+        scheduleIdleQuality(desktopScale, 360);
+        return;
+      }
       isZoomed = !isZoomed;
       const nextScale = isZoomed ? getZoomScale() : 1;
       globeWrap.classList.toggle("is-zoomed", isZoomed);
@@ -434,7 +444,11 @@ export const setupInteractiveGlobe = (markers = []) => {
   };
 
   const start = () => {
-    updateSize(1);
+    const initialScale = isDesktopScreen() ? getZoomScale() : 1;
+    isZoomed = isDesktopScreen();
+    globeWrap.classList.toggle("is-zoomed", isZoomed);
+    globe.style.setProperty("--globe-scale", `${initialScale}`);
+    updateSize(initialScale);
     updateColors();
     draw();
     isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -449,7 +463,17 @@ export const setupInteractiveGlobe = (markers = []) => {
   });
 
   window.addEventListener("resize", () => {
+    if (isDesktopScreen()) {
+      isZoomed = true;
+      globeWrap.classList.add("is-zoomed");
+      const desktopScale = getZoomScale();
+      globe.style.setProperty("--globe-scale", `${desktopScale}`);
+      updateSize(desktopScale);
+      draw();
+      return;
+    }
     updateSize(isZoomed ? getZoomScale() : 1);
+    draw();
   });
   new MutationObserver(updateColors).observe(document.documentElement, {
     attributes: true,
