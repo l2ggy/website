@@ -242,7 +242,8 @@ export const setupInteractiveGlobe = (markers = []) => {
   let frameBuffer = null;
   let lineColor = "#d9dce1";
   let textColor = "#15191f";
-  let isZoomed = false;
+  const isMobileLayout = () => window.matchMedia("(max-width: 700px)").matches;
+  let isZoomed = !isMobileLayout();
   let isInteracting = false;
   let settleTimer = null;
   let pointerStartX = 0;
@@ -421,7 +422,7 @@ export const setupInteractiveGlobe = (markers = []) => {
     pointerId = null;
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
-    if (!pointerMoved) {
+    if (!pointerMoved && isMobileLayout()) {
       isZoomed = !isZoomed;
       const nextScale = isZoomed ? getZoomScale() : 1;
       globeWrap.classList.toggle("is-zoomed", isZoomed);
@@ -434,7 +435,10 @@ export const setupInteractiveGlobe = (markers = []) => {
   };
 
   const start = () => {
-    updateSize(1);
+    const initialScale = isZoomed ? getZoomScale() : 1;
+    globeWrap.classList.toggle("is-zoomed", isZoomed);
+    globe.style.setProperty("--globe-scale", `${initialScale}`);
+    updateSize(initialScale);
     updateColors();
     draw();
     isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -449,7 +453,13 @@ export const setupInteractiveGlobe = (markers = []) => {
   });
 
   window.addEventListener("resize", () => {
-    updateSize(isZoomed ? getZoomScale() : 1);
+    if (!isMobileLayout()) {
+      isZoomed = true;
+    }
+    const nextScale = isZoomed ? getZoomScale() : 1;
+    globeWrap.classList.toggle("is-zoomed", isZoomed);
+    globe.style.setProperty("--globe-scale", `${nextScale}`);
+    updateSize(nextScale);
   });
   new MutationObserver(updateColors).observe(document.documentElement, {
     attributes: true,
