@@ -250,6 +250,7 @@ export const setupInteractiveGlobe = (markers = []) => {
   let pointerMoved = false;
 
   const isCoarsePointer = () => window.matchMedia("(pointer: coarse)").matches;
+  const isDesktopScreen = () => window.matchMedia("(min-width: 701px)").matches;
   const getZoomScale = () => {
     const raw = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--globe-zoom-scale"));
     const preferred = Number.isFinite(raw) && raw > 1 ? raw : 1.85;
@@ -422,6 +423,10 @@ export const setupInteractiveGlobe = (markers = []) => {
     document.body.classList.remove("is-globe-dragging");
     globe.releasePointerCapture(event.pointerId);
     if (!pointerMoved) {
+      if (isDesktopScreen()) {
+        scheduleIdleQuality(getZoomScale());
+        return;
+      }
       isZoomed = !isZoomed;
       const nextScale = isZoomed ? getZoomScale() : 1;
       globeWrap.classList.toggle("is-zoomed", isZoomed);
@@ -434,7 +439,11 @@ export const setupInteractiveGlobe = (markers = []) => {
   };
 
   const start = () => {
-    updateSize(1);
+    const initialScale = isDesktopScreen() ? getZoomScale() : 1;
+    isZoomed = isDesktopScreen();
+    globeWrap.classList.toggle("is-zoomed", isZoomed);
+    globe.style.setProperty("--globe-scale", `${initialScale}`);
+    updateSize(initialScale);
     updateColors();
     draw();
     isAnimating = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -449,7 +458,12 @@ export const setupInteractiveGlobe = (markers = []) => {
   });
 
   window.addEventListener("resize", () => {
-    updateSize(isZoomed ? getZoomScale() : 1);
+    const desktop = isDesktopScreen();
+    isZoomed = desktop ? true : false;
+    globeWrap.classList.toggle("is-zoomed", isZoomed);
+    const scale = desktop ? getZoomScale() : 1;
+    globe.style.setProperty("--globe-scale", `${scale}`);
+    updateSize(scale);
   });
   new MutationObserver(updateColors).observe(document.documentElement, {
     attributes: true,
